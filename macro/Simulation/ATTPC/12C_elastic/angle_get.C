@@ -1,0 +1,404 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <TCanvas.h>
+#include <TEventList.h>
+#include <TH1F.h>
+#include <TH2.h>
+#include <TROOT.h>
+#include <TTree.h>
+#include <TFile.h>
+#include"TString.h"
+#include"TFile.h"
+#include"TTree.h"
+#include"TH1.h"
+#include"TH2.h"
+#include"TH3.h"
+#include"TClonesArray.h"
+#include"TCanvas.h"
+#include"TMath.h"
+#include<fstream>
+#include<vector>
+#include"TChain.h"
+
+void angle_get(int sub=0, string filenum="0"){
+    
+  //set timer
+  TStopwatch timer;
+  timer.Start();
+  
+  //set constants
+  Double_t mass[2];
+  Double_t c12_mass=11177.736;  
+  Double_t h1_mass=938.7669711;
+  Double_t pi=3.1415926535;
+  Double_t rad_to_deg=180/pi;
+  Double_t dz=1;
+  int GtoM2=1e6;
+  
+  //set variable
+  // want to get
+  Int_t eve, eenb, eens, eeno, n, np, enpb, enps, enpo, s, p;
+  Int_t massnum[2]={-100,-100};
+  Int_t atomnum[2]={-100,-100};
+  Int_t massstop=-1000;
+  Int_t atomstop=-1000;
+  Int_t massstar=-1000;
+  Int_t atomstar=-1000;
+  Int_t masstemp[2]={-100,-100};
+  Int_t atomtemp[2]={-100,-100};
+  Int_t massbefo[2]={-100,-100};
+  Int_t atombefo[2]={-100,-100};
+  Int_t ne=0;
+  Int_t ne_b=0;
+  Int_t ne_s=0;
+  Int_t ne_es=0;
+  Int_t ne_eb=0;
+  Int_t ne_eo=0;
+  Int_t trackid=-100;
+  Double_t ener[2]={0,0};
+  Double_t ener_max, tener;
+  Double_t lab_theta[2];
+  Double_t cms_theta[2];
+  Double_t bx, by, bz, pba;
+  Double_t startx[2];
+  Double_t starty[2];
+  Double_t startz[2];
+  Double_t stopx[2];
+  Double_t stopy[2];
+  Double_t stopz[2];
+  Double_t p_gx, p_gy, p_gz, p_ga, deltaE, been, momd;
+  Double_t pxc[2];
+  Double_t pyc[2];
+  Double_t pzc[2];
+  Double_t pac[2];
+  Double_t psp[2];
+  Double_t pbx, pby, pbz;
+  Double_t px[2]={0,0};
+  Double_t py[2]={0,0};
+  Double_t pz[2]={0,0};
+  Double_t pa[2]={0,0};
+  Double_t sp[2]={0,0};
+  bool beam_start=true;
+  bool scat_start[2]={true,true};
+
+  //input
+  //  TString infname = "data1/attpcsim_"+ filenum + filenum +"_" + to_string(sub) + ".root";
+  TString infname = "data2/attpcsim_"+ filenum + filenum +"_130matm_" + to_string(sub) + ".root";
+  if(filenum=="12c" || filenum=="p"){
+    cout<<"get angle about "<<filenum+filenum<<" "<<sub<<"."<<endl;
+  }
+  else {
+    cout<<"error about filenumber at sign in getang function!! end this macro!"<<endl;
+    gSystem->Exit(0);
+  }
+
+  TFile *file =new TFile(infname);  
+  TTree *tree = (TTree*)file->Get("cbmsim");
+
+  // set reading data
+  AtMCTrack* track=new AtMCTrack();
+  TClonesArray *trackArray=0;
+  tree= (TTree*) file->Get("cbmsim");
+  tree->SetBranchAddress("MCTrack",&trackArray);
+
+  //get AtMCPoint data
+  AtMCPoint* point = new AtMCPoint();    
+  TClonesArray *pointArray=0;
+  tree->SetBranchAddress("AtTpcPoint",&pointArray);
+  Int_t nEvents=tree->GetEntriesFast();
+  Int_t n_d[nEvents];
+  cout<<endl;
+
+  //set output
+  //  TString outfname = "data1/check_posi_ang_"+ filenum +"_" + to_string(sub) + ".root";
+  TString outfname = "data1/check_posi_ang_"+ filenum +"_130matm_" + to_string(sub) + ".root";
+  /*
+  if(filenum==0){
+    TString outfname = "data1/check_posi_ang_12c_" + to_string(sub) + ".root";
+  }
+  else if(filenum==1){
+    TString outfname = "data1/check_posi_ang_p_" + to_string(sub) + ".root";
+  }
+  else{cout<<"error about filenumber at setting output in getang function"<<endl;}
+  */
+  
+  TFile *simmacro=new TFile(outfname, "recreate");
+  TTree *anadata = new TTree("anadata","anadata");
+  TTree *expbeam = new TTree("expbeam","expbeam");
+  TTree *expscat = new TTree("expscat","expscat");
+  TTree *expothe = new TTree("expothe","expothe");
+
+  // new branch for simmacro.root
+  anadata->Branch("event_number",&eve,"eve/I");
+  anadata->Branch("startx",&startx,"startx[2]/D");
+  anadata->Branch("starty",&starty,"starty[2]/D");
+  anadata->Branch("startz",&startz,"startz[2]/D");
+  anadata->Branch("stopx",&stopx,"stopx[2]/D");
+  anadata->Branch("stopy",&stopy,"stopy[2]/D");
+  anadata->Branch("stopz",&stopz,"stopz[2]/D");
+  anadata->Branch("massnum",&massnum,"massnum[2]/I");
+  anadata->Branch("atomnum",&atomnum,"atomnum[2]/I");
+  anadata->Branch("Energy",&ener,"ener[2]/D");
+  anadata->Branch("ener_max",&ener_max,"ener_max/D");
+  anadata->Branch("TotalE",&tener,"TotalE/D");
+  anadata->Branch("theta_lab",&lab_theta,"theta_lab[2]/D");
+  anadata->Branch("theta_cms",&cms_theta,"theta_cms[2]/D");
+  anadata->Branch("n",&n,"n/I");
+  // the branch in other tree
+  expbeam->Branch("event_number_beam",&eenb,"eenb/I");
+  expbeam->Branch("number_of_particle_beam",&enpb,"enpb/I");
+  expscat->Branch("event_number_scat",&eens,"eens/I");
+  expscat->Branch("number_of_particle_scat",&enps,"enps/I");
+  expothe->Branch("event_number_other",&eeno,"eeno/I");
+  expothe->Branch("number_of_particle_other",&enpo,"enpo/I");
+  
+  // analysis of attpcsim.root
+  for(int i=0;i < nEvents; i++){
+    tree->GetEvent(i);
+    p=trackArray->GetEntries();
+    n_d[i]=p;
+    if(i%100==0) {
+      //need
+      cout<<"Get data "<<100*i/nEvents <<" % !           \r"<<flush;
+    }
+  }
+  cout<<"Get data 100 % !                     \r"<<flush;
+  for(int i=0;i < nEvents; i++){
+  //  for(int i=0;i < 100; i++){
+    if(i%1000==0) {
+      //need
+      cout<<"Finish "<<100*i/nEvents <<" % !             \r"<<flush;
+    }
+    eve = i;    
+    ne++;
+    // initialization
+    for(int pernum=0; pernum<2; pernum++){
+      startx[pernum]=-1000;
+      starty[pernum]=-1000;
+      startz[pernum]=-1000;
+      stopx[pernum]=-1000;
+      stopy[pernum]=-1000;
+      stopz[pernum]=-1000;
+    }   
+    lab_theta[0]=-1000;
+    cms_theta[0]=-1000;
+    p_gx=-1000;
+    p_gy=-1000;
+    p_gz=-1000;
+    pxc[0]=-1000;
+    pyc[0]=-1000;
+    pzc[0]=-1000;
+    pxc[1]=-1000;
+    pyc[1]=-1000;
+    pzc[1]=-1000;
+    //    rmax_nd=-1000;
+    
+    //get event
+    tree->GetEvent(i);
+    n=trackArray->GetEntries();
+    np=pointArray->GetEntries();
+    //    cout<<i <<" "<<n<<endl;
+
+    //calculate energy, ang
+    //set for beam event
+    if (i%2==0 && n==1) {
+      ne_b++;
+      point=(AtMCPoint*)pointArray->At(0); // get the point information
+      trackid=(int)(point->GetTrackID()); //get track ID
+      if(trackid==0){
+	massstar=point->GetMassNum();
+	atomstar=point->GetAtomicNum();
+	//cout<<i<<"  mass number "<<massstar<<endl;
+	if(massstar==12 && atomstar==6){
+	  startx[0]=point->GetX();
+	  starty[0]=point->GetY();
+	  startz[0]=point->GetZ();
+	  startx[1]=0;
+	  starty[1]=0;
+	  startz[1]=0;
+	  px[0]=point->GetPx();
+	  py[0]=point->GetPy();
+	  pz[0]=point->GetPz();
+	  px[1]=0;
+	  py[1]=0;
+	  pz[1]=0;
+	  ener[0]=(px[0]*px[0]+py[0]*py[0]+pz[0]*pz[0])*GtoM2/c12_mass/2;
+	  ener[1]=0;
+	  ener_max=0;
+	  tener=0;
+	  pxc[0]=0;
+	  pyc[0]=0;
+	  pzc[0]=0;
+	  pxc[1]=0;
+	  pyc[1]=0;
+	  pzc[1]=0;
+	  lab_theta[0]=0;
+	  lab_theta[1]=0;
+	  cms_theta[0]=0;
+	  cms_theta[1]=0;
+	}
+      }
+      else {cout<<i<<" something is wrong with track ID at start point in beam event !!!     "<<endl<<endl;}
+
+      for(int k=0; k<np; k++){
+	point=(AtMCPoint*)pointArray->At(k); // get the point information
+	trackid=(int)(point->GetTrackID()); //get track ID
+	massstop=point->GetMassNum();
+	atomstop=point->GetAtomicNum();
+	if(trackid==0 && massstop==12 && atomstop==6 ){
+	  //	cout<<i<<"  mass number "<<massstop<<endl;
+	  stopx[0]=point->GetX();
+	  stopy[0]=point->GetY();
+	  stopz[0]=point->GetZ();
+	  stopx[1]=0;
+	  stopy[1]=0;
+	  stopz[1]=0;
+	  bx=stopx[0];
+	  by=stopy[0];
+	  bz=stopz[0];
+	  pbx=point->GetPx();
+	  pby=point->GetPy();
+	  pbz=point->GetPz();
+	  pba=sqrt(pbx*pbx+pby*pby+pbz*pbz);
+	  if(massstar==massstop && atomstar==atomstop){
+	    massnum[0]=massstop;
+	    massnum[1]=0;
+	    atomnum[0]=atomstop;
+	    atomnum[1]=0;
+	  }
+	  else {cout<<i<<"  "<<k<<" something is wrong with mass and atomic number at start and stop in beam event !!!"<<endl<<endl;
+	  }
+	}
+	else {cout<<i<<" something is wrong with track ID at end point in beam event !!!     "<<endl<<endl;}
+      }
+    }
+
+    //exclude beam and strange event(n>2)
+    else if (i%2==1 && n==2 && n_d[i-1]==1) {
+      for(int j=0; j<n ; j++){	
+	scat_start[0]=true;
+	scat_start[1]=true;
+	for(int k=0; k<np ; k++){
+	  point=(AtMCPoint*)pointArray->At(k);
+	  trackid=(int)(point->GetTrackID());
+	  if(trackid==j){
+	    masstemp[j]=point->GetMassNum();
+	    atomtemp[j]=point->GetAtomicNum();
+	    if(scat_start[j]){
+	      massbefo[j]=masstemp[j];
+	      atombefo[j]=atomtemp[j];
+	      startx[j]=point->GetX();
+	      starty[j]=point->GetY();
+	      startz[j]=point->GetZ();
+	      px[j]=point->GetPx();
+	      py[j]=point->GetPy();
+	      pz[j]=point->GetPz();
+	      scat_start[j]=false;
+	    }
+	    stopx[j]=point->GetX();
+	    stopy[j]=point->GetY();
+	    stopz[j]=point->GetZ();
+	    if(masstemp[j]==massbefo[j] && atomtemp[j]==atombefo[j]){
+	      massnum[j]=masstemp[j];
+	      atomnum[j]=atomtemp[j];
+	    }
+	    else{cout<<i<<"  "<<j<<" something wrong with mass and atomic number in scattering event !!!   "<<endl<<endl;}
+	    massbefo[j]=masstemp[j];
+	    atombefo[j]=atomtemp[j];
+	  }
+	}
+	if (massnum[j]==12 && atomnum[j]==6) {
+	  mass[j]=c12_mass;
+	  ener[j]=(px[j]*px[j]+py[j]*py[j]+pz[j]*pz[j])*GtoM2/mass[j]/2;
+	  pa[j]=sqrt(px[j]*px[j]+py[j]*py[j]+pz[j]*pz[j]); //abs vector
+	  sp[j]=pbx*px[j]+pby*py[j]+pbz*pz[j];  //scalar product
+	  lab_theta[j]=rad_to_deg*acos(sp[j]/(pba*pa[j]));
+	}
+	else if (massnum[j]==1 && atomnum[j]==1) {
+	  mass[j]=h1_mass;
+	  ener[j]=(px[j]*px[j]+py[j]*py[j]+pz[j]*pz[j])*GtoM2/h1_mass/2;
+	  pa[j]=sqrt(px[j]*px[j]+py[j]*py[j]+pz[j]*pz[j]); //abs vector
+	  sp[j]=pbx*px[j]+pby*py[j]+pbz*pz[j];  //scalar product
+	  lab_theta[j]=rad_to_deg*acos(sp[j]/(pba*pa[j]));
+	}
+	else {cout<<i<<" "<<j<<" something is wrong with mass and atomic number !!!     "<<endl<<endl;}
+      }
+      //total energy
+      tener=(ener[0]+ener[1]);
+      if(ener[0] >  ener[1]) ener_max = ener[0];
+      if(ener[0] <= ener[1]) ener_max = ener[1];      
+      p_gx=c12_mass*pbx/(mass[0]+mass[1]);
+      p_gy=c12_mass*pby/(mass[0]+mass[1]);
+      p_gz=c12_mass*pbz/(mass[0]+mass[1]);
+      p_ga=sqrt(p_gx*p_gx+p_gy*p_gy+p_gz*p_gz); //abs vector in cms
+      
+      //about angle in cms
+      for(int k=0; k<n; k++){
+	pxc[k]=px[k]-p_gx;
+	pyc[k]=py[k]-p_gy;
+	pzc[k]=pz[k]-p_gz;
+	pac[k]=sqrt(pxc[k]*pxc[k]+pyc[k]*pyc[k]+pzc[k]*pzc[k]); //abs vector in cms
+	psp[k]=p_gx*pxc[k]+p_gy*pyc[k]+p_gz*pzc[k]; // scalar product
+	cms_theta[k]=rad_to_deg*acos(psp[k]/(p_ga*pac[k]));
+      }
+    }
+
+    //display n>3 event    
+    //exclude the beam event
+    else if (i%2==1 && n>2) {
+      eens=i;
+      enps=n;
+      ne_es++;
+      expscat->Fill();
+      continue;
+    }
+    else if (i%2==0) {
+      eenb=i;
+      enpb=n;
+      ne_eb++;
+      expbeam->Fill();
+      continue;
+    }
+    else {
+      eeno=i;
+      enpo=n;
+      ne_eo++;
+      expothe->Fill();
+      //      cout<<i <<" "<<n<<endl;
+      continue;      
+    }
+    if(i%2==1 && n<3) {
+      ne_s++;
+      anadata->Fill();
+    }
+    else if(i%2==0 && n<2) {anadata->Fill();}
+    else{continue;}
+  }
+  anadata->AutoSave();
+  expscat->AutoSave();
+  expbeam->AutoSave();
+  expothe->AutoSave();
+  simmacro->Close();
+  cout<<"Finish 100 % !                 \r"<<flush;
+  /*
+  cout<<"all event "<<ne<<"   beam event "<<ne_b<<"   scattaring event "<<ne_s<<endl;
+  cout<<"except event "<<ne_es+ne_eb+ne_eo<<endl;
+  cout<<"except scattering event "<<ne_es<<endl;
+  cout<<"except beam event "<<ne_eb<<endl;
+  cout<<"except other problem event "<<ne_eo<<endl;
+  */
+  if(filenum=="12c"){cout<<"12c12c finished get angle "<<sub<<" file"<<flush;}
+  else if(filenum=="p"){cout<<"12cp finished get angle "<<sub<<" file"<<flush;}
+  else{cout<<"error about filenumber at sign in getang function"<<endl;}
+
+  // stop timer
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+  cout << endl;
+  cout << "output: " << outfname << endl;
+  cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
+  return 0;
+
+}

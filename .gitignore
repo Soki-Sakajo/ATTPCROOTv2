@@ -1,0 +1,59 @@
+*.swp
+*.root
+*.log
+*.graw
+gphysi.dat
+core_dump*
+build
+lib
+include
+bin
+!*/build
+data
+.vscode
+*~
+*#*
+event.dat
+pulser-files.txt
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.ko
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+*.lib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Compressed packages
+*.tar.bz2
+*.tar.gz
+*.zip
+
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+doxygen/html
+doxygen/latex
+macros/data
+.DS_Store
+.nfs*
+compiled/E20009Analysis/.NabinWorkDir/

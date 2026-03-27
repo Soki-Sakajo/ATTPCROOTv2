@@ -1,0 +1,7 @@
+root -l "C12_12C12C_decay_sequential_70matm.C"
+root -l "C12_12C12C_decay_sequential_80matm.C"
+root -l "C12_12C12C_decay_sequential_90matm.C"
+root -l "C12_12C12C_decay_sequential_100matm.C"
+root -l "C12_12C12C_decay_sequential_110matm.C"
+root -l "C12_12C12C_decay_sequential_120matm.C"
+root -l "C12_12C12C_decay_sequential_130matm.C"

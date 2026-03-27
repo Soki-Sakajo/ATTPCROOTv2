@@ -1,0 +1,8 @@
+root -l "run_digi_12c12c_rcnp_attpc_80matm.C"
+root -l "run_digi_12c12c_rcnp_attpc_90matm.C"
+root -l "run_digi_12c12c_rcnp_attpc_100matm.C"
+root -l "run_digi_12c12c_rcnp_attpc_110matm.C"
+root -l "run_digi_12c12c_rcnp_attpc_120matm.C"
+root -l "run_digi_12c12c_rcnp_attpc_130matm.C"
+
+
