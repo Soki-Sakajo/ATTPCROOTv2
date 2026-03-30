@@ -8,6 +8,7 @@ bool reduceFunc(AtRawEvent *evt){
 }
 
 void unpack_rcnp_129matm(int run_num = 116){
+
   // Load the library for unpacking and reconstruction
   gSystem->Load("libAtRecoMediumnstruction.so");
 
@@ -15,8 +16,9 @@ void unpack_rcnp_129matm(int run_num = 116){
   timer.Start();
 
   TString fileName = TString::Format("run_%04d", run_num);
-  TString parameterFile = "ATTPC.E546.par"; // need to check
   TString mappath = "";
+  TString parameterFile = "ATTPC.E546.par"; // need to check
+  TString beampadsfile = "BeamPads_RCNP.csv";
   TString filepath = "./h5_file/";
   TString fileExt = ".h5";
   TString outputpath = "./decode_data/";
@@ -26,6 +28,7 @@ void unpack_rcnp_129matm(int run_num = 116){
   TString dir = getenv("VMCWORKDIR");
   TString mapDir = dir + "/scripts/" + scriptfile;
   TString scriptdir = dir + "/scripts/" + scriptfile;
+  TString beampadsdir = dir + "/scripts/" + beampadsfile;
   TString dataDir = dir + "/macro/data/";
   TString geomDir = dir + "/geometry/";
   gSystem->Setenv("GEOMPATH", geomDir.Data());
@@ -64,6 +67,7 @@ void unpack_rcnp_129matm(int run_num = 116){
   auto fAtMapPtr = std::make_shared<AtTpcMap>();
   fAtMapPtr->ParseXMLMap(mapDir.Data());
   fAtMapPtr->GeneratePadPlane();
+  //  fAtMapPtr->InhibitBeamPads(beampadsdir); //veto of the pads in beam region
 
   //auto unpacker = std::make_unique<AtHDFUnpacker>(fAtMapPtr);
   auto unpacker = std::make_unique<AtFRIBLinkedHDFUnpacker>(fAtMapPtr);
@@ -74,6 +78,11 @@ void unpack_rcnp_129matm(int run_num = 116){
   auto unpackTask = new AtUnpackTask(std::move(unpacker));
   unpackTask->SetPersistence(true); // true: saving AtRawEvents data. "false" is better for data saving process.
 
+  /*
+  auto ICTask = new AtICTask();
+  ICTask->SetPersistence(true);
+  */
+  
   AtFilterSubtraction *filter = new AtFilterSubtraction(fAtMapPtr);
   filter->SetThreshold(50);
   filter->SetIsGood(false);
@@ -82,7 +91,6 @@ void unpack_rcnp_129matm(int run_num = 116){
   filterTask->SetPersistence(false);
   filterTask->SetFilterAux(false);
 
-  //ADC threshold
   auto threshold = 60;
 
   // auto psa = new AtPSASimple2();
@@ -124,43 +132,42 @@ void unpack_rcnp_129matm(int run_num = 116){
   //  patternModTask->SetOutputBranch("AtPatternEvent");
   patternModTask->SetPersistence(kTRUE);
 
-   // Create the AtFitterTask task.
-   std::vector<std::unique_ptr<AtTools::AtELossModel>> eLossModels;
+  // Create the AtFitterTask task.
+  std::vector<std::unique_ptr<AtTools::AtELossModel>> eLossModels;
 
-   std::vector<std::tuple<int, int, int>> materialComponents;
-   materialComponents.push_back(std::make_tuple(12, 6, 4));
-   materialComponents.push_back(std::make_tuple(1, 1, 10));
+  std::vector<std::tuple<int, int, int>> materialComponents;
+  materialComponents.push_back(std::make_tuple(12, 6, 4));
+  materialComponents.push_back(std::make_tuple(1, 1, 10));
 
-   std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_alpha = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_alpha");
-   eLossModelC4H10_alpha->SetMaterial(materialComponents);
-   eLossModelC4H10_alpha->SetProjectile(4, 2, 4.00260325413);
-   eLossModels.push_back(std::move(eLossModelC4H10_alpha));
+  std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_alpha = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_alpha");
+  eLossModelC4H10_alpha->SetMaterial(materialComponents);
+  eLossModelC4H10_alpha->SetProjectile(4, 2, 4.00260325413);
+  eLossModels.push_back(std::move(eLossModelC4H10_alpha));
 
-   std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_12C = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_12C");
-   eLossModelC4H10_12C->SetMaterial(materialComponents);
-   eLossModelC4H10_12C->SetProjectile(12, 6, 12);
-   eLossModels.push_back(std::move(eLossModelC4H10_12C));
+  std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_12C = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_12C");
+  eLossModelC4H10_12C->SetMaterial(materialComponents);
+  eLossModelC4H10_12C->SetProjectile(12, 6, 12);
+  eLossModels.push_back(std::move(eLossModelC4H10_12C));
 
-   std::unique_ptr<EventFit::AtBraggCurveFitter> braggCurveFitter = std::make_unique<EventFit::AtBraggCurveFitter>(std::move(eLossModels));
-   braggCurveFitter->SetEstimatedAmplitudeFactor(6000);
-   braggCurveFitter->SetEstimatedAmplitudeFactorPrecision(1000);
-   braggCurveFitter->SetDistanceThreshold(10);
-   braggCurveFitter->Init();
+  std::unique_ptr<EventFit::AtBraggCurveFitter> braggCurveFitter = std::make_unique<EventFit::AtBraggCurveFitter>(std::move(eLossModels));
+  braggCurveFitter->SetEstimatedAmplitudeFactor(6000);
+  braggCurveFitter->SetEstimatedAmplitudeFactorPrecision(1000);
+  braggCurveFitter->SetDistanceThreshold(10);
+  braggCurveFitter->Init();
 
-   AtFitterTask *fitterTask = new AtFitterTask(std::move(braggCurveFitter));
-   fitterTask->SetPersistence(kTRUE);
-   fitterTask->SetInputBranch("AtPatternEventModified");
-   fitterTask->SetFitMetadataBranch("AtFitMetadata");
+  AtFitterTask *fitterTask = new AtFitterTask(std::move(braggCurveFitter));
+  fitterTask->SetPersistence(kTRUE);
+  fitterTask->SetInputBranch("AtPatternEventModified");
+  fitterTask->SetFitMetadataBranch("AtFitMetadata");
 
   run->AddTask(unpackTask);
-  /*
-  // run->AddTask(filterTask);
+  //  run->AddTask(ICTask);
+  //  run->AddTask(filterTask);
   run->AddTask(psaTask);
   run->AddTask(SCTask);
   run->AddTask(ransacTask);
   run->AddTask(patternModTask);
   run->AddTask(fitterTask);
-  */
 
   std::cout << "***** Starting Init ******" << std::endl;
   run->Init();
