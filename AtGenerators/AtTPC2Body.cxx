@@ -487,9 +487,10 @@ Bool_t AtTPC2Body::GenerateReaction(FairPrimaryGenerator *primGen)
 
          Int_t trackIdCut = 0;
 
-         if (!kIsFinalGen)
+         if (!kIsFinalGen){
 	   //            trackIdCut = 2; // Remove beam and decaying particle
             trackIdCut = 3; // Remove beam and decaying particle
+         }
          else
             trackIdCut = 1; // Remove beam
 
