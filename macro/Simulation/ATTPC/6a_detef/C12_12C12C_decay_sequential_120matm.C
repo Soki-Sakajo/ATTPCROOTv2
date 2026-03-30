@@ -1,0 +1,290 @@
+void C12_12C12C_decay_sequential_120matm(Int_t nEvents = 10000, Int_t subnum=0)
+{
+  TString dir = getenv("VMCWORKDIR");
+
+  // Output file name
+  TString OutDir = "./data1/";
+  //  TString OutDir = "./data2/";
+  //  TString outFile = "./data/attpcsim_C12C12.root";
+  TString outFile =
+    OutDir +"attpcsim_sequential_hoylehoyle_120matm_"+ to_string(subnum) +".root";
+  
+  // Parameter file name
+  //  TString parFile = "./data/attpcpar_C12C12.root";
+  TString parFile =
+    OutDir +"attpcpar_sequential_hoylehoyle_120matm_"+ to_string(subnum) +".root";
+  
+  // -----   Timer   --------------------------------------------------------
+  TStopwatch timer;
+  timer.Start();
+  // ------------------------------------------------------------------------
+  
+  // -----   Create simulation run   ----------------------------------------
+  FairRunSim *run = new FairRunSim();
+  run->SetName("TGeant4");      // Transport engine
+  run->SetOutputFile(outFile); // Output file
+  FairRuntimeDb *rtdb = run->GetRuntimeDb();
+  // ------------------------------------------------------------------------
+  
+  // -----   Create media   -------------------------------------------------
+  run->SetMaterials("media.geo"); // Materials
+  // ------------------------------------------------------------------------
+  
+  // -----   Create geometry   ----------------------------------------------
+  
+  FairModule *cave = new AtCave("CAVE");
+  cave->SetGeometryFileName("cave.geo");
+  run->AddModule(cave);
+  
+  // FairModule* magnet = new AtMagnet("Magnet");
+  // run->AddModule(magnet);
+  
+  /*FairModule* pipe = new AtPipe("Pipe");
+    run->AddModule(pipe);*/
+  
+  FairDetector *ATTPC = new AtTpc("ATTPC", kTRUE);
+  //  ATTPC->SetGeometryFileName("ATTPC_He600torr_v2.root");
+  ATTPC->SetGeometryFileName("rcnp_120matm.root");
+  // ATTPC->SetModifyGeometry(kTRUE);
+  run->AddModule(ATTPC);
+  
+  // ------------------------------------------------------------------------
+  
+  // -----   Magnetic field   -------------------------------------------
+  // Constant Field
+  AtConstField *fMagField = new AtConstField();
+  fMagField->SetField(0., 0., 0.);                       // values are in kG
+  fMagField->SetFieldRegion(-50, 50, -50, 50, -10, 230); // values are in cm
+  //  (xmin,xmax,ymin,ymax,zmin,zmax)
+  run->SetField(fMagField);
+  // --------------------------------------------------------------------
+  
+  // -----   Create PrimaryGenerator   --------------------------------------
+  FairPrimaryGenerator *primGen = new FairPrimaryGenerator();
+  
+  // Beam Information
+  Int_t z = 6;  // Atomic number
+  Int_t a = 12; // Mass number
+  Int_t q = 0;  // Charge State
+  Int_t m = 1;  // Multiplicity  NOTE: Due the limitation of the TGenPhaseSpace accepting only pointers/arrays the
+  // maximum multiplicity has been set to 10 particles.
+  Double_t px = 0.000 / a; // X-Momentum / per nucleon!!!!!!
+  Double_t py = 0.000 / a; // Y-Momentum / per nucleon!!!!!!
+  //  Double_t pz = 1.189 / a; // Z-Momentum / per nucleon!!!!!!
+  Double_t pz = 1.05842978 / a; // Z-Momentum / per nucleon!!!!!!
+  Double_t BExcEner = 0.0;
+  Double_t Bmass = 12.0;
+  //  Double_t NomEnergy = 40.0;
+  Double_t NomEnergy = 20.0;
+  
+  AtTPCIonGenerator *ionGen = new AtTPCIonGenerator("Ion", z, a, q, m, px, py, pz, BExcEner, Bmass, NomEnergy);
+  ionGen->SetSpotRadius(0, -100, 0);
+  // add the ion generator
+  
+  primGen->AddGenerator(ionGen);
+  
+  // primGen->SetBeam(1,1,0,0); //These parameters change the position of the vertex of every track
+  // added to the Primary Generator
+  // primGen->SetTarget(30,0);
+  
+  // Variables for 2-Body kinematics reaction
+  std::vector<Int_t> Zp;      // Zp
+  std::vector<Int_t> Ap;      // Ap
+  std::vector<Int_t> Qp;      // Electric charge
+  Int_t mult;                 // Number of particles
+  std::vector<Double_t> Pxp;  // Px momentum X
+  std::vector<Double_t> Pyp;  // Py momentum Y
+  std::vector<Double_t> Pzp;  // Pz momentum Z
+  std::vector<Double_t> Mass; // Masses
+  std::vector<Double_t> ExE;  // Excitation energy
+  Double_t ResEner;           // Energy of the beam (Useless for the moment)
+  
+  // Note: Momentum will be calculated from the phase Space according to the residual energy of the beam
+  
+  mult = 4; // Number of Nuclei involved in the reaction (Should be always 4) THIS DEFINITION IS MANDATORY (and the
+  // number of particles must be the same)
+  ResEner = 40.0; // MeV
+  
+  // ---- Beam ----
+  Zp.push_back(z); // 40Ar TRACKID=0
+  Ap.push_back(a); //
+  Qp.push_back(q);
+  Pxp.push_back(px);
+  Pyp.push_back(py);
+  Pzp.push_back(pz);
+  Mass.push_back(12.0); // uma
+  ExE.push_back(BExcEner);
+  
+  // ---- Target ----
+  Zp.push_back(6);  // p
+  Ap.push_back(12); //
+  Qp.push_back(0);  //
+  Pxp.push_back(0.0);
+  Pyp.push_back(0.0);
+  Pzp.push_back(0.0);
+  Mass.push_back(12.0); // uma
+  ExE.push_back(0.0);   // In MeV
+  
+  //--- Scattered -----
+  Zp.push_back(6);  //
+  Ap.push_back(12); //
+  Qp.push_back(0);
+  Pxp.push_back(0.0);
+  Pyp.push_back(0.0);
+  Pzp.push_back(0.0);
+  Mass.push_back(12.0); // uma
+  //  ExE.push_back(7.5);
+  ExE.push_back(7.654);
+  
+  // ---- Recoil -----
+  Zp.push_back(6);  //
+  Ap.push_back(12); //
+  Qp.push_back(0);  //
+  Pxp.push_back(0.0);
+  Pyp.push_back(0.0);
+  Pzp.push_back(0.0);
+  Mass.push_back(12.0); // uma
+  //  ExE.push_back(7.5);   // In MeV
+  ExE.push_back(7.654);   // In MeV
+
+  //need to check
+  //  Double_t ThetaMinCMS = 20.0;
+  //  Double_t ThetaMaxCMS = 80.0;
+  Double_t ThetaMinCMS = 0.0;
+  Double_t ThetaMaxCMS = 180.0;
+  
+  AtTPC2Body *TwoBody =
+    new AtTPC2Body("TwoBody", &Zp, &Ap, &Qp, mult, &Pxp, &Pyp, &Pzp, &Mass, &ExE, ResEner, ThetaMinCMS, ThetaMaxCMS);
+  TwoBody->SetSequentialDecay(kTRUE);
+  primGen->AddGenerator(TwoBody);
+  
+  Int_t zB;
+  Int_t aB;
+  Double_t massDecayB;
+  Double_t massTarget;
+  
+  zB = 6;
+  aB = 12;
+  massDecayB = 12.0;
+  massTarget = 0.0;
+  
+  DecayIon scatter;
+  scatter.sequentialDecay = true;
+  scatter.multiplicity = 4; // Number of ions involved in the decay
+  //  scatter.exEnergy = 7.5;
+  scatter.exEnergy = 7.654;
+  scatter.trackID = 0;
+  scatter.parentMass = 12.0 * 0.931494; // Mass of the scatter/recoil
+  scatter.parentMultiplicity = 2;       // Number of ions in the parent decay
+  scatter.daughterMultiplicity = 2;     // Number of ions in the daughter decay
+  DecayIon recoil;
+  recoil.sequentialDecay = true;
+  recoil.multiplicity = 4;
+  //  recoil.exEnergy = 7.5;
+  recoil.exEnergy = 7.654;
+  recoil.trackID = 1;
+  recoil.parentMass = 12.0 * 0.931494;
+  recoil.parentMultiplicity = 2;
+  recoil.daughterMultiplicity = 2;
+  
+  // Scatter Parent
+  scatter.z.push_back(2);
+  scatter.a.push_back(8);
+  scatter.q.push_back(0);
+  scatter.mass.push_back(8.00530510); //uma
+  scatter.decays.push_back(1); // First ion on the list decays
+  
+  scatter.z.push_back(2);
+  scatter.a.push_back(4);
+  scatter.q.push_back(0);
+  scatter.mass.push_back(4.00260325415); //uma
+  scatter.decays.push_back(0);
+  
+  // Scatter Daughter
+  scatter.z.push_back(2);
+  scatter.a.push_back(4);
+  scatter.q.push_back(0);
+  scatter.mass.push_back(4.00260325415); //uma
+  scatter.decays.push_back(0);
+  
+  scatter.z.push_back(2);
+  scatter.a.push_back(4);
+  scatter.q.push_back(0);
+  scatter.mass.push_back(4.00260325415); //uma
+  scatter.decays.push_back(0);
+  
+  ///////////////////////////////////////////////////////////////////
+  
+  // Recoil Parent
+  recoil.z.push_back(2);
+  recoil.a.push_back(8);
+  recoil.q.push_back(0);
+  recoil.mass.push_back(8.00530510); //uma
+  recoil.decays.push_back(1);
+  
+  recoil.z.push_back(2);
+  recoil.a.push_back(4);
+  recoil.q.push_back(0);
+  recoil.mass.push_back(4.00260325415); //uma
+  recoil.decays.push_back(0);
+  
+  // Recoil Daughter
+  recoil.z.push_back(2);
+  recoil.a.push_back(4);
+  recoil.q.push_back(0);
+  recoil.mass.push_back(4.00260325415); //uma
+  recoil.decays.push_back(0);
+  
+  recoil.z.push_back(2);
+  recoil.a.push_back(4);
+  recoil.q.push_back(0);
+  recoil.mass.push_back(4.00260325415); //uma
+  recoil.decays.push_back(0);
+  
+  AtTPCReactionDecay *decay = new AtTPCReactionDecay(scatter, recoil, zB, aB, massDecayB, massTarget);
+  
+  primGen->AddGenerator(decay);
+  
+  run->SetGenerator(primGen);
+  
+  // ------------------------------------------------------------------------
+  
+  //---Store the visualiztion info of the tracks, this make the output file very large!!
+  //--- Use it only to display but not for production!
+  run->SetStoreTraj(kTRUE);
+  
+  // -----   Initialize simulation run   ------------------------------------
+  run->Init();
+  // ------------------------------------------------------------------------
+  
+  // -----   Runtime database   ---------------------------------------------
+  
+  Bool_t kParameterMerged = kTRUE;
+  FairParRootFileIo *parOut = new FairParRootFileIo(kParameterMerged);
+  parOut->open(parFile.Data());
+  rtdb->setOutput(parOut);
+  rtdb->saveOutput();
+  rtdb->print();
+  // ------------------------------------------------------------------------
+  
+  // -----   Start run   ----------------------------------------------------
+  run->Run(nEvents);
+  
+  // You can export your ROOT geometry ot a separate file
+  //  run->CreateGeometryFile("./data/geofile_full.root");
+  TString outgeoFile =
+    OutDir + "geofile_full_sequential_hoylehoyle_120matm_"+ to_string(subnum) +".root";
+  run->CreateGeometryFile(outgeoFile);
+  // ------------------------------------------------------------------------
+  
+  // -----   Finish   -------------------------------------------------------
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+  cout << endl << endl;
+  cout << "Macro finished succesfully." << endl;
+  cout << "Output file is " << outFile << endl;
+  cout << "Parameter file is " << parFile << endl;
+  cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
+  // ------------------------------------------------------------------------
+}

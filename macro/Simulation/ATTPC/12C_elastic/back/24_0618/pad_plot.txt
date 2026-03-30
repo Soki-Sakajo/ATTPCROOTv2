@@ -1,0 +1,32 @@
+reset
+set size square
+set parametric
+
+#set plot
+set xrange[-300:300]
+set yrange[-300:300]
+set xlabel 'pad x [mm]'
+set ylabel 'pad y [mm]'
+set title "pad hit pattern"
+set title font "Arial,30"
+set xlabel font "Arial,20"
+set ylabel font "Arial,20"
+set tics font "Arial,20"  #scale marks
+set xlabel offset 0,0
+set ylabel offset -5,0
+set bmargin 4  #margin of xlabel
+set lmargin 15 #margin of ylabel
+
+
+#difine hit pattern
+#plot 'out_hit_rcnp.dat' u 1:2 w p
+plot 'out_hit_rcnp.dat'
+
+#set circle of ATTPC pad
+replot[0:2*pi] 275*cos(t), 275*sin(t) linecolor 'red' title "ATTPC pad"
+
+
+#set (0,0)
+set obj circle at 0,0 fc rgb "black" size 5 fs solid
+#replot[0:2*pi] 5*cos(t),5*sin(t) with filledcurves closed
+

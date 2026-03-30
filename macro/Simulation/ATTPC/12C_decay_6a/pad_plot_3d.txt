@@ -1,0 +1,6 @@
+reset
+#set zrange[-300:0]
+#set zrange[-250:50]
+set zrange[-300:50]
+#splot 'out_hit_rcnp.dat' u 1:2:3
+splot 'out_hit_rcnp_up_nd_2.dat' u 1:2:3

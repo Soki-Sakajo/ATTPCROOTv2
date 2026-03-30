@@ -15,6 +15,7 @@
 #include <Eigen/Dense>
 
 #include "types.h"
+#include <assert.h>
 
 namespace kf {
 namespace util {
