@@ -76,7 +76,7 @@ void unpack_rcnp_129matm(int run_num = 116){
   unpacker->SetBaseLineSubtraction(true);
 
   auto unpackTask = new AtUnpackTask(std::move(unpacker));
-  unpackTask->SetPersistence(true); // true: saving AtRawEvents data. "false" is better for data saving process.
+  unpackTask->SetPersistence(false); // true: saving AtRawEvents data. "false" is better for data saving process.
 
   /*
   auto ICTask = new AtICTask();

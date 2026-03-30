@@ -76,7 +76,7 @@ void unpack_rcnp(int run_num = 52){
   unpacker->SetBaseLineSubtraction(true);
 
   auto unpackTask = new AtUnpackTask(std::move(unpacker));
-  unpackTask->SetPersistence(true); // true: saving AtRawEvents data. "false" is better for data saving process.
+  unpackTask->SetPersistence(false); // true: saving AtRawEvents data. "false" is better for data saving process.
 
   /*
   auto ICTask = new AtICTask();
