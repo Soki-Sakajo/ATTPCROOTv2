@@ -1,0 +1,106 @@
+void transfer_root(int run_number)
+{
+
+   FairRunAna *run = new FairRunAna();
+
+   //Int_t run_number = 40;
+
+   TString inputpath = "~/fair_install/decode_data/";
+   TString inputfile = inputpath + TString::Format("run_%04d.root",run_number);
+   TFile *file = new TFile(inputfile, "READ");
+   
+   TTree *tree = (TTree *)file->Get("cbmsim");
+   Int_t nEvents = tree->GetEntries();
+   std::cout << " Number of events : " << nEvents << std::endl;
+
+  
+  TTreeReader Reader("cbmsim", file);
+   TTreeReaderValue<TClonesArray> eventHArray(Reader, "AtEventH");
+   TTreeReaderValue<TClonesArray> patternArray(Reader, "AtPatternEvent");
+   
+   TString outputfile ="~/fair_install/transfer_data/" + TString::Format("run_%04d.root", run_number);
+   TFile *opf = new TFile(outputfile, "RECREATE");
+   TTree *new_tree = new TTree("tree", "tree"); 
+
+   opf->cd();
+   Int_t run_num = 0;
+   Int_t ntrack = 0;
+   Double_t track_theta[50];
+   Double_t track_phi[50];
+   Double_t track_range[50];
+   Double_t track_charge[50];
+   Double_t track_vertex[50];
+   Double_t track_first_z[50];
+   Double_t track_last_z[50];
+
+   new_tree->Branch("run_num", &run_num, "run_num/I");
+   new_tree->Branch("ntrack", &ntrack, "ntrack/I");
+   new_tree->Branch("theta", track_theta, "theta[ntrack]/D");
+   new_tree->Branch("phi", track_phi, "phi[ntrack]/D");
+   new_tree->Branch("range", track_range, "range[ntrack]/D");
+   new_tree->Branch("charge", track_charge, "charge[ntrack]/D");
+   new_tree->Branch("vertex", track_vertex, "vertex[ntrack]/D");
+   new_tree->Branch("first_z", track_first_z, "first_z[ntrack]/D");
+   new_tree->Branch("last_z", track_last_z, "last_z[ntrack]/D");
+
+   for (Int_t i = 0; i < nEvents; i++) {
+      run_num = run_number;
+      ntrack = 0;
+      Reader.Next();
+
+      AtEvent *event = (AtEvent *)eventHArray->At(0);
+      AtPatternEvent *patternEvent = (AtPatternEvent *)patternArray->At(0);
+
+      if (event && patternEvent) {
+
+         auto &hitArray = event->GetHits();
+         auto &tracks = patternEvent->GetTrackCand();
+         //std::cout << " Number of hits : " << hitArray.size() << std::endl;
+         //std::cout << " Number of tracks : " << tracks.size() << std::endl;
+
+	 if(tracks.size() >= 2){
+	    /* AtTrack track1 = tracks[0];
+	     AtTrack track2 = tracks[1];
+
+	     Double_t theta1 = 180.0 - track1.GetGeoTheta()*180.0/TMath::Pi();
+	     Double_t theta2 = 180.0 - track2.GetGeoTheta()*180.0/TMath::Pi();
+	     
+	     Double_t phi1 = track1.GetGeoPhi()*180.0/TMath::Pi();
+	     Double_t phi2 = track2.GetGeoPhi()*180.0/TMath::Pi();
+	    */	
+  	     ntrack = tracks.size();	     
+	     int itrack = 0;
+		
+	     AtFindVertex fvertex;
+	     fvertex.FindVertex(tracks, tracks.size());
+             auto valout = fvertex.GetTracksVertex();
+	     cout<< " valout : "<<valout[0].vertex.X()<<endl;  
+	    for (auto &track : tracks) {
+            	track_theta[itrack] =180.0 - track.GetGeoTheta()*180.0/TMath::Pi();
+		track_phi[itrack] = track.GetGeoPhi()*180.0/TMath::Pi();
+		track_range[itrack] = track.GetLinearRange();
+		track_charge[itrack] = track.GetGeoQEnergy();
+		track_vertex[itrack] = track.GetVertexToZDist();
+		
+		track_first_z[itrack] = track.GetFirstPoint().Z();
+		track_last_z[itrack] = track.GetLastPoint().Z();
+
+		//cout<<track.GetVertexToZDist()<<endl;
+		itrack ++;
+            	//std::cout<< "    Track theta :"<< track.GetGeoTheta() << std::endl;
+	    }
+
+	    new_tree->Fill();
+	 }
+	
+
+      }
+
+      if(i % 10000 == 0)cout<<"processing : "<<i<<" / "<<nEvents<<endl;
+   }
+   
+   new_tree->Write();
+   opf->Close();
+   
+   file->Close(); 
+}
