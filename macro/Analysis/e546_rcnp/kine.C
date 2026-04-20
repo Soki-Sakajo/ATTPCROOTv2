@@ -275,11 +275,13 @@ void kine(){
 
    // Draw histograms in TCanvas.
    TCanvas *c1 = new TCanvas();
+   c1->cd();
    histRangeVThetaLAB->Draw("zcol");
    histRangeVThetaLAB->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB->GetYaxis()->SetTitle("roughRange [mm]");
 
    TCanvas *c2 = new TCanvas();
+   c2->cd();
    histEstimatedKinEVThetaLABTotal->Draw("colz");
    //kine_d3He->Draw("same");
    //kine_d3HeEx2_2->Draw("same");
@@ -288,6 +290,7 @@ void kine(){
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
    TCanvas *c3 = new TCanvas();
+   c3->cd();
    histEstimatedKinEVThetaLABTotal->Draw("colz");
    //   kine_dp_gs->Draw("same");
    //   kine_dd_gs->Draw("same");
@@ -295,12 +298,14 @@ void kine(){
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
    TCanvas *c4 = new TCanvas();
+   c4->cd();
    histThetaLABThetaLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
 
    TCanvas *c5 = new TCanvas();
+   c5->cd();
    histdEdxVTotalRange->Draw("zcol");
    //   cutPIDproton->Draw("same");
    //   cutPIDdeuteron->Draw("same");
@@ -308,6 +313,7 @@ void kine(){
    histdEdxVTotalRange->GetYaxis()->SetTitle("roughRange [mm]");
 
    TCanvas *c6 = new TCanvas();
+   c6->cd();
    histdEdxVTotalRangeBackwards->Draw("zcol");
    //   cutPIDproton->Draw("same");
    //   cutPIDdeuteron->Draw("same");
@@ -316,10 +322,12 @@ void kine(){
 
    /*
    TCanvas *c7 = new TCanvas();
+   c7->cd();
    histExdp->Draw();
    histExdp->GetXaxis()->SetTitle("Ex [MeV]");
 
    TCanvas *c8 = new TCanvas();
+   c8->cd();
    histExdd->Draw();
    histExdd->GetXaxis()->SetTitle("Ex [MeV]");
    */
@@ -410,8 +418,7 @@ kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Dou
 
    m4_ex = sqrt((cos(thetalab) * omega(s, pow(m1, 2), pow(m2, 2)) * omega(u, pow(m2, 2), pow(m3, 2)) -
                  (s - pow(m1, 2) - pow(m2, 2)) * (pow(m2, 2) + pow(m3, 2) - u)) /
-                   (2 * pow(m2, 2)) +
-                s + u - pow(m2, 2));
+                   (2 * pow(m2, 2)) + s + u - pow(m2, 2));
    Ex = m4_ex - m4;
 
    t = pow(m2, 2) + pow(m4_ex, 2) - 2 * m2 * Et4;
