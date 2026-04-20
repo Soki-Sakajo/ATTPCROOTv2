@@ -58,8 +58,8 @@ void angle_check_12c12c()
 				//for (auto &track : tracks) {
 				//	Double_t theta1 = track.GetGeoThera();
 				//std::cout<< "    Track theta :"<< track.GetGeoTheta() << std::endl;
-	//}
-	//}
+				//}
+				//}
 				for(auto &hit : hitArray) {
 					auto pos = hit->GetPosition();
 					auto charge = hit->GetCharge();

@@ -2,8 +2,7 @@ TGraph* ReadKinematics(TString kineFile);
 Double_t omega(Double_t x, Double_t y, Double_t z);
 std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Double_t thetalab, Double_t K_eject);
 
-void kine()
-{
+void kine(){
    /*
    // Masses.
    double u_to_MeV = 931.49401;
@@ -26,6 +25,8 @@ void kine()
    AtTpcMap *map = new AtTpcMap();
    map->ParseXMLMap(mapDir.Data());
    map->GeneratePadPlane();
+   Double_t r_tri = 0;
+   Double_t r_max = 0;
 
    // Punch through filter.
    double punchThroughThreshold = 20;
@@ -155,6 +156,8 @@ void kine()
             auto &hits = track.GetHitArray();
             double rangeInSmallPads{};
             for (auto &hit: hits) {
+               auto pos = hit->GetPosition();
+               auto rad = TMath::Sqrt(pos.X() * pos.X() + pos.Y() * pos.Y());
                int padNum = hit->GetPadNum();
                int sizeID = map->GetPadSize(padNum);
                if (sizeID == 1) {
@@ -163,8 +166,12 @@ void kine()
                }
                smallPadCharge += hit->GetCharge();
                double currentRangeInSmallPads = pattern->DistanceAlongPattern(hit->GetPosition(), firstPoint);
-               if (currentRangeInSmallPads > rangeInSmallPads)
+               if (currentRangeInSmallPads > rangeInSmallPads){
                   rangeInSmallPads = currentRangeInSmallPads;
+               }
+               if(rad > r_max){
+                  r_max = rad;
+               }
             }
             double dEdx = smallPadCharge / rangeInSmallPads;
 
@@ -241,11 +248,19 @@ void kine()
             }
             */
          }
+         if(r_trig > r_max){
+            r_trig = r_max;
+         }
+         if(i%100==0){
+            std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
+         }
       }
+      std::cout << "  Filled data: 100 %!, " << nUnpackEvents << " events" << std::endl;
       //      std::cout << "Number of 2 tracks events in run" << runNum << ":" << nEventsWith2Tracks << std::endl;
       // Close files.
       unpackFile->Close();
    }
+   std::cout << "Maximum radius of hits: " << r_max << " mm, Trigger radius: " << r_trig << " mm" << std::endl;
 
    /*
    // Kinematic lines.
@@ -413,8 +428,7 @@ void kine()
    Results->Close();
 }
 
-TGraph* ReadKinematics(TString kineFile)
-{
+TGraph* ReadKinematics(TString kineFile){
    Double_t *ThetaCMS = new Double_t[20000];
    Double_t *ThetaLabRec = new Double_t[20000];
    Double_t *EnerLabRec = new Double_t[20000];
