@@ -49,13 +49,13 @@ void kine(){
    std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_alpha = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_alpha");
    eLossModelC4H10_alpha->SetMaterial(materialComponents);
    eLossModelC4H10_alpha->SetProjectile(4, 2, 4.00260325413);
-   eLossModels.push_back(std::move(eLossModelC4H10_alpha));
+   //   eLossModels.push_back(std::move(eLossModelC4H10_alpha));
    //   eLossModelC4H10_alpha->SetPDGCode("1000010010");
 
    std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_12C = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_12C");
    eLossModelC4H10_12C->SetMaterial(materialComponents);
    eLossModelC4H10_12C->SetProjectile(12, 6, 12);
-   eLossModels.push_back(std::move(eLossModelC4H10_12C));
+   //   eLossModels.push_back(std::move(eLossModelC4H10_12C));
    //   eLossModelC4H10_12C->SetPDGCode("1000120060");
 
    // Cut files.
