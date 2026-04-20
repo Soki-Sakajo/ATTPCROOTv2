@@ -14,6 +14,11 @@ void kine(){
    // Beam energy.
    double E_beam = 27.091 * 17.022578650;
    */
+
+   // events.
+   std::vector runNums = {52};
+   TFile * Results = new TFile("kine_results.root","recreate");
+
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
    //   TFile *outfile=new TFile(outfname,"recreate");
@@ -106,9 +111,6 @@ void kine(){
    TH2F *histRangeVThetaLAB = new TH2F("histRangeVThetaLAB", "histRangeVThetaLAB", 180, 0, 180, 1030, 0, 1030);
    TH2F *histEstimatedKinEVThetaLAB2H  = new TH2F("histEstimatedKinEVThetaLAB2H", "histEstimatedKinEVThetaLAB2H", 180, 0, 180, 250, 0, 20);
    TH2F *histEstimatedKinEVThetaLAB1H  = new TH2F("histEstimatedKinEVThetaLAB1H", "histEstimatedKinEVThetaLAB1H", 180, 0, 180, 250, 0, 20);
-
-   // All events.
-   std::vector runNums = {52};
 
    for (int runNum: runNums) {
       // Open the digitalization file and get the TTree.
@@ -287,25 +289,12 @@ void kine(){
 
    TCanvas *c3 = new TCanvas();
    histEstimatedKinEVThetaLABTotal->Draw("colz");
-   kine_dp_gs->Draw("same");
-   kine_dd_gs->Draw("same");
+   //   kine_dp_gs->Draw("same");
+   //   kine_dd_gs->Draw("same");
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
-<<<<<<< HEAD
    TCanvas *c4 = new TCanvas();
-=======
-   TCanvas *c3_Exdp = new TCanvas();
-   histExdp->Draw();
-   histExdp->GetXaxis()->SetTitle("Ex [MeV]");
-
-   TCanvas *c3_Exdd = new TCanvas();
-   histExdd->Draw();
-   histExdd->GetXaxis()->SetTitle("Ex [MeV]");
-   
-
-   TCanvas *c3_tt = new TCanvas();
->>>>>>> parent of 9d019414 (Debag for kine.C)
    histThetaLABThetaLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
@@ -336,7 +325,6 @@ void kine(){
    */
 
    // Saving histograms in a .root file ...
-   TFile * Results = new TFile("kine_results_5109_5116.root","recreate");
    Results->cd();
 
    // dE Vs Total Range
@@ -348,17 +336,17 @@ void kine(){
 
    // Kinematics
    histEstimatedKinEVThetaLABTotal->Write();
-   histEstimatedKinEVThetaLAB_ProtonATTPC->Write();
-   histEstimatedKinEVThetaLAB_ProtonATTPC_extended->Write();
-   histEstimatedKinEVThetaLAB_ProtonATTPC_CarbonSi->Write();
-   histEstimatedKinEVThetaLAB_DeuteronATTPC->Write();
-   histEstimatedKinEVThetaLAB_CarbonSi->Write();
-   histEstimatedKinEVThetaLAB_NitrogenSi->Write();
-   kine_dp_gs->Write("kin_dp_gs");
-   kine_dd_gs->Write("kin_dd_gs");
-   kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
-   kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
+   //   histEstimatedKinEVThetaLAB_ProtonATTPC->Write();
+   //   histEstimatedKinEVThetaLAB_ProtonATTPC_extended->Write();
+   //   histEstimatedKinEVThetaLAB_DeuteronATTPC->Write();
+   //   histEstimatedKinEVThetaLAB_CarbonSi->Write();
+   //   histEstimatedKinEVThetaLAB_NitrogenSi->Write();
+   //   kine_dp_gs->Write("kin_dp_gs");
+   //   kine_dd_gs->Write("kin_dd_gs");
+   //   kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
+   //   kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
 
+   /*
    // Excitation energy spectra
    histExdp->Write();
    histExdp_extended->Write();
@@ -369,13 +357,10 @@ void kine(){
    histAngDist_elastic->Write();
    histAngDist_dp->Write();
    histAngDist_dp_CarbonSi->Write();
-
-   // Si and Gagg PID
-   histSiPIDADCMax->Write();
-   histGaggPIDADCMax->Write();
+   */
 
    // Others ...
-   // histThetaLABThetaLAB->Write();
+   histThetaLABThetaLAB->Write();
 
    Results->Close();
 }
@@ -393,8 +378,7 @@ TGraph* ReadKinematics(TString kineFile){
 
    if (!kineStr->fail()){
       while (!kineStr->eof()){
-	         *kineStr >> ThetaCMS[numKin] >> ThetaLabRec[numKin] >> EnerLabRec[numKin] >>
-	                     ThetaLabSca[numKin] >> EnerLabSca[numKin];
+	         *kineStr >> ThetaCMS[numKin] >> ThetaLabRec[numKin] >> EnerLabRec[numKin] >> ThetaLabSca[numKin] >> EnerLabSca[numKin];
          numKin++;
       }
    } else if (kineStr->fail())
