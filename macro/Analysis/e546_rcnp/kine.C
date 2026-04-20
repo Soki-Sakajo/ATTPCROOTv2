@@ -292,7 +292,20 @@ void kine(){
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
+<<<<<<< HEAD
    TCanvas *c4 = new TCanvas();
+=======
+   TCanvas *c3_Exdp = new TCanvas();
+   histExdp->Draw();
+   histExdp->GetXaxis()->SetTitle("Ex [MeV]");
+
+   TCanvas *c3_Exdd = new TCanvas();
+   histExdd->Draw();
+   histExdd->GetXaxis()->SetTitle("Ex [MeV]");
+   
+
+   TCanvas *c3_tt = new TCanvas();
+>>>>>>> parent of 9d019414 (Debag for kine.C)
    histThetaLABThetaLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
@@ -346,7 +359,6 @@ void kine(){
    kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
    kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
 
-   /*
    // Excitation energy spectra
    histExdp->Write();
    histExdp_extended->Write();
@@ -357,7 +369,6 @@ void kine(){
    histAngDist_elastic->Write();
    histAngDist_dp->Write();
    histAngDist_dp_CarbonSi->Write();
-   */
 
    // Si and Gagg PID
    histSiPIDADCMax->Write();
