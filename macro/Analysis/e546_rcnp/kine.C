@@ -248,8 +248,8 @@ void kine(){
             }
             */
          }
-         if(r_trig > r_max){
-            r_trig = r_max;
+         if(r_tri > r_max){
+            r_tri = r_max;
          }
          if(i%100==0){
             std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
@@ -260,7 +260,7 @@ void kine(){
       // Close files.
       unpackFile->Close();
    }
-   std::cout << "Maximum radius of hits: " << r_max << " mm, Trigger radius: " << r_trig << " mm" << std::endl;
+   std::cout << "Maximum radius of hits: " << r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
 
    /*
    // Kinematic lines.
@@ -285,26 +285,14 @@ void kine(){
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
-   TCanvas *c2_ProtonATTPC = new TCanvas();
-   histEstimatedKinEVThetaLAB_ProtonATTPC->Draw("colz");
-   kine_dp_gs->Draw("same");
-   kine_dd_gs->Draw("same");
-   histEstimatedKinEVThetaLAB_ProtonATTPC->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   histEstimatedKinEVThetaLAB_ProtonATTPC->GetYaxis()->SetTitle("roughKinE [MeV]");
-   
-   TCanvas *c2_DeuteronATTPC = new TCanvas();
-   histEstimatedKinEVThetaLAB_DeuteronATTPC->Draw("colz");
-   kine_dd_gs->Draw("same");
-   histEstimatedKinEVThetaLAB_DeuteronATTPC->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   histEstimatedKinEVThetaLAB_DeuteronATTPC->GetYaxis()->SetTitle("roughKinE [MeV]");
-
-   TCanvas *c3_kineTotal = new TCanvas();
+   TCanvas *c3 = new TCanvas();
    histEstimatedKinEVThetaLABTotal->Draw("colz");
    kine_dp_gs->Draw("same");
    kine_dd_gs->Draw("same");
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
+   /*
    TCanvas *c3_Exdp = new TCanvas();
    histExdp->Draw();
    histExdp->GetXaxis()->SetTitle("Ex [MeV]");
@@ -312,76 +300,27 @@ void kine(){
    TCanvas *c3_Exdd = new TCanvas();
    histExdd->Draw();
    histExdd->GetXaxis()->SetTitle("Ex [MeV]");
-   
+   */
 
-   TCanvas *c3_tt = new TCanvas();
+   TCanvas *c4 = new TCanvas();
    histThetaLABThetaLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
 
-   TCanvas *c4 = new TCanvas();
+   TCanvas *c5 = new TCanvas();
    histdEdxVTotalRange->Draw("zcol");
    cutPIDproton->Draw("same");
    cutPIDdeuteron->Draw("same");
    histdEdxVTotalRange->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRange->GetYaxis()->SetTitle("roughRange [mm]");
 
-   TCanvas *c4_Backwards = new TCanvas();
+   TCanvas *c6 = new TCanvas();
    histdEdxVTotalRangeBackwards->Draw("zcol");
    cutPIDproton->Draw("same");
    cutPIDdeuteron->Draw("same");
    histdEdxVTotalRangeBackwards->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRangeBackwards->GetYaxis()->SetTitle("#frac{dE}{dx} [ADC/mm]");
-
-   TCanvas *c8 = new TCanvas();
-   histSiPIDADCMax->Draw("zcol");
-   //cutSiB->Draw("same");
-   //cutSiC->Draw("same");
-   //cutSi13B->Draw("same");
-   //cutSiBe->Draw("same");
-   histSiPIDADCMax->GetXaxis()->SetTitle("ADC^{max}_{2} [ADC]");
-   histSiPIDADCMax->GetYaxis()->SetTitle("ADC^{max}_{1} [ADC]");
-
-   // Perine : Check Si PID with ATTPC PID conditions on p and d to confirm PID of protons
-   TCanvas *c8_ProtonATTPC = new TCanvas();
-   histSiPIDADCMax_ProtonATTPC->Draw("zcol");
-   //cutSiB->Draw("same");
-   //cutSiC->Draw("same");
-   //cutSi13B->Draw("same");
-   //cutSiBe->Draw("same");
-   histSiPIDADCMax_ProtonATTPC->GetXaxis()->SetTitle("ADC^{max}_{2} [ADC]");
-   histSiPIDADCMax_ProtonATTPC->GetYaxis()->SetTitle("ADC^{max}_{1} [ADC]");
-
-   TCanvas *c8_DeuteronATTPC = new TCanvas();
-   histSiPIDADCMax_DeuteronATTPC->Draw("zcol");
-   //cutSiB->Draw("same");
-   //cutSiC->Draw("same");
-   //cutSi13B->Draw("same");
-   //cutSiBe->Draw("same");
-   histSiPIDADCMax_DeuteronATTPC->GetXaxis()->SetTitle("ADC^{max}_{2} [ADC]");
-   histSiPIDADCMax_DeuteronATTPC->GetYaxis()->SetTitle("ADC^{max}_{1} [ADC]");
-
-   TCanvas *c8_TritonATTPC = new TCanvas();
-   histSiPIDADCMax_TritonATTPC->Draw("zcol");
-   //cutSiB->Draw("same");
-   //cutSiC->Draw("same");
-   //cutSi13B->Draw("same");
-   //cutSiBe->Draw("same");
-   histSiPIDADCMax_TritonATTPC->GetXaxis()->SetTitle("ADC^{max}_{2} [ADC]");
-   histSiPIDADCMax_TritonATTPC->GetYaxis()->SetTitle("ADC^{max}_{1} [ADC]");
-
-
-   TCanvas *c11 = new TCanvas();
-   histGaggPIDADCMax->Draw("colz");
-   //cutGaggB->Draw("same");
-   //cutGaggBe->Draw("same");
-   //cutGaggLi->Draw("same");
-   //cutGaggHe->Draw("same");
-   histGaggPIDADCMax->GetXaxis()->SetTitle("#Sigma ADC^{max}_{Gagg} [ADC]");
-   histGaggPIDADCMax->GetYaxis()->SetTitle("ADC^{max}_{2} [ADC]");
-
-
 
    // Saving histograms in a .root file ...
    TFile * Results = new TFile("kine_results_5109_5116.root","recreate");
@@ -407,6 +346,7 @@ void kine(){
    kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
    kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
 
+   /*
    // Excitation energy spectra
    histExdp->Write();
    histExdp_extended->Write();
@@ -417,6 +357,7 @@ void kine(){
    histAngDist_elastic->Write();
    histAngDist_dp->Write();
    histAngDist_dp_CarbonSi->Write();
+   */
 
    // Si and Gagg PID
    histSiPIDADCMax->Write();
