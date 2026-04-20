@@ -302,15 +302,15 @@ void kine(){
 
    TCanvas *c5 = new TCanvas();
    histdEdxVTotalRange->Draw("zcol");
-   cutPIDproton->Draw("same");
-   cutPIDdeuteron->Draw("same");
+   //   cutPIDproton->Draw("same");
+   //   cutPIDdeuteron->Draw("same");
    histdEdxVTotalRange->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRange->GetYaxis()->SetTitle("roughRange [mm]");
 
    TCanvas *c6 = new TCanvas();
    histdEdxVTotalRangeBackwards->Draw("zcol");
-   cutPIDproton->Draw("same");
-   cutPIDdeuteron->Draw("same");
+   //   cutPIDproton->Draw("same");
+   //   cutPIDdeuteron->Draw("same");
    histdEdxVTotalRangeBackwards->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRangeBackwards->GetYaxis()->SetTitle("#frac{dE}{dx} [ADC/mm]");
 
@@ -330,9 +330,9 @@ void kine(){
    // dE Vs Total Range
    histdEdxVTotalRange->Write();
    histdEdxVTotalRangeBackwards->Write();
-   cutPIDproton->Write("PIDCutProton");
-   cutPIDproton_extension->Write("PIDCutProtonExtension");
-   cutPIDdeuteron->Write("PIDCutDeuteron");
+   //   cutPIDproton->Write("PIDCutProton");
+   //   cutPIDproton_extension->Write("PIDCutProtonExtension");
+   //   cutPIDdeuteron->Write("PIDCutDeuteron");
 
    // Kinematics
    histEstimatedKinEVThetaLABTotal->Write();
