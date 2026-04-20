@@ -292,16 +292,6 @@ void kine(){
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
-   /*
-   TCanvas *c3_Exdp = new TCanvas();
-   histExdp->Draw();
-   histExdp->GetXaxis()->SetTitle("Ex [MeV]");
-
-   TCanvas *c3_Exdd = new TCanvas();
-   histExdd->Draw();
-   histExdd->GetXaxis()->SetTitle("Ex [MeV]");
-   */
-
    TCanvas *c4 = new TCanvas();
    histThetaLABThetaLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
@@ -321,6 +311,16 @@ void kine(){
    cutPIDdeuteron->Draw("same");
    histdEdxVTotalRangeBackwards->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRangeBackwards->GetYaxis()->SetTitle("#frac{dE}{dx} [ADC/mm]");
+
+   /*
+   TCanvas *c7 = new TCanvas();
+   histExdp->Draw();
+   histExdp->GetXaxis()->SetTitle("Ex [MeV]");
+
+   TCanvas *c8 = new TCanvas();
+   histExdd->Draw();
+   histExdd->GetXaxis()->SetTitle("Ex [MeV]");
+   */
 
    // Saving histograms in a .root file ...
    TFile * Results = new TFile("kine_results_5109_5116.root","recreate");
