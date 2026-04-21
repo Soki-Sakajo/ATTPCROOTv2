@@ -85,8 +85,9 @@ void kine(){
    
    // Histogram definitions.
    // ... ATTPC PID
-   TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];roughRange [mm]", 500, 0, 1030, 1600, 0, 4000);
-   TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];roughRange [mm]", 500, 0, 1030, 1600, 0, 4000);
+   TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 500, 0, 1030, 600, 0, 6e5);
+   TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
+   TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
    // ... kinematics 
    TH2F *histEstimatedKinEVThetaLABTotal = new TH2F("histEstimatedKinEVThetaLABTotal", "histEstimatedKinEVThetaLABTotal;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
    TH2F *histEstimatedKinEVThetaLAB_Carbon = new TH2F("histEstimatedKinEVThetaLAB_Carbon", "histEstimatedKinEVThetaLAB_Carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
@@ -148,6 +149,7 @@ void kine(){
             auto *pattern = track.GetPattern();
             auto firstPoint = track.GetFirstPoint();
             auto lastPoint = track.GetLastPoint();
+            auto charge = track.GetGeoQEnergy();
             double roughRangeEstimation = pattern->DistanceAlongPattern(lastPoint, firstPoint);
             auto pseudoVertex = pattern->ClosestPointOnPattern(firstPoint);
             double trackThetaLAB = track.GetGeoTheta() * 180 / TMath::Pi();
@@ -182,6 +184,7 @@ void kine(){
             if (rangeInBigPads / roughRangeEstimation < 0.05)
                reachedBigPads = false;
 
+            histChargeTotalRange->Fill(roughRangeEstimation,charge);
             histRangeVThetaLAB->Fill(trackThetaLAB, roughRangeEstimation);
             histdEdxVTotalRange->Fill(roughRangeEstimation, dEdx);
             if (!reachedBigPads)
@@ -203,13 +206,13 @@ void kine(){
             } else {
                estimatedKinE = -1;
             }
-            */
 
             // While we don't have cut files defined, assume deuteron.
             //while (eLossModelC3D8_d->GetRange(estimatedKinE) < roughRangeEstimation)
                //estimatedKinE += 0.01;
 
             histEstimatedKinEVThetaLABTotal->Fill(trackThetaLAB, estimatedKinE);
+            */
 
             /*
             // Kinematics plots
@@ -275,45 +278,26 @@ void kine(){
 
    // Draw histograms in TCanvas.
    TCanvas *c1 = new TCanvas();
+   histChargeTotalRange->SetDirectory(0);
+   histChargeTotalRange->Draw("colz");
+   histChargeTotalRange->GetXaxis()->SetTitle("roughRange [mm]");
+   histChargeTotalRange->GetYaxis()->SetTitle("Charge [ADC]");
+
+   TCanvas *c2 = new TCanvas();
    histRangeVThetaLAB->SetDirectory(0);
+   histRangeVThetaLAB->Draw("colz");
    histRangeVThetaLAB->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB->GetYaxis()->SetTitle("roughRange [mm]");
 
-   TCanvas *c2 = new TCanvas();
-   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
-   histEstimatedKinEVThetaLABTotal->Draw("colz");
-   //kine_d3He->Draw("same");
-   //kine_d3HeEx2_2->Draw("same");
-   //kine_d3HeEx2_7->Draw("same");
-   histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
-
-   /*
    TCanvas *c3 = new TCanvas();
-   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
-   histEstimatedKinEVThetaLABTotal->Draw("colz");
-   //   kine_dp_gs->Draw("same");
-   //   kine_dd_gs->Draw("same");
-   histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
-   */
-
-   TCanvas *c4 = new TCanvas();
-   histThetaLABThetaLAB->SetDirectory(0);
-   histThetaLABThetaLAB->Draw("zcol");
-   //kine_d3He_tt->Draw("same");
-   histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
-   histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-
-   TCanvas *c5 = new TCanvas();
    histdEdxVTotalRange->SetDirectory(0);
    histdEdxVTotalRange->Draw("zcol");
    //   cutPIDproton->Draw("same");
    //   cutPIDdeuteron->Draw("same");
    histdEdxVTotalRange->GetXaxis()->SetTitle("roughRange [mm]");
-   histdEdxVTotalRange->GetYaxis()->SetTitle("roughRange [mm]");
+   histdEdxVTotalRange->GetYaxis()->SetTitle("dEdx [ADC/mm]");
 
-   TCanvas *c6 = new TCanvas();
+   TCanvas *c4 = new TCanvas();
    histdEdxVTotalRangeBackwards->SetDirectory(0);
    histdEdxVTotalRangeBackwards->Draw("zcol");
    //   cutPIDproton->Draw("same");
@@ -322,12 +306,36 @@ void kine(){
    histdEdxVTotalRangeBackwards->GetYaxis()->SetTitle("#frac{dE}{dx} [ADC/mm]");
 
    /*
+   TCanvas *c5 = new TCanvas();
+   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
+   histEstimatedKinEVThetaLABTotal->Draw("colz");
+   //kine_d3He->Draw("same");
+   //kine_d3HeEx2_2->Draw("same");
+   //kine_d3HeEx2_7->Draw("same");
+   histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
+
+   TCanvas *c6 = new TCanvas();
+   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
+   histEstimatedKinEVThetaLABTotal->Draw("colz");
+   //   kine_dp_gs->Draw("same");
+   //   kine_dd_gs->Draw("same");
+   histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
+
    TCanvas *c7 = new TCanvas();
+   histThetaLABThetaLAB->SetDirectory(0);
+   histThetaLABThetaLAB->Draw("zcol");
+   //kine_d3He_tt->Draw("same");
+   histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+
+   TCanvas *c8 = new TCanvas();
    histExdp->SetDirectory(0);
    histExdp->Draw();
    histExdp->GetXaxis()->SetTitle("Ex [MeV]");
 
-   TCanvas *c8 = new TCanvas();
+   TCanvas *c9 = new TCanvas();
    histExdd->SetDirectory(0);
    histExdd->Draw();
    histExdd->GetXaxis()->SetTitle("Ex [MeV]");
