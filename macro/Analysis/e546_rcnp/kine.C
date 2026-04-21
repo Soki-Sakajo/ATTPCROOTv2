@@ -379,15 +379,15 @@ void kine(){
    Results->Close();
 
    // save canvases
-   c1->SaveAs("data/kine_charge_range.C");
-   c2->SaveAs("data/kine_thetaLAB_range.C");
-   c3->SaveAs("data/kine_dEdx_range.C");
-   c4->SaveAs("data/kine_dEdx_range_backwards.C");
-   //   c5->SaveAs("data/kine_kinE_thetaLAB.C");
-   //   c6->SaveAs("data/kine_kinE_thetaLAB_kinematics.C");
-   //   c7->SaveAs("data/kine_thetaLAB_thetaLAB.C");
-   //   c8->SaveAs("data/kine_Ex_dp.C");
-   //   c9->SaveAs("data/kine_Ex_dd.C");
+   c1->SaveAs("hist_data/kine_charge_range.C");
+   c2->SaveAs("hist_data/kine_thetaLAB_range.C");
+   c3->SaveAs("hist_data/kine_dEdx_range.C");
+   c4->SaveAs("hist_data/kine_dEdx_range_backwards.C");
+   //   c5->SaveAs("hist_data/kine_kinE_thetaLAB.C");
+   //   c6->SaveAs("hist_data/kine_kinE_thetaLAB_kinematics.C");
+   //   c7->SaveAs("hist_data/kine_thetaLAB_thetaLAB.C");
+   //   c8->SaveAs("hist_data/kine_Ex_dp.C");
+   //   c9->SaveAs("hist_data/kine_Ex_dd.C");
 
 }
 
