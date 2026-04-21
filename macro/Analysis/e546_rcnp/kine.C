@@ -85,7 +85,7 @@ void kine(){
    
    // Histogram definitions.
    // ... ATTPC PID
-   TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 500, 0, 1030, 600, 0, 6e5);
+   TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 400, 0, 1200, 300, 0, 6e5);
    TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
    TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
    // ... kinematics 
