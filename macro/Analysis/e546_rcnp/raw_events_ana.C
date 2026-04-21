@@ -176,31 +176,31 @@ void raw_events_ana(){
       // Iterate over AtPads.
       for (auto &pad: pads) {
 	for (int j = 0; j < 512; j++) {
-	  Double_t ADC = pad->GetADC(j);
-	  Double_t rawADC = pad->GetRawADC(j);
-	  Int_t padNum = pad->GetPadNum();
-	  histADC->Fill(ADC);
-	  histRawADC->Fill(rawADC);
-	  histADCvTB2->Fill(j, ADC);
-	  histRawADCvTB2->Fill(j, rawADC);
+    Double_t ADC = pad->GetADC(j);
+    Double_t rawADC = pad->GetRawADC(j);
+    Int_t padNum = pad->GetPadNum();
+    histADC->Fill(ADC);
+    histRawADC->Fill(rawADC);
+    histADCvTB2->Fill(j, ADC);
+    histRawADCvTB2->Fill(j, rawADC);
 
-	  if (ADC > threshold){
-	    histADCvTB->Fill(j, ADC);
-	    histADCvT->Fill(j*SP, ADC);
-	  }
+    if (ADC > threshold){
+      histADCvTB->Fill(j, ADC);
+      histADCvT->Fill(j*SP, ADC);
+    }
 	  histADCPerPad[padNum / 512]->Fill(padNum - (padNum / 512) * 512, ADC);
 	  //histRawADCPerPad[padNum / 512]->Fill(padNum - (padNum / 512) * 512, rawADC);
 
-	  if (map->GetPadSize(padNum) == 0) {
-	    int smallPadNum = padNumToSmallPadNum.at(padNum);
+    if (map->GetPadSize(padNum) == 0) {
+      int smallPadNum = padNumToSmallPadNum.at(padNum);
 	    histADCPerSmallPad[smallPadNum / 512]->Fill(smallPadNum - (smallPadNum / 512) * 512, ADC);
 	    //histRawADCPerSmallPad[smallPadNum / 512]->Fill(smallPadNum - (smallPadNum / 512) * 512, rawADC);
-	  }
-	  else if (map->GetPadSize(padNum) == 1) {
-	    int bigPadNum = padNumToBigPadNum.at(padNum);
+    }
+    else if (map->GetPadSize(padNum) == 1) {
+      int bigPadNum = padNumToBigPadNum.at(padNum);
 	    histADCPerBigPad[bigPadNum / 512]->Fill(bigPadNum - (bigPadNum / 512) * 512, ADC);
 	    //histRawADCPerBigPad[bigPadNum / 512]->Fill(bigPadNum - (bigPadNum / 512) * 512, rawADC);
-	  }
+    }
 	}
       }
       if(i%1000==0){

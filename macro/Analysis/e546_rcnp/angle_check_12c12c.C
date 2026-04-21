@@ -1,11 +1,11 @@
-void angle_check_12c12c()
-{
-	bool sigle_event = true;
+void angle_check_12c12c(){
+
+	bool single_event = true;
 	FairRunAna *run = new FairRunAna();
 
 	Int_t run_number = 52;
 
-	TString inputpath = "~/fair_install/decode_data/";
+	TString inputpath = "decode_data/";
 	TString inputfile = inputpath + TString::Format("run_%04d.root",run_number);
 	TFile *file = new TFile(inputfile, "READ");
 
@@ -83,7 +83,7 @@ void angle_check_12c12c()
 					//std::cout<< "    Track theta :"<< track.GetGeoTheta() << std::endl;
 				}
 
-				if(sigle_event ==1 ){
+				if(single_event ==1 ){
 					TCanvas *c3 = new TCanvas("c1","c1",1200,600);
 					c3->Divide(2,1);
 					c3->cd(1); h_xy->Draw("colz");
@@ -143,7 +143,7 @@ void angle_check_12c12c()
 					//std::cout<< "    Track theta :"<< track.GetGeoTheta() << std::endl;
 				}
 
-				if(sigle_event ==1 ){
+				if(single_event ==1 ){
 					TCanvas *c3 = new TCanvas("c1","c1",1200,600);
 					c3->Divide(2,1);
 					c3->cd(1); h_xy->Draw("colz");

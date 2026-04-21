@@ -17,7 +17,7 @@ void kine(){
 
    // events.
    std::vector runNums = {52};
-   TFile * Results = new TFile("kine_results.root","recreate");
+   TFile * Results = new TFile("data/kine_results.root","recreate");
 
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
@@ -30,7 +30,7 @@ void kine(){
    AtTpcMap *map = new AtTpcMap();
    map->ParseXMLMap(mapDir.Data());
    map->GeneratePadPlane();
-   Double_t r_tri = 0;
+   Double_t r_tri = 300;
    Double_t r_max = 0;
 
    // Punch through filter.
@@ -275,13 +275,12 @@ void kine(){
 
    // Draw histograms in TCanvas.
    TCanvas *c1 = new TCanvas();
-   c1->cd();
-   histRangeVThetaLAB->Draw("zcol");
+   histRangeVThetaLAB->SetDirectory(0);
    histRangeVThetaLAB->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB->GetYaxis()->SetTitle("roughRange [mm]");
 
    TCanvas *c2 = new TCanvas();
-   c2->cd();
+   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
    histEstimatedKinEVThetaLABTotal->Draw("colz");
    //kine_d3He->Draw("same");
    //kine_d3HeEx2_2->Draw("same");
@@ -289,23 +288,25 @@ void kine(){
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
+   /*
    TCanvas *c3 = new TCanvas();
-   c3->cd();
+   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
    histEstimatedKinEVThetaLABTotal->Draw("colz");
    //   kine_dp_gs->Draw("same");
    //   kine_dd_gs->Draw("same");
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
+   */
 
    TCanvas *c4 = new TCanvas();
-   c4->cd();
+   histThetaLABThetaLAB->SetDirectory(0);
    histThetaLABThetaLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
 
    TCanvas *c5 = new TCanvas();
-   c5->cd();
+   histdEdxVTotalRange->SetDirectory(0);
    histdEdxVTotalRange->Draw("zcol");
    //   cutPIDproton->Draw("same");
    //   cutPIDdeuteron->Draw("same");
@@ -313,7 +314,7 @@ void kine(){
    histdEdxVTotalRange->GetYaxis()->SetTitle("roughRange [mm]");
 
    TCanvas *c6 = new TCanvas();
-   c6->cd();
+   histdEdxVTotalRangeBackwards->SetDirectory(0);
    histdEdxVTotalRangeBackwards->Draw("zcol");
    //   cutPIDproton->Draw("same");
    //   cutPIDdeuteron->Draw("same");
@@ -322,12 +323,12 @@ void kine(){
 
    /*
    TCanvas *c7 = new TCanvas();
-   c7->cd();
+   histExdp->SetDirectory(0);
    histExdp->Draw();
    histExdp->GetXaxis()->SetTitle("Ex [MeV]");
 
    TCanvas *c8 = new TCanvas();
-   c8->cd();
+   histExdd->SetDirectory(0);
    histExdd->Draw();
    histExdd->GetXaxis()->SetTitle("Ex [MeV]");
    */
@@ -335,6 +336,7 @@ void kine(){
    // Saving histograms in a .root file ...
    Results->cd();
 
+   histRangeVThetaLAB->Write();
    // dE Vs Total Range
    histdEdxVTotalRange->Write();
    histdEdxVTotalRangeBackwards->Write();
