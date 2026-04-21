@@ -343,7 +343,6 @@ void kine(){
 
    // Saving histograms in a .root file ...
    Results->cd();
-
    histRangeVThetaLAB->Write();
    // dE Vs Total Range
    histdEdxVTotalRange->Write();
@@ -363,14 +362,12 @@ void kine(){
    //   kine_dd_gs->Write("kin_dd_gs");
    //   kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
    //   kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
-
    /*
    // Excitation energy spectra
    histExdp->Write();
    histExdp_extended->Write();
    histExdp_CarbonSi->Write();
    histExdd->Write();
-
    // Angular distributions 
    histAngDist_elastic->Write();
    histAngDist_dp->Write();
@@ -379,8 +376,19 @@ void kine(){
 
    // Others ...
    histThetaLABThetaLAB->Write();
-
    Results->Close();
+
+   // save canvases
+   c1->SaveAs("data/kine_charge_range.C");
+   c2->SaveAs("data/kine_thetaLAB_range.C");
+   c3->SaveAs("data/kine_dEdx_range.C");
+   c4->SaveAs("data/kine_dEdx_range_backwards.C");
+   //   c5->SaveAs("data/kine_kinE_thetaLAB.C");
+   //   c6->SaveAs("data/kine_kinE_thetaLAB_kinematics.C");
+   //   c7->SaveAs("data/kine_thetaLAB_thetaLAB.C");
+   //   c8->SaveAs("data/kine_Ex_dp.C");
+   //   c9->SaveAs("data/kine_Ex_dd.C");
+
 }
 
 TGraph* ReadKinematics(TString kineFile){
