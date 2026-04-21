@@ -4,8 +4,8 @@
 void kine_dEdx_range_backwards()
 {
 //=========Macro generated from canvas: c1_n4/c1_n4
-//=========  (Tue Apr 21 15:08:08 2026) by ROOT version 6.26/10
-   TCanvas *c1_n4 = new TCanvas("c1_n4", "c1_n4",107,748,700,500);
+//=========  (Tue Apr 21 17:46:54 2026) by ROOT version 6.26/10
+   TCanvas *c1_n4 = new TCanvas("c1_n4", "c1_n4",508,801,700,500);
    c1_n4->Range(0,0,1,1);
    c1_n4->SetFillColor(0);
    c1_n4->SetBorderMode(0);

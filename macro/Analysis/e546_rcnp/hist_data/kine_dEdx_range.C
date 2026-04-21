@@ -4,8 +4,8 @@
 void kine_dEdx_range()
 {
 //=========Macro generated from canvas: c1_n3/c1_n3
-//=========  (Tue Apr 21 15:08:08 2026) by ROOT version 6.26/10
-   TCanvas *c1_n3 = new TCanvas("c1_n3", "c1_n3",449,792,700,500);
+//=========  (Tue Apr 21 17:46:54 2026) by ROOT version 6.26/10
+   TCanvas *c1_n3 = new TCanvas("c1_n3", "c1_n3",422,752,700,500);
    c1_n3->Range(0,0,1,1);
    c1_n3->SetFillColor(0);
    c1_n3->SetBorderMode(0);

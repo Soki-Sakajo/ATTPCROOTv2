@@ -4,8 +4,8 @@
 void kine_thetaLAB_range()
 {
 //=========Macro generated from canvas: c1_n2/c1_n2
-//=========  (Tue Apr 21 15:08:08 2026) by ROOT version 6.26/10
-   TCanvas *c1_n2 = new TCanvas("c1_n2", "c1_n2",236,821,700,500);
+//=========  (Tue Apr 21 17:46:54 2026) by ROOT version 6.26/10
+   TCanvas *c1_n2 = new TCanvas("c1_n2", "c1_n2",290,774,700,500);
    c1_n2->Range(0,0,1,1);
    c1_n2->SetFillColor(0);
    c1_n2->SetBorderMode(0);
