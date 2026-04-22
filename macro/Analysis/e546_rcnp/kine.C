@@ -18,6 +18,7 @@ void kine(){
    // events.
    std::vector runNums = {52};
    TFile * Results = new TFile("data/kine_results.root","recreate");
+   std::ofstream Results_c("output_can/kine_canvases.C");
 
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
@@ -30,8 +31,6 @@ void kine(){
    AtTpcMap *map = new AtTpcMap();
    map->ParseXMLMap(mapDir.Data());
    map->GeneratePadPlane();
-   Double_t r_tri = 300;
-   Double_t r_max = 0;
 
    // Punch through filter.
    double punchThroughThreshold = 20;
@@ -82,10 +81,27 @@ void kine(){
    legend->AddEntry(kinecurve_3HeGS,"3He G.S.","l");
    legend->AddEntry(ang_lab_cm_3HeGS,"5 deg pitch in #theta_{cm}","p");
    legend->SetFillColor(0);*/
-   
+
+   // Characteristic definitions
+   Int_t narray = 10;
+   Int_t ntrack = 0;
+   Int_t itrack = 0;
+   Double_t rad = -100;
+   Double_t r_tem = 0;
+   Double_t r_max = 0;
+   Double_t r_tri = 300;
+   Double_t track_theta[narray];
+   Double_t track_phi[narray];
+   Double_t track_range[narray];
+   Double_t track_charge[narray];
+   Double_t track_r[narray];
+
    // Histogram definitions.
+   // ... Rmax check
+   TH1D *histrmax = new TH1F("histrmax", "histrmax;Rmax [mm]", 600, 0, 300);
    // ... ATTPC PID
    TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
+   TH2F *histChargeTotalRange_cutPhi = new TH2F("histChargeTotalRange_cutPhi", "histChargeTotalRange_cutPhi;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
    TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
    TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
    // ... kinematics 
@@ -93,6 +109,11 @@ void kine(){
    TH2F *histEstimatedKinEVThetaLAB_Carbon = new TH2F("histEstimatedKinEVThetaLAB_Carbon", "histEstimatedKinEVThetaLAB_Carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
    TH2F *histEstimatedKinEVThetaLAB_Alpha = new TH2F("histEstimatedKinEVThetaLAB_Alpha", "histEstimatedKinEVThetaLAB_Alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
 
+   // ... angle correlations
+   TH2F *histThetaLABThetaLAB = new TH2F("histThetaLABThetaLAB", "histThetaLABThetaLAB", 360, 0, 180, 360, 0, 180);
+   TH2F *histPhiLABPhiLAB = new TH2F("histPhiLABPhiLAB", "histPhiLABPhiLAB", 360, -180, 180, 360, -180, 180);
+   TH2F *histRangeVThetaLAB = new TH2F("histRangeVThetaLAB", "histRangeVThetaLAB", 180, 0, 180, 1030, 0, 1030);
+   TH2F *histRangeVThetaLAB_cutPhi = new TH2F("histRangeVThetaLAB_cutPhi", "histRangeVThetaLAB_cutPhi", 180, 0, 180, 1030, 0, 1030);
    /*
    // ... Excitation energy 
    TH1F *histExdp = new TH1F("histExdp", "histExdp;Ex [MeV]", 80, -5, 15);
@@ -106,10 +127,8 @@ void kine(){
    TH1F *histAngDist_dp_CarbonSi = new TH1F("histAngDist_dp_CarbonSi", "histAngDist_dp_CarbonSi;#theta_{c.m.} [deg];Counts / deg", 180, 0, 180);
    */
    // ... others ...
-   TH2F *histThetaLABThetaLAB = new TH2F("histThetaLABThetaLAB", "histThetaLABThetaLAB", 360, 0, 180, 360, 0, 180);
    TH2F *histESmallVTotalRange = new TH2F("histESmallVTotalRange", "histESmallVTotalRange", 500, 0, 1030, 1600, 0, 160000);
    TH2F *histEBigVBigRange = new TH2F("histEBigVBigRange", "histEBigVBigRange", 500, 0, 1030, 1600, 0, 160000);
-   TH2F *histRangeVThetaLAB = new TH2F("histRangeVThetaLAB", "histRangeVThetaLAB", 180, 0, 180, 1030, 0, 1030);
    TH2F *histEstimatedKinEVThetaLAB2H  = new TH2F("histEstimatedKinEVThetaLAB2H", "histEstimatedKinEVThetaLAB2H", 180, 0, 180, 250, 0, 20);
    TH2F *histEstimatedKinEVThetaLAB1H  = new TH2F("histEstimatedKinEVThetaLAB1H", "histEstimatedKinEVThetaLAB1H", 180, 0, 180, 250, 0, 20);
 
@@ -134,6 +153,10 @@ void kine(){
 
          // We want to focus on events with 2 or less tracks for now.
          auto &tracks = patternEvent->GetTrackCand();
+         ntrack = tracks.size();
+         rad = -100;
+         r_tem = -100;
+         itrack = 0;
          //         int maxTrackNum{4};
          //         if (tracks.size() > maxTrackNum) continue;
          //         if (tracks.size() == 2) nEventsWith2Tracks++;
@@ -145,25 +168,26 @@ void kine(){
          for (auto &track: tracks) {
             bool isPunchThrough = punchThroughChecker.IsPunchThrough(&track);
             // if (isPunchThrough) continue;
-
+            double smallPadCharge{};
+            double bigPadCharge{};
+            double rangeInSmallPads{};
             auto *pattern = track.GetPattern();
             auto firstPoint = track.GetFirstPoint();
             auto lastPoint = track.GetLastPoint();
-            auto charge = track.GetGeoQEnergy();
-            double roughRangeEstimation = pattern->DistanceAlongPattern(lastPoint, firstPoint);
             auto pseudoVertex = pattern->ClosestPointOnPattern(firstPoint);
-            double trackThetaLAB = track.GetGeoTheta() * 180 / TMath::Pi();
-            double trackPhi = track.GetGeoPhi() * 180 / TMath::Pi();
-            double smallPadCharge{};
-            double bigPadCharge{};
             auto braggCurvePairs = track.GetBraggCurveValues();
             auto &hits = track.GetHitArray();
-            double rangeInSmallPads{};
+
+            track_range[itrack] = pattern->DistanceAlongPattern(lastPoint, firstPoint);
+            track_charge[itrack] = track.GetGeoQEnergy();
+            track_theta[itrack] = 180 - track.GetGeoTheta() * 180 / TMath::Pi();
+            track_phi[itrack] = track.GetGeoPhi() * 180 / TMath::Pi();
+
             for (auto &hit: hits) {
                auto pos = hit->GetPosition();
-               auto rad = TMath::Sqrt(pos.X() * pos.X() + pos.Y() * pos.Y());
                int padNum = hit->GetPadNum();
                int sizeID = map->GetPadSize(padNum);
+               rad = TMath::Sqrt(pos.X() * pos.X() + pos.Y() * pos.Y());
                if (sizeID == 1) {
                   bigPadCharge += hit->GetCharge();
                   continue;
@@ -173,27 +197,36 @@ void kine(){
                if (currentRangeInSmallPads > rangeInSmallPads){
                   rangeInSmallPads = currentRangeInSmallPads;
                }
-               if(rad > r_max){
-                  r_max = rad;
+               if (rad > r_tem){
+                  r_tem = rad;
                }
             }
+            track_r[itrack] = r_tem;
+            if(track_r[itrack] > r_max){
+               r_max = track_r[itrack];
+            }
+
             double dEdx = smallPadCharge / rangeInSmallPads;
 
             double rangeInBigPads = roughRangeEstimation - rangeInSmallPads;
             bool reachedBigPads = true;
-            if (rangeInBigPads / roughRangeEstimation < 0.05)
+            if (rangeInBigPads / roughRangeEstimation < 0.05){
                reachedBigPads = false;
+            }
 
             histChargeTotalRange->Fill(roughRangeEstimation,charge);
             histRangeVThetaLAB->Fill(trackThetaLAB, roughRangeEstimation);
             histdEdxVTotalRange->Fill(roughRangeEstimation, dEdx);
-            if (!reachedBigPads)
+            if (!reachedBigPads){
                histESmallVTotalRange->Fill(roughRangeEstimation, smallPadCharge);
-            else
+            }
+            else {
                histEBigVBigRange->Fill(rangeInBigPads, bigPadCharge);
+            }
 
-            if (trackThetaLAB > 100)
+            if (trackThetaLAB > 100){
                histdEdxVTotalRangeBackwards->Fill(roughRangeEstimation, dEdx);
+            }
 
             double estimatedKinE{0.1};
             /*
@@ -252,9 +285,17 @@ void kine(){
                }
             }
             */
+            itrack ++;
          }
+         histrmax->Fill(r_max);
          if(r_tri > r_max){
             r_tri = r_max;
+         }
+         if(abs(abs(phi[0] - phi[1]) - 180) < 5){
+            histChargeRange_cutPhi -> Fill(track_range[0], track_charge[0]);
+            histThetaLABThetaLAB -> Fill(track_theta[0], track_theta[1]);
+            histRangeVThetaLAB_cutPhi -> Fill(track_theta[0], track_range[0]);
+            histPhiLABPhiLAB -> Fill(track_phi[0], track_phi[1]);
          }
          if(i%100==0){
             std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
@@ -277,6 +318,11 @@ void kine(){
    */
 
    // Draw histograms in TCanvas.
+   TCanvas *c0 = new TCanvas();
+   histrmax->SetDirectory(0);
+   histrmax->Draw();
+   histrmax->GetXaxis()->SetTitle("Rmax [mm]");
+
    TCanvas *c1 = new TCanvas();
    histChargeTotalRange->SetDirectory(0);
    histChargeTotalRange->Draw("colz");
@@ -305,6 +351,36 @@ void kine(){
    histdEdxVTotalRangeBackwards->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRangeBackwards->GetYaxis()->SetTitle("#frac{dE}{dx} [ADC/mm]");
 
+   TCanvas *c5 = new TCanvas();
+   histChargeTotalRange_cutPhi->SetDirectory(0);
+   histChargeTotalRange_cutPhi->Draw("colz");
+   histChargeTotalRange_cutPhi->GetXaxis()->SetTitle("roughRange [mm]");
+   histChargeTotalRange_cutPhi->GetYaxis()->SetTitle("Charge [ADC]");
+   histChargeTotalRange_cutPhi->SetTitle("Charge Vs Range (phi1-phi2-180 deg < 5 deg)");
+
+   TCanvas *c6 = new TCanvas();
+   histThetaLABThetaLAB->SetDirectory(0);
+   histThetaLABThetaLAB->Draw("zcol");
+   //kine_d3He_tt->Draw("same");
+   histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   histThetaLABThetaLAB->SetTitle("Theta LAB Vs Theta LAB (phi1-phi2-180 deg < 5 deg)");
+
+   TCanvas *c7 = new TCanvas();
+   histRangeVThetaLAB_cutPhi->SetDirectory(0);
+   histRangeVThetaLAB_cutPhi->Draw("colz");
+   histRangeVThetaLAB_cutPhi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   histRangeVThetaLAB_cutPhi->GetYaxis()->SetTitle("roughRange [mm]");
+   histRangeVThetaLAB_cutPhi->SetTitle("Range Vs Theta LAB (phi1-phi2-180 deg < 5 deg)");
+
+   TCanvas *c8 = new TCanvas();
+   histPhiLABPhiLAB->SetDirectory(0);
+   histPhiLABPhiLAB->Draw("zcol");
+   //kine_d3He_tt->Draw("same");
+   histPhiLABPhiLAB->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   histPhiLABPhiLAB->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   histPhiLABPhiLAB->SetTitle("Phi LAB Vs Phi LAB (phi1-phi2-180 deg < 5 deg)");
+
    /*
    TCanvas *c5 = new TCanvas();
    histEstimatedKinEVThetaLABTotal->SetDirectory(0);
@@ -323,13 +399,6 @@ void kine(){
    histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
 
-   TCanvas *c7 = new TCanvas();
-   histThetaLABThetaLAB->SetDirectory(0);
-   histThetaLABThetaLAB->Draw("zcol");
-   //kine_d3He_tt->Draw("same");
-   histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
-   histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-
    TCanvas *c8 = new TCanvas();
    histExdp->SetDirectory(0);
    histExdp->Draw();
@@ -343,8 +412,10 @@ void kine(){
 
    // Saving histograms in a .root file ...
    Results->cd();
-   histRangeVThetaLAB->Write();
-   // dE Vs Total Range
+   histrmax->Write();
+   histChargeTotalRange->Write();
+   histChargeTotalRange_cutPhi->Write();
+   // dEdx Vs Total Range
    histdEdxVTotalRange->Write();
    histdEdxVTotalRangeBackwards->Write();
    //   cutPIDproton->Write("PIDCutProton");
@@ -353,15 +424,23 @@ void kine(){
 
    // Kinematics
    histEstimatedKinEVThetaLABTotal->Write();
-   //   histEstimatedKinEVThetaLAB_ProtonATTPC->Write();
-   //   histEstimatedKinEVThetaLAB_ProtonATTPC_extended->Write();
-   //   histEstimatedKinEVThetaLAB_DeuteronATTPC->Write();
-   //   histEstimatedKinEVThetaLAB_CarbonSi->Write();
-   //   histEstimatedKinEVThetaLAB_NitrogenSi->Write();
-   //   kine_dp_gs->Write("kin_dp_gs");
-   //   kine_dd_gs->Write("kin_dd_gs");
-   //   kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
-   //   kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
+   /*
+   histEstimatedKinEVThetaLAB_ProtonATTPC->Write();
+   histEstimatedKinEVThetaLAB_ProtonATTPC_extended->Write();
+   histEstimatedKinEVThetaLAB_DeuteronATTPC->Write();
+   histEstimatedKinEVThetaLAB_CarbonSi->Write();
+   histEstimatedKinEVThetaLAB_NitrogenSi->Write();
+   kine_dp_gs->Write("kin_dp_gs");
+   kine_dd_gs->Write("kin_dd_gs");
+   kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
+   kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
+   */
+
+   // angle correlations
+   histRangeVThetaLAB->Write();
+   histThetaLABThetaLAB->Write();
+   histPhiLABPhiLAB->Write();
+
    /*
    // Excitation energy spectra
    histExdp->Write();
@@ -375,20 +454,27 @@ void kine(){
    */
 
    // Others ...
-   histThetaLABThetaLAB->Write();
+   /*
+   histESmallVTotalRange->Write();
+   histEBigVBigRange->Write();
+   histEstimatedKinEVThetaLAB2H->Write();
+   histEstimatedKinEVThetaLAB1H->Write();
+   */
    Results->Close();
 
    // save canvases
-   c1->SaveAs("hist_data/kine_charge_range.C");
-   c2->SaveAs("hist_data/kine_thetaLAB_range.C");
-   c3->SaveAs("hist_data/kine_dEdx_range.C");
-   c4->SaveAs("hist_data/kine_dEdx_range_backwards.C");
-   //   c5->SaveAs("hist_data/kine_kinE_thetaLAB.C");
-   //   c6->SaveAs("hist_data/kine_kinE_thetaLAB_kinematics.C");
-   //   c7->SaveAs("hist_data/kine_thetaLAB_thetaLAB.C");
-   //   c8->SaveAs("hist_data/kine_Ex_dp.C");
-   //   c9->SaveAs("hist_data/kine_Ex_dd.C");
-
+   Results_c << "void kine_canvases(){\n" << std::endl;
+   c0->SetPrimitive(Results_c, "kine_rmax");
+   c1->SetPrimitive(Results_c, "kine_charge_range");
+   c2->SetPrimitive(Results_c, "kine_thetaLAB_range");
+   c3->SetPrimitive(Results_c, "kine_dEdx_range");
+   c4->SetPrimitive(Results_c, "kine_dEdx_range_backwards");
+   c5->SetPrimitive(Results_c, "kine_charge_range_cutPhi");
+   c6->SetPrimitive(Results_c, "kine_thetaLAB_thetaLAB");
+   c7->SetPrimitive(Results_c, "kine_thetaLAB_range_cutPhi");
+   c8->SetPrimitive(Results_c, "kine_phiLAB_phiLAB");
+   Results_c << "}\n" << std::endl;
+   Results_c.close();
 }
 
 TGraph* ReadKinematics(TString kineFile){

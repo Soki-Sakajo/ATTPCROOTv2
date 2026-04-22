@@ -159,7 +159,7 @@ void angle_check_12c12c(){
 				}
 			}
 		}
-		if(i % 10000 == 0)cout<<"processing : "<<i<<" / "<<nEvents<<endl;
+		if(i % 1000 == 0)cout<<"processing : "<<i<<" / "<<nEvents<<endl;
 	}
 
 	//file->Close();
