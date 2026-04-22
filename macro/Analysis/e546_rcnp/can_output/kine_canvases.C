@@ -1,5 +1,5 @@
 void kine_canvases(){
-   //2026/04/22 
+   //2026/04/22 19:00
    c1->Range(0,0,1,1);
    c1->SetFillColor(0);
    c1->SetBorderMode(0);
