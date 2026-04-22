@@ -90,6 +90,7 @@ void kine(){
    legend->SetFillColor(0);*/
 
    // Characteristic definitions
+   char histname[100] = {0};
    Int_t narray = 10;
    Int_t ntrack = 0;
    Int_t itrack = 0;
@@ -363,7 +364,9 @@ void kine(){
    histChargeTotalRange_cutPhi->Draw("colz");
    histChargeTotalRange_cutPhi->GetXaxis()->SetTitle("roughRange [mm]");
    histChargeTotalRange_cutPhi->GetYaxis()->SetTitle("Charge [ADC]");
-   histChargeTotalRange_cutPhi->SetTitle("Charge Range (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)");
+   histname = {0};
+   histname = "Charge Range (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
+   histChargeTotalRange_cutPhi->SetTitle(histname.c_str());
 
    TCanvas *c6 = new TCanvas();
    histThetaLABThetaLAB->SetDirectory(0);
@@ -371,14 +374,18 @@ void kine(){
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-   histThetaLABThetaLAB->SetTitle("Theta_LAB Theta_LAB (phi1-phi2-180 < " + std::to_string(del_phi) + " )");
+   histname = {0};
+   histname = "Theta_LAB Theta_LAB (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
+   histThetaLABThetaLAB->SetTitle(histname.c_str());
 
    TCanvas *c7 = new TCanvas();
    histRangeVThetaLAB_cutPhi->SetDirectory(0);
    histRangeVThetaLAB_cutPhi->Draw("colz");
    histRangeVThetaLAB_cutPhi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB_cutPhi->GetYaxis()->SetTitle("roughRange [mm]");
-   histRangeVThetaLAB_cutPhi->SetTitle("Range Theta_LAB (phi1-phi2-180 < " + std::to_string(del_phi) + " )");
+   histname = {0};
+   histname = "Range Theta_LAB (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
+   histRangeVThetaLAB_cutPhi->SetTitle(histname.c_str());
 
    TCanvas *c8 = new TCanvas();
    histPhiLABPhiLAB->SetDirectory(0);
@@ -386,7 +393,9 @@ void kine(){
    //kine_d3He_tt->Draw("same");
    histPhiLABPhiLAB->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    histPhiLABPhiLAB->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
-   histPhiLABPhiLAB->SetTitle("Phi_LAB Phi_LAB (phi1-phi2-180 < " + std::to_string(del_phi) + " )");
+   histname = {0};
+   histname = "Phi_LAB Phi_LAB (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
+   histPhiLABPhiLAB->SetTitle(histname.c_str());
 
    /*
    TCanvas *c5 = new TCanvas();
