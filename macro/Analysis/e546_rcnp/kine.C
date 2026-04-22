@@ -1,3 +1,8 @@
+#include <fstream>
+#include "TFile.h"
+#include "TObject.h"
+#include "TCanvas.h"
+
 TGraph* ReadKinematics(TString kineFile);
 Double_t omega(Double_t x, Double_t y, Double_t z);
 std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Double_t thetalab, Double_t K_eject);
@@ -98,7 +103,7 @@ void kine(){
 
    // Histogram definitions.
    // ... Rmax check
-   TH1D *histrmax = new TH1F("histrmax", "histrmax;Rmax [mm]", 600, 0, 300);
+   TH1D *histrmax = new TH1D("histrmax", "histrmax;Rmax [mm]", 600, 0, 300);
    // ... ATTPC PID
    TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
    TH2F *histChargeTotalRange_cutPhi = new TH2F("histChargeTotalRange_cutPhi", "histChargeTotalRange_cutPhi;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
@@ -207,25 +212,24 @@ void kine(){
             }
 
             double dEdx = smallPadCharge / rangeInSmallPads;
-
-            double rangeInBigPads = roughRangeEstimation - rangeInSmallPads;
+            double rangeInBigPads = track_range[itrack] - rangeInSmallPads;
             bool reachedBigPads = true;
-            if (rangeInBigPads / roughRangeEstimation < 0.05){
+            if (rangeInBigPads / track_range[itrack] < 0.05){
                reachedBigPads = false;
             }
 
-            histChargeTotalRange->Fill(roughRangeEstimation,charge);
-            histRangeVThetaLAB->Fill(trackThetaLAB, roughRangeEstimation);
-            histdEdxVTotalRange->Fill(roughRangeEstimation, dEdx);
+            histChargeTotalRange->Fill(track_range[itrack],track_charge[itrack]);
+            histRangeVThetaLAB->Fill(track_theta[itrack], track_range[itrack]);
+            histdEdxVTotalRange->Fill(track_range[itrack], dEdx);
             if (!reachedBigPads){
-               histESmallVTotalRange->Fill(roughRangeEstimation, smallPadCharge);
+               histESmallVTotalRange->Fill(track_range[itrack], smallPadCharge);
             }
             else {
                histEBigVBigRange->Fill(rangeInBigPads, bigPadCharge);
             }
 
-            if (trackThetaLAB > 100){
-               histdEdxVTotalRangeBackwards->Fill(roughRangeEstimation, dEdx);
+            if (track_theta[itrack] > 100){
+               histdEdxVTotalRangeBackwards->Fill(track_range[itrack], dEdx);
             }
 
             double estimatedKinE{0.1};
@@ -291,8 +295,8 @@ void kine(){
          if(r_tri > r_max){
             r_tri = r_max;
          }
-         if(abs(abs(phi[0] - phi[1]) - 180) < 5){
-            histChargeRange_cutPhi -> Fill(track_range[0], track_charge[0]);
+         if(abs(abs(track_phi[0] - track_phi[1]) - 180) < 5){
+            histChargeTotalRange_cutPhi -> Fill(track_range[0], track_charge[0]);
             histThetaLABThetaLAB -> Fill(track_theta[0], track_theta[1]);
             histRangeVThetaLAB_cutPhi -> Fill(track_theta[0], track_range[0]);
             histPhiLABPhiLAB -> Fill(track_phi[0], track_phi[1]);
