@@ -363,7 +363,7 @@ void kine(){
    histChargeTotalRange_cutPhi->Draw("colz");
    histChargeTotalRange_cutPhi->GetXaxis()->SetTitle("roughRange [mm]");
    histChargeTotalRange_cutPhi->GetYaxis()->SetTitle("Charge [ADC]");
-   histChargeTotalRange_cutPhi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", del_phi));
+   histChargeTotalRange_cutPhi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", (int)del_phi));
 
    TCanvas *c6 = new TCanvas();
    histThetaLABThetaLAB->SetDirectory(0);
@@ -372,14 +372,14 @@ void kine(){
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    
-   histThetaLABThetaLAB->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", del_phi));
+   histThetaLABThetaLAB->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
 
    TCanvas *c7 = new TCanvas();
    histRangeVThetaLAB_cutPhi->SetDirectory(0);
    histRangeVThetaLAB_cutPhi->Draw("colz");
    histRangeVThetaLAB_cutPhi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB_cutPhi->GetYaxis()->SetTitle("roughRange [mm]");
-   histRangeVThetaLAB_cutPhi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", del_phi));
+   histRangeVThetaLAB_cutPhi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
 
    TCanvas *c8 = new TCanvas();
    histPhiLABPhiLAB->SetDirectory(0);
@@ -387,7 +387,7 @@ void kine(){
    //kine_d3He_tt->Draw("same");
    histPhiLABPhiLAB->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    histPhiLABPhiLAB->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
-   histPhiLABPhiLAB->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d )", del_phi));
+   histPhiLABPhiLAB->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d )", (int)del_phi));
 
    /*
    TCanvas *c5 = new TCanvas();
