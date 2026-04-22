@@ -9,7 +9,7 @@ std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double
 
 void kine(){
    // set parameters
-   Double_t del_phi = 10.0; // cut value; phi1 - phi2 - 180 deg < del_phi
+   Double_t del_phi = 10; // cut value; phi1 - phi2 - 180 deg < del_phi
    /*
    // Masses.
    double u_to_MeV = 931.49401;
@@ -90,7 +90,6 @@ void kine(){
    legend->SetFillColor(0);*/
 
    // Characteristic definitions
-   char histname[100] = {0};
    Int_t narray = 10;
    Int_t ntrack = 0;
    Int_t itrack = 0;
@@ -364,9 +363,7 @@ void kine(){
    histChargeTotalRange_cutPhi->Draw("colz");
    histChargeTotalRange_cutPhi->GetXaxis()->SetTitle("roughRange [mm]");
    histChargeTotalRange_cutPhi->GetYaxis()->SetTitle("Charge [ADC]");
-   histname = {0};
-   histname = "Charge Range (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
-   histChargeTotalRange_cutPhi->SetTitle(histname.c_str());
+   histChargeTotalRange_cutPhi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", del_phi));
 
    TCanvas *c6 = new TCanvas();
    histThetaLABThetaLAB->SetDirectory(0);
@@ -374,18 +371,15 @@ void kine(){
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-   histname = {0};
-   histname = "Theta_LAB Theta_LAB (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
-   histThetaLABThetaLAB->SetTitle(histname.c_str());
+   
+   histThetaLABThetaLAB->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", del_phi));
 
    TCanvas *c7 = new TCanvas();
    histRangeVThetaLAB_cutPhi->SetDirectory(0);
    histRangeVThetaLAB_cutPhi->Draw("colz");
    histRangeVThetaLAB_cutPhi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB_cutPhi->GetYaxis()->SetTitle("roughRange [mm]");
-   histname = {0};
-   histname = "Range Theta_LAB (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
-   histRangeVThetaLAB_cutPhi->SetTitle(histname.c_str());
+   histRangeVThetaLAB_cutPhi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", del_phi));
 
    TCanvas *c8 = new TCanvas();
    histPhiLABPhiLAB->SetDirectory(0);
@@ -393,9 +387,7 @@ void kine(){
    //kine_d3He_tt->Draw("same");
    histPhiLABPhiLAB->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    histPhiLABPhiLAB->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
-   histname = {0};
-   histname = "Phi_LAB Phi_LAB (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)";
-   histPhiLABPhiLAB->SetTitle(histname.c_str());
+   histPhiLABPhiLAB->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d )", del_phi));
 
    /*
    TCanvas *c5 = new TCanvas();
