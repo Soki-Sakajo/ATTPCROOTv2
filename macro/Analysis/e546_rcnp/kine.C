@@ -468,15 +468,15 @@ void kine(){
 
    // save canvases
    Results_c << "void kine_canvases(){\n" << std::endl;
-   c0->SetPrimitive(Results_c, "kine_rmax");
-   c1->SetPrimitive(Results_c, "kine_charge_range");
-   c2->SetPrimitive(Results_c, "kine_thetaLAB_range");
-   c3->SetPrimitive(Results_c, "kine_dEdx_range");
-   c4->SetPrimitive(Results_c, "kine_dEdx_range_backwards");
-   c5->SetPrimitive(Results_c, "kine_charge_range_cutPhi");
-   c6->SetPrimitive(Results_c, "kine_thetaLAB_thetaLAB");
-   c7->SetPrimitive(Results_c, "kine_thetaLAB_range_cutPhi");
-   c8->SetPrimitive(Results_c, "kine_phiLAB_phiLAB");
+   c0->SavePrimitive(Results_c, "kine_rmax");
+   c1->SavePrimitive(Results_c, "kine_charge_range");
+   c2->SavePrimitive(Results_c, "kine_thetaLAB_range");
+   c3->SavePrimitive(Results_c, "kine_dEdx_range");
+   c4->SavePrimitive(Results_c, "kine_dEdx_range_backwards");
+   c5->SavePrimitive(Results_c, "kine_charge_range_cutPhi");
+   c6->SavePrimitive(Results_c, "kine_thetaLAB_thetaLAB");
+   c7->SavePrimitive(Results_c, "kine_thetaLAB_range_cutPhi");
+   c8->SavePrimitive(Results_c, "kine_phiLAB_phiLAB");
    Results_c << "}\n" << std::endl;
    Results_c.close();
 }
