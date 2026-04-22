@@ -2,11 +2,11 @@ void kine_canvases(){
 
 TCanvas *c1 = new TCanvas("c1", "c1");
 c1->cd();
-   c0->Range(0,0,1,1);
-   c0->SetFillColor(0);
-   c0->SetBorderMode(0);
-   c0->SetBorderSize(2);
-   c0->SetFrameBorderMode(0);
+   c1->Range(0,0,1,1);
+   c1->SetFillColor(0);
+   c1->SetBorderMode(0);
+   c1->SetBorderSize(2);
+   c1->SetFrameBorderMode(0);
    
    TH1D *h_rmax__1 = new TH1D("h_rmax__1","h_rmax",100,0,200);
    h_rmax__1->SetBinContent(1,1794);
@@ -88,16 +88,16 @@ c1->cd();
    h_rmax__1->GetZaxis()->SetTitleOffset(1);
    h_rmax__1->GetZaxis()->SetTitleFont(42);
    h_rmax__1->Draw("");
-   c0->Modified();
-   c0->cd();
+   c1->Modified();
+   c1->cd();
 
 TCanvas *c2 = new TCanvas("c2", "c2");
 c2->cd();
-   c1->Range(0,0,1,1);
-   c1->SetFillColor(0);
-   c1->SetBorderMode(0);
-   c1->SetBorderSize(2);
-   c1->SetFrameBorderMode(0);
+   c2->Range(0,0,1,1);
+   c2->SetFillColor(0);
+   c2->SetBorderMode(0);
+   c2->SetBorderSize(2);
+   c2->SetFrameBorderMode(0);
    
    TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange","histChargeTotalRange",600,0,1200,600,0,600000);
    histChargeTotalRange->SetBinContent(1867,1);
@@ -30279,16 +30279,16 @@ c2->cd();
    histChargeTotalRange->GetZaxis()->SetTitleOffset(1);
    histChargeTotalRange->GetZaxis()->SetTitleFont(42);
    histChargeTotalRange->Draw("colz");
-   c1->Modified();
-   c1->cd();
+   c2->Modified();
+   c2->cd();
 
 TCanvas *c3 = new TCanvas("c3", "c3");
 c3->cd();
-   c2->Range(0,0,1,1);
-   c2->SetFillColor(0);
-   c2->SetBorderMode(0);
-   c2->SetBorderSize(2);
-   c2->SetFrameBorderMode(0);
+   c3->Range(0,0,1,1);
+   c3->SetFillColor(0);
+   c3->SetBorderMode(0);
+   c3->SetBorderSize(2);
+   c3->SetFrameBorderMode(0);
    
    TH2F *histRangeVThetaLAB = new TH2F("histRangeVThetaLAB","histRangeVThetaLAB",180,0,180,1030,0,1030);
    histRangeVThetaLAB->SetBinContent(184,1);
@@ -60097,16 +60097,16 @@ c3->cd();
    histRangeVThetaLAB->GetZaxis()->SetTitleOffset(1);
    histRangeVThetaLAB->GetZaxis()->SetTitleFont(42);
    histRangeVThetaLAB->Draw("colz");
-   c2->Modified();
-   c2->cd();
+   c3->Modified();
+   c3->cd();
 
 TCanvas *c4 = new TCanvas("c4", "c4");
 c4->cd();
-   c3->Range(0,0,1,1);
-   c3->SetFillColor(0);
-   c3->SetBorderMode(0);
-   c3->SetBorderSize(2);
-   c3->SetFrameBorderMode(0);
+   c4->Range(0,0,1,1);
+   c4->SetFillColor(0);
+   c4->SetBorderMode(0);
+   c4->SetBorderSize(2);
+   c4->SetFrameBorderMode(0);
    
    TH2F *histdEdxVTotalRange__2 = new TH2F("histdEdxVTotalRange__2","histdEdxVTotalRange",515,0,1030,2000,0,4000);
    histdEdxVTotalRange__2->SetBinContent(713,1);
@@ -111803,16 +111803,16 @@ c4->cd();
    histdEdxVTotalRange__2->GetZaxis()->SetTitleOffset(1);
    histdEdxVTotalRange__2->GetZaxis()->SetTitleFont(42);
    histdEdxVTotalRange__2->Draw("zcol");
-   c3->Modified();
-   c3->cd();
+   c4->Modified();
+   c4->cd();
 
 TCanvas *c5 = new TCanvas("c5", "c5");
 c5->cd();
-   c4->Range(0,0,1,1);
-   c4->SetFillColor(0);
-   c4->SetBorderMode(0);
-   c4->SetBorderSize(2);
-   c4->SetFrameBorderMode(0);
+   c5->Range(0,0,1,1);
+   c5->SetFillColor(0);
+   c5->SetBorderMode(0);
+   c5->SetBorderSize(2);
+   c5->SetFrameBorderMode(0);
    
    TH2F *histdEdxVTotalRangeBackwards__3 = new TH2F("histdEdxVTotalRangeBackwards__3","histdEdxVTotalRangeBackwards",515,0,1030,2000,0,4000);
    histdEdxVTotalRangeBackwards__3->SetBinContent(1674,1);
@@ -115922,16 +115922,16 @@ c5->cd();
    histdEdxVTotalRangeBackwards__3->GetZaxis()->SetTitleOffset(1);
    histdEdxVTotalRangeBackwards__3->GetZaxis()->SetTitleFont(42);
    histdEdxVTotalRangeBackwards__3->Draw("zcol");
-   c4->Modified();
-   c4->cd();
+   c5->Modified();
+   c5->cd();
 
 TCanvas *c6 = new TCanvas("c6", "c6");
 c6->cd();
-   c5->Range(0,0,1,1);
-   c5->SetFillColor(0);
-   c5->SetBorderMode(0);
-   c5->SetBorderSize(2);
-   c5->SetFrameBorderMode(0);
+   c6->Range(0,0,1,1);
+   c6->SetFillColor(0);
+   c6->SetBorderMode(0);
+   c6->SetBorderSize(2);
+   c6->SetFrameBorderMode(0);
    
    TH2F *histChargeTotalRange_cutPhi = new TH2F("histChargeTotalRange_cutPhi","Charge Range (phi1-phi2-180 < 10 )",300,0,1200,300,0,600000);
    histChargeTotalRange_cutPhi->SetBinContent(650,2);
@@ -117914,16 +117914,16 @@ c6->cd();
    histChargeTotalRange_cutPhi->GetZaxis()->SetTitleOffset(1);
    histChargeTotalRange_cutPhi->GetZaxis()->SetTitleFont(42);
    histChargeTotalRange_cutPhi->Draw("colz");
-   c5->Modified();
-   c5->cd();
+   c6->Modified();
+   c6->cd();
 
 TCanvas *c7 = new TCanvas("c7", "c7");
 c7->cd();
-   c6->Range(0,0,1,1);
-   c6->SetFillColor(0);
-   c6->SetBorderMode(0);
-   c6->SetBorderSize(2);
-   c6->SetFrameBorderMode(0);
+   c7->Range(0,0,1,1);
+   c7->SetFillColor(0);
+   c7->SetBorderMode(0);
+   c7->SetBorderSize(2);
+   c7->SetFrameBorderMode(0);
    
    TH2F *histThetaLABThetaLAB__4 = new TH2F("histThetaLABThetaLAB__4","Theta_LAB Theta_LAB (phi1-phi2-180 < 10 )",200,0,100,200,0,100);
    histThetaLABThetaLAB__4->SetBinContent(1152,1);
@@ -121034,16 +121034,16 @@ c7->cd();
    histThetaLABThetaLAB__4->GetZaxis()->SetTitleOffset(1);
    histThetaLABThetaLAB__4->GetZaxis()->SetTitleFont(42);
    histThetaLABThetaLAB__4->Draw("zcol");
-   c6->Modified();
-   c6->cd();
+   c7->Modified();
+   c7->cd();
 
 TCanvas *c8 = new TCanvas("c8", "c8");
 c8->cd();
-   c7->Range(0,0,1,1);
-   c7->SetFillColor(0);
-   c7->SetBorderMode(0);
-   c7->SetBorderSize(2);
-   c7->SetFrameBorderMode(0);
+   c8->Range(0,0,1,1);
+   c8->SetFillColor(0);
+   c8->SetBorderMode(0);
+   c8->SetBorderSize(2);
+   c8->SetFrameBorderMode(0);
    
    TH2F *histRangeVThetaLAB_cutPhi = new TH2F("histRangeVThetaLAB_cutPhi","Range Theta_LAB (phi1-phi2-180 < 10 )",180,0,180,1030,0,1030);
    histRangeVThetaLAB_cutPhi->SetBinContent(259,1);
@@ -123776,16 +123776,16 @@ c8->cd();
    histRangeVThetaLAB_cutPhi->GetZaxis()->SetTitleOffset(1);
    histRangeVThetaLAB_cutPhi->GetZaxis()->SetTitleFont(42);
    histRangeVThetaLAB_cutPhi->Draw("colz");
-   c7->Modified();
-   c7->cd();
+   c8->Modified();
+   c8->cd();
 
 TCanvas *c9 = new TCanvas("c9", "c9");
 c9->cd();
-   c8->Range(0,0,1,1);
-   c8->SetFillColor(0);
-   c8->SetBorderMode(0);
-   c8->SetBorderSize(2);
-   c8->SetFrameBorderMode(0);
+   c9->Range(0,0,1,1);
+   c9->SetFillColor(0);
+   c9->SetBorderMode(0);
+   c9->SetBorderSize(2);
+   c9->SetFrameBorderMode(0);
    
    TH2F *histPhiLABPhiLAB__5 = new TH2F("histPhiLABPhiLAB__5","Phi_LAB Phi_LAB (phi1-phi2-180 < 10 )",360,-180,180,360,-180,180);
    histPhiLABPhiLAB__5->SetBinContent(541,1);
@@ -126448,8 +126448,8 @@ c9->cd();
    histPhiLABPhiLAB__5->GetZaxis()->SetTitleOffset(1);
    histPhiLABPhiLAB__5->GetZaxis()->SetTitleFont(42);
    histPhiLABPhiLAB__5->Draw("zcol");
-   c8->Modified();
-   c8->cd();
+   c9->Modified();
+   c9->cd();
 
 }
 
