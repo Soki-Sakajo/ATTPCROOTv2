@@ -25,7 +25,7 @@ void kine(){
    // files.
    std::vector runNums = {52};
    TFile * Results = new TFile("data/kine_results.root","recreate");
-   std::ofstream Results_c("output_can/kine_canvases.C",std::ios::trunc);
+   std::ofstream Results_c("can_output/kine_canvases.C",std::ios::out | std::ios::trunc);
    
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
