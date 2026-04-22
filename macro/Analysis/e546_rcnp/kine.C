@@ -8,6 +8,8 @@ Double_t omega(Double_t x, Double_t y, Double_t z);
 std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Double_t thetalab, Double_t K_eject);
 
 void kine(){
+   // set parameters
+   Double_t del_phi = 10.0; // cut value; phi1 - phi2 - 180 deg < del_phi
    /*
    // Masses.
    double u_to_MeV = 931.49401;
@@ -20,11 +22,11 @@ void kine(){
    double E_beam = 27.091 * 17.022578650;
    */
 
-   // events.
+   // files.
    std::vector runNums = {52};
    TFile * Results = new TFile("data/kine_results.root","recreate");
    std::ofstream Results_c("output_can/kine_canvases.C");
-
+   
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
    //   TFile *outfile=new TFile(outfname,"recreate");
@@ -103,19 +105,19 @@ void kine(){
 
    // Histogram definitions.
    // ... Rmax check
-   TH1D *histrmax = new TH1D("histrmax", "histrmax;Rmax [mm]", 600, 0, 300);
+   TH1D *h_rmax = new TH1D("h_rmax", "h_rmax;Rmax [mm]", 600, 0, 300);
    // ... ATTPC PID
-   TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
-   TH2F *histChargeTotalRange_cutPhi = new TH2F("histChargeTotalRange_cutPhi", "histChargeTotalRange_cutPhi;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
-   TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
-   TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];dEdx [ADC/mm]", 500, 0, 1030, 1600, 0, 4000);
+   TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 300, 0, 1200, 300, 0, 6e5);
+   TH2F *histChargeTotalRange_cutPhi = new TH2F("histChargeTotalRange_cutPhi", "histChargeTotalRange_cutPhi;roughRange [mm];Charge [ADC]", 300, 0, 1200, 300, 0, 6e5);
+   TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 1600, 0, 4000);
+   TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 1600, 0, 4000);
    // ... kinematics 
    TH2F *histEstimatedKinEVThetaLABTotal = new TH2F("histEstimatedKinEVThetaLABTotal", "histEstimatedKinEVThetaLABTotal;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
    TH2F *histEstimatedKinEVThetaLAB_Carbon = new TH2F("histEstimatedKinEVThetaLAB_Carbon", "histEstimatedKinEVThetaLAB_Carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
    TH2F *histEstimatedKinEVThetaLAB_Alpha = new TH2F("histEstimatedKinEVThetaLAB_Alpha", "histEstimatedKinEVThetaLAB_Alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
 
    // ... angle correlations
-   TH2F *histThetaLABThetaLAB = new TH2F("histThetaLABThetaLAB", "histThetaLABThetaLAB", 360, 0, 180, 360, 0, 180);
+   TH2F *histThetaLABThetaLAB = new TH2F("histThetaLABThetaLAB", "histThetaLABThetaLAB", 100, 0, 100, 100, 0, 100);
    TH2F *histPhiLABPhiLAB = new TH2F("histPhiLABPhiLAB", "histPhiLABPhiLAB", 360, -180, 180, 360, -180, 180);
    TH2F *histRangeVThetaLAB = new TH2F("histRangeVThetaLAB", "histRangeVThetaLAB", 180, 0, 180, 1030, 0, 1030);
    TH2F *histRangeVThetaLAB_cutPhi = new TH2F("histRangeVThetaLAB_cutPhi", "histRangeVThetaLAB_cutPhi", 180, 0, 180, 1030, 0, 1030);
@@ -160,9 +162,10 @@ void kine(){
          auto &tracks = patternEvent->GetTrackCand();
          ntrack = tracks.size();
          rad = -100;
+         r_max = -100;
          r_tem = -100;
          itrack = 0;
-         //         int maxTrackNum{4};
+                  //         int maxTrackNum{4};
          //         if (tracks.size() > maxTrackNum) continue;
          //         if (tracks.size() == 2) nEventsWith2Tracks++;
          int trackIndex = 0;
@@ -291,11 +294,11 @@ void kine(){
             */
             itrack ++;
          }
-         histrmax->Fill(r_max);
+         h_rmax->Fill(r_max);
          if(r_tri > r_max){
             r_tri = r_max;
          }
-         if(abs(abs(track_phi[0] - track_phi[1]) - 180) < 5){
+         if(abs(abs(track_phi[0] - track_phi[1]) - 180) < del_phi){
             histChargeTotalRange_cutPhi -> Fill(track_range[0], track_charge[0]);
             histThetaLABThetaLAB -> Fill(track_theta[0], track_theta[1]);
             histRangeVThetaLAB_cutPhi -> Fill(track_theta[0], track_range[0]);
@@ -323,9 +326,9 @@ void kine(){
 
    // Draw histograms in TCanvas.
    TCanvas *c0 = new TCanvas();
-   histrmax->SetDirectory(0);
-   histrmax->Draw();
-   histrmax->GetXaxis()->SetTitle("Rmax [mm]");
+   h_rmax->SetDirectory(0);
+   h_rmax->Draw();
+   h_rmax->GetXaxis()->SetTitle("Rmax [mm]");
 
    TCanvas *c1 = new TCanvas();
    histChargeTotalRange->SetDirectory(0);
@@ -360,7 +363,7 @@ void kine(){
    histChargeTotalRange_cutPhi->Draw("colz");
    histChargeTotalRange_cutPhi->GetXaxis()->SetTitle("roughRange [mm]");
    histChargeTotalRange_cutPhi->GetYaxis()->SetTitle("Charge [ADC]");
-   histChargeTotalRange_cutPhi->SetTitle("Charge Vs Range (phi1-phi2-180 deg < 5 deg)");
+   histChargeTotalRange_cutPhi->SetTitle("Charge Range (phi1-phi2-180 deg < " + std::to_string(del_phi) + " deg)");
 
    TCanvas *c6 = new TCanvas();
    histThetaLABThetaLAB->SetDirectory(0);
@@ -368,14 +371,14 @@ void kine(){
    //kine_d3He_tt->Draw("same");
    histThetaLABThetaLAB->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-   histThetaLABThetaLAB->SetTitle("Theta LAB Vs Theta LAB (phi1-phi2-180 deg < 5 deg)");
+   histThetaLABThetaLAB->SetTitle("Theta_LAB Theta_LAB (phi1-phi2-180 < " + std::to_string(del_phi) + " )");
 
    TCanvas *c7 = new TCanvas();
    histRangeVThetaLAB_cutPhi->SetDirectory(0);
    histRangeVThetaLAB_cutPhi->Draw("colz");
    histRangeVThetaLAB_cutPhi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB_cutPhi->GetYaxis()->SetTitle("roughRange [mm]");
-   histRangeVThetaLAB_cutPhi->SetTitle("Range Vs Theta LAB (phi1-phi2-180 deg < 5 deg)");
+   histRangeVThetaLAB_cutPhi->SetTitle("Range Theta_LAB (phi1-phi2-180 < " + std::to_string(del_phi) + " )");
 
    TCanvas *c8 = new TCanvas();
    histPhiLABPhiLAB->SetDirectory(0);
@@ -383,7 +386,7 @@ void kine(){
    //kine_d3He_tt->Draw("same");
    histPhiLABPhiLAB->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    histPhiLABPhiLAB->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
-   histPhiLABPhiLAB->SetTitle("Phi LAB Vs Phi LAB (phi1-phi2-180 deg < 5 deg)");
+   histPhiLABPhiLAB->SetTitle("Phi_LAB Phi_LAB (phi1-phi2-180 < " + std::to_string(del_phi) + " )");
 
    /*
    TCanvas *c5 = new TCanvas();
@@ -416,7 +419,7 @@ void kine(){
 
    // Saving histograms in a .root file ...
    Results->cd();
-   histrmax->Write();
+   h_rmax->Write();
    histChargeTotalRange->Write();
    histChargeTotalRange_cutPhi->Write();
    // dEdx Vs Total Range
@@ -466,17 +469,19 @@ void kine(){
    */
    Results->Close();
 
-   // save canvases
+   // save canvases as .C macros
    Results_c << "void kine_canvases(){\n" << std::endl;
-   c0->SavePrimitive(Results_c, "kine_rmax");
-   c1->SavePrimitive(Results_c, "kine_charge_range");
-   c2->SavePrimitive(Results_c, "kine_thetaLAB_range");
-   c3->SavePrimitive(Results_c, "kine_dEdx_range");
-   c4->SavePrimitive(Results_c, "kine_dEdx_range_backwards");
-   c5->SavePrimitive(Results_c, "kine_charge_range_cutPhi");
-   c6->SavePrimitive(Results_c, "kine_thetaLAB_thetaLAB");
-   c7->SavePrimitive(Results_c, "kine_thetaLAB_range_cutPhi");
-   c8->SavePrimitive(Results_c, "kine_phiLAB_phiLAB");
+   TSeqCollection *canList = gROOT->GetListOfCanvases();
+   TIter next(canList);
+   TCanvas *c;
+   Int_t can_num = 1;
+   while ((c = (TCanvas *)next())) {
+      Results_c << Form("TCanvas *c%d = new TCanvas(\"c%d\", \"c%d\");\n", can_num, can_num, can_num);
+      Results_c << Form("c%d->cd();\n", can_num);
+      c->SavePrimitive(Results_c, "");
+      Results_c << "\n";
+      can_num++;
+   }
    Results_c << "}\n" << std::endl;
    Results_c.close();
 }

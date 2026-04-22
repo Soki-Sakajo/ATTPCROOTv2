@@ -15,7 +15,7 @@
 #include"TH3.h"
 #include"TCanvas.h"
 
-void fig(Int_t start=52, Int_t stop=56){ 
+void raw_eve_can(Int_t start=52, Int_t stop=56){ 
   
   //input
   TString infi="can_raw_eve_run" + to_string(start) + "-"+to_string(stop)+".root";
