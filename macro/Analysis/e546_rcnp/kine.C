@@ -97,6 +97,7 @@ void kine(){
    Double_t r_tem = 0;
    Double_t r_max = 0;
    Double_t r_tri = 300;
+   Double_t max_r_max = 0;
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
@@ -105,12 +106,12 @@ void kine(){
 
    // Histogram definitions.
    // ... Rmax check
-   TH1D *h_rmax = new TH1D("h_rmax", "h_rmax;Rmax [mm]", 600, 0, 300);
+   TH1D *h_rmax = new TH1D("h_rmax", "h_rmax;Rmax [mm]", 100, 0, 200);
    // ... ATTPC PID
-   TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 300, 0, 1200, 300, 0, 6e5);
+   TH2F *histChargeTotalRange = new TH2F("histChargeTotalRange", "histChargeTotalRange;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
    TH2F *histChargeTotalRange_cutPhi = new TH2F("histChargeTotalRange_cutPhi", "histChargeTotalRange_cutPhi;roughRange [mm];Charge [ADC]", 300, 0, 1200, 300, 0, 6e5);
-   TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 1600, 0, 4000);
-   TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 1600, 0, 4000);
+   TH2F *histdEdxVTotalRange = new TH2F("histdEdxVTotalRange", "histdEdxVTotalRange;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
+   TH2F *histdEdxVTotalRangeBackwards = new TH2F("histdEdxVTotalRangeBackwards", "histdEdxVTotalRangeBackwards;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
    // ... kinematics 
    TH2F *histEstimatedKinEVThetaLABTotal = new TH2F("histEstimatedKinEVThetaLABTotal", "histEstimatedKinEVThetaLABTotal;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
    TH2F *histEstimatedKinEVThetaLAB_Carbon = new TH2F("histEstimatedKinEVThetaLAB_Carbon", "histEstimatedKinEVThetaLAB_Carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
@@ -161,11 +162,11 @@ void kine(){
          // We want to focus on events with 2 or less tracks for now.
          auto &tracks = patternEvent->GetTrackCand();
          ntrack = tracks.size();
-         rad = -100;
-         r_max = -100;
-         r_tem = -100;
+         rad = 0;
+         r_max = 0;
+         r_tem = 0;
          itrack = 0;
-                  //         int maxTrackNum{4};
+         //         int maxTrackNum{4};
          //         if (tracks.size() > maxTrackNum) continue;
          //         if (tracks.size() == 2) nEventsWith2Tracks++;
          int trackIndex = 0;
@@ -295,9 +296,13 @@ void kine(){
             itrack ++;
          }
          h_rmax->Fill(r_max);
-         if(r_tri > r_max){
+         if(r_tri > r_max && r_max > 0){
             r_tri = r_max;
          }
+         if(r_max > max_r_max){
+            max_r_max = r_max;
+         }
+
          if(abs(abs(track_phi[0] - track_phi[1]) - 180) < del_phi){
             histChargeTotalRange_cutPhi -> Fill(track_range[0], track_charge[0]);
             histThetaLABThetaLAB -> Fill(track_theta[0], track_theta[1]);
@@ -313,7 +318,7 @@ void kine(){
       // Close files.
       unpackFile->Close();
    }
-   std::cout << "Maximum radius of hits: " << r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
+   std::cout << "Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
 
    /*
    // Kinematic lines.
