@@ -330,24 +330,24 @@ void kine(){
    */
 
    // Draw histograms in TCanvas.
-   TCanvas *c0 = new TCanvas("c0", "c0");
+   TCanvas *c1 = new TCanvas("c1", "c1");
    h_rmax->SetDirectory(0);
    h_rmax->Draw();
    h_rmax->GetXaxis()->SetTitle("Rmax [mm]");
 
-   TCanvas *c1 = new TCanvas("c1", "c1");
+   TCanvas *c2 = new TCanvas("c2", "c2");
    histChargeTotalRange->SetDirectory(0);
    histChargeTotalRange->Draw("colz");
    histChargeTotalRange->GetXaxis()->SetTitle("roughRange [mm]");
    histChargeTotalRange->GetYaxis()->SetTitle("Charge [ADC]");
 
-   TCanvas *c2 = new TCanvas("c2", "c2");
+   TCanvas *c3 = new TCanvas("c3", "c3");
    histRangeVThetaLAB->SetDirectory(0);
    histRangeVThetaLAB->Draw("colz");
    histRangeVThetaLAB->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB->GetYaxis()->SetTitle("roughRange [mm]");
 
-   TCanvas *c3 = new TCanvas("c3", "c3");
+   TCanvas *c4 = new TCanvas("c4", "c4");
    histdEdxVTotalRange->SetDirectory(0);
    histdEdxVTotalRange->Draw("zcol");
    //   cutPIDproton->Draw("same");
@@ -355,7 +355,7 @@ void kine(){
    histdEdxVTotalRange->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRange->GetYaxis()->SetTitle("dEdx [ADC/mm]");
 
-   TCanvas *c4 = new TCanvas("c4", "c4");
+   TCanvas *c5 = new TCanvas("c5", "c5");
    histdEdxVTotalRangeBackwards->SetDirectory(0);
    histdEdxVTotalRangeBackwards->Draw("zcol");
    //   cutPIDproton->Draw("same");
@@ -363,14 +363,14 @@ void kine(){
    histdEdxVTotalRangeBackwards->GetXaxis()->SetTitle("roughRange [mm]");
    histdEdxVTotalRangeBackwards->GetYaxis()->SetTitle("#frac{dE}{dx} [ADC/mm]");
 
-   TCanvas *c5 = new TCanvas("c5", "c5");
+   TCanvas *c6 = new TCanvas("c6", "c6");
    histChargeTotalRange_cutPhi->SetDirectory(0);
    histChargeTotalRange_cutPhi->Draw("colz");
    histChargeTotalRange_cutPhi->GetXaxis()->SetTitle("roughRange [mm]");
    histChargeTotalRange_cutPhi->GetYaxis()->SetTitle("Charge [ADC]");
    histChargeTotalRange_cutPhi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", (int)del_phi));
 
-   TCanvas *c6 = new TCanvas("c6", "c6");
+   TCanvas *c7 = new TCanvas("c7", "c7");
    histThetaLABThetaLAB->SetDirectory(0);
    histThetaLABThetaLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
@@ -378,14 +378,14 @@ void kine(){
    histThetaLABThetaLAB->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    histThetaLABThetaLAB->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
 
-   TCanvas *c7 = new TCanvas("c7", "c7");
+   TCanvas *c8 = new TCanvas("c8", "c8");
    histRangeVThetaLAB_cutPhi->SetDirectory(0);
    histRangeVThetaLAB_cutPhi->Draw("colz");
    histRangeVThetaLAB_cutPhi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    histRangeVThetaLAB_cutPhi->GetYaxis()->SetTitle("roughRange [mm]");
    histRangeVThetaLAB_cutPhi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
 
-   TCanvas *c8 = new TCanvas("c8", "c8");
+   TCanvas *c9 = new TCanvas("c9", "c9");
    histPhiLABPhiLAB->SetDirectory(0);
    histPhiLABPhiLAB->Draw("zcol");
    //kine_d3He_tt->Draw("same");
