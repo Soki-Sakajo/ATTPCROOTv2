@@ -105,7 +105,7 @@ void AtFindVertex::FindVertexMultipleLines(std::vector<AtTrack> tracks, Int_t nb
    for (Int_t i = 0; i < vtxCand.size(); i++)
       // std::cout << vtxCand.size() << " check vtxCand size " << vtxCand.at(i).size() << std::endl;
 
-   std::vector<XYZVector> cogVtx;
+      std::vector<XYZVector> cogVtx;
    cogVtx = CoGVtx(vtxCand, lines, wlines);
    // for(Int_t i =0; i<cogVtx.size(); i++)std::cout<<cogVtx.size()<<" check cogVtx size "<<cogVtx.at(i).X()<<"
    // "<<cogVtx.at(i).Y()<<" "<<cogVtx.at(i).Z()<<std::endl;
@@ -188,7 +188,7 @@ std::vector<std::vector<Int_t>> AtFindVertex::SortTrackSameVtx(std::vector<std::
             }
          }
       } // j loop lines
-   }    // i loop lines
+   } // i loop lines
    if (paired.size() > 1)
       result.push_back(paired);
 
@@ -261,7 +261,7 @@ std::vector<XYZVector> AtFindVertex::CoGVtx(std::vector<std::vector<Int_t>> vtxC
                }
             }
          } // End of track_f (for loop j)
-      }    // Loop over the lines (for loop i)
+      } // Loop over the lines (for loop i)
 
       Double_t sumW = 0; // sum of the weights
       for (Int_t i = 0; i < iv.size(); i++) {
