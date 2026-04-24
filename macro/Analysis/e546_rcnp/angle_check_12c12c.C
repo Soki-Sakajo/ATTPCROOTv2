@@ -186,7 +186,7 @@ void angle_check_12c12c(){
 	Int_t can_num = 1;
 	Int_t n_can = canlist->GetEntries();
 	histfile << "void angle_check_12c12c(){\n" << std::endl;
-	histfile <<  Form("std::cout << \"load %d canvases... \" << std::endl;\n", n_can); << std::endl;
+	histfile <<  Form("std::cout << \"load %d canvases... \" << std::endl;\n", n_can) << std::endl;
 	TCanvas *c;
 	while ((c = (TCanvas *)next())) {
 		histfile << Form("TCanvas *c%d = new TCanvas(\"c%d\", \"c%d\");\n", can_num, can_num, can_num);

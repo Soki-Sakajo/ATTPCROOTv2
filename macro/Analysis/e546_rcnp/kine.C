@@ -611,7 +611,7 @@ void kine(){
    Int_t can_num = 1;
    Int_t n_can = canlist->GetEntries();
    Results_c << "void kine_canvases(){\n" << std::endl;
-   Results_c <<  Form("std::cout << \"load %d canvases... \" << std::endl;\n", n_can); << std::endl;
+   Results_c <<  Form("std::cout << \"load %d canvases... \" << std::endl;\n", n_can) << std::endl;
    TCanvas *c;
       while ((c = (TCanvas *)next())) {
       Results_c << Form("TCanvas *c%d = new TCanvas(\"c%d\", \"c%d\");\n", can_num, can_num, can_num);
