@@ -321,7 +321,7 @@ void kine(){
             continue;
          }
          else if (ntrack == 1){
-            fver->FindvertexAingleLine(tracks);
+            fver->FindVertexSingleLine(tracks);
             check_tracks = true;
          }
          else if (ntrack > 1 && ntrack < 7){
