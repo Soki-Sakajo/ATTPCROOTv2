@@ -100,10 +100,10 @@ void AtFindVertex::FindVertexMultipleLines(std::vector<AtTrack> tracks, Int_t nb
    std::vector<AtTrack> tracksFromSameVtx;  // save tracks coming from a common vertex
    std::vector<std::vector<Int_t>> vtxCand; // save track ID of tracks coming from a common vertex
    vtxCand = SortTrackSameVtx(lines);
-   //for (Int_t i = 0; i < vtxCand.size(); i++)
-      //std::cout << vtxCand.size() << " check vtxCand size " << vtxCand.at(i).size() << std::endl;
+   // for (Int_t i = 0; i < vtxCand.size(); i++)
+   // std::cout << vtxCand.size() << " check vtxCand size " << vtxCand.at(i).size() << std::endl;
 
-   std::vector<XYZVector> cogVtx;
+      std::vector<XYZVector> cogVtx;
    cogVtx = CoGVtx(vtxCand, lines, wlines);
    // for(Int_t i =0; i<cogVtx.size(); i++)std::cout<<cogVtx.size()<<" check cogVtx size "<<cogVtx.at(i).X()<<"
    // "<<cogVtx.at(i).Y()<<" "<<cogVtx.at(i).Z()<<std::endl;
