@@ -10,6 +10,7 @@ std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double
 void kine(){
    // set parameters
    Double_t del_phi = 10; // cut value; phi1 - phi2 - 180 deg < del_phi
+   Double_t th_verz = 500; // cut value; vertex z > th_verz
    /*
    // Masses.
    double u_to_MeV = 931.49401;
@@ -28,7 +29,7 @@ void kine(){
    Int_t run_start = runNums.front();
    Int_t run_end = runNums.back();
    TFile * Results = new TFile(Form("data/kine_results_run%d-run%d.root", run_start, run_end),"recreate");
-   std::ofstream Results_c(Form("can_output/kine_canvases_run%d-run%d.C", run_start, run_end),std::ios::out | std::ios::trunc);
+   std::ofstream Results_c("can_output/kine_canvases.C", std::ios::out | std::ios::trunc);
    
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
@@ -114,7 +115,7 @@ void kine(){
 
    // Histogram definitions.
    // ... TH1 hist for checking something.
-   TH1D *h_ntra = new TH1D("h_ntra", "h_ntra;NTracks", 10, 0, 10);
+   TH1D *h_ntra = new TH1D("h_ntra", "h_ntra;NTracks", 11, -0.5, 10.5);
    TH1D *h_rmax = new TH1D("h_rmax", "h_rmax;Rmax [mm]", 100, 0, 200);
 
    // ... ATTPC PID
@@ -136,11 +137,10 @@ void kine(){
    TH2F *h_range_thetalab_cutverz = new TH2F("h_range_thetalab_cutverz", "h_range_thetalab_cutverz", 180, 0, 180, 1030, 0, 1030);
 
    // ... track vertex
-   TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 1500, -500, 1000);
-   TH2F *h_verxy = new TH2F("h_verxy", "h_verxy", 400, -200, 200, 400, -200, 200);
-   TH2F *h_verz_ntra = new TH2F("h_verz_ntra", "h_verz_ntra", 10, 0, 10, 750, -500, 1000);
+   TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 1010, -10, 1000);
+   TH2F *h_verxy = new TH2F("h_verxy", "h_verxy", 100, -50, 50, 100, -50, 50);
+   TH2F *h_verz_ntra = new TH2F("h_verz_ntra", "h_verz_ntra", 11, -0.5, 10.5, 1010, -10, 1000);
 
-   
    /*
    // ... Excitation energy 
    TH1F *h_Exdp = new TH1F("h_Exdp", "h_Exdp;Ex [MeV]", 80, -5, 15);
@@ -316,6 +316,9 @@ void kine(){
             itrack ++;
          }
          check_tracks = false;
+
+         // find vertex.
+         /*
          if (ntrack == 0){
             //            cout<<"No tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
             continue;
@@ -332,6 +335,44 @@ void kine(){
             //            cout<<"More than 6 tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
             continue;
          }
+         */
+
+         for(Int_t k=1; k<4; k++){
+            if(tracks.size() != k && tracks.size() != 1){continue;}
+            else if(tracks.size() == 1){
+               fver->FindVertexSingleLine(tracks);
+               check_tracks=true;
+            }
+            else if(tracks.size() == k){
+               fver->FindVertexMultipleLines(tracks, ntrack);
+               check_tracks=true;
+            }
+            auto vtxlist = fver->GetTracksVertex();
+            for(auto &v:vtxlist){
+               //	 cout<<"run number: "<<run_num<<endl;
+               //	 cout<<"Found vertex at ("<<v.vertex.X()<<", "<<v.vertex.Y()<<", "<<v.vertex.Z()<<")"<<endl;
+               track_verx = v.vertex.X();
+               track_very = v.vertex.Y();
+               track_verz = v.vertex.Z();
+            }
+         }
+         if (ntrack == 0){
+            //            cout<<"No tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
+            continue;
+         }
+         else if (ntrack == 1){
+            fver->FindVertexSingleLine(tracks);
+            check_tracks = true;
+         }
+         else if (ntrack > 1 && ntrack < 7){
+            fver->FindVertexMultipleLines(tracks, ntrack);
+            check_tracks = true;
+         }
+         else {
+            //            cout<<"More than 6 tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
+            continue;
+         }
+
          auto vtxlist = fver->GetTracksVertex();
          for (auto &v: vtxlist){
             track_verx = v.vertex.X();
@@ -341,6 +382,11 @@ void kine(){
          h_verxy->Fill(track_verx, track_very);
          h_verz->Fill(track_verz);
          h_verz_ntra->Fill(ntrack, track_verz);
+         if(track_verz > th_verz){
+            for(Int_t k=0; k<ntrack; k++){
+               h_range_thetalab_cutverz->Fill(track_theta[k], track_range[k]);
+            }
+         }
 
          h_rmax->Fill(r_max);
          if(r_tri > r_max && r_max > 0){
@@ -408,19 +454,19 @@ void kine(){
    h_dEdx_range->GetYaxis()->SetTitle("dEdx [ADC/mm]");
 
    TCanvas *c6 = new TCanvas("c6", "c6");
+   h_range_thetalab_cutphi->SetDirectory(0);
+   h_range_thetalab_cutphi->Draw("colz");
+   h_range_thetalab_cutphi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cutphi->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cutphi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+
+   TCanvas *c7 = new TCanvas("c7", "c7");
    h_thetalab_thetalab_cutphi->SetDirectory(0);
    h_thetalab_thetalab_cutphi->Draw("colz");
    //kine_d3He_tt->Draw("same");
    h_thetalab_thetalab_cutphi->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
-
-   TCanvas *c7 = new TCanvas("c7", "c7");
-   h_range_thetalab_cutphi->SetDirectory(0);
-   h_range_thetalab_cutphi->Draw("colz");
-   h_range_thetalab_cutphi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   h_range_thetalab_cutphi->GetYaxis()->SetTitle("roughRange [mm]");
-   h_range_thetalab_cutphi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
 
    TCanvas *c8 = new TCanvas("c8", "c8");
    h_philab_philab_cutphi->SetDirectory(0);
@@ -446,6 +492,13 @@ void kine(){
    h_verz_ntra->Draw("colz");
    h_verz_ntra->GetXaxis()->SetTitle("Number of tracks");
    h_verz_ntra->GetYaxis()->SetTitle("Vertex Z [mm]");
+
+   TCanvas *c12 = new TCanvas("c12", "c12");
+   h_range_thetalab_cutverz->SetDirectory(0);
+   h_range_thetalab_cutverz->Draw("colz");
+   h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_range_thetalab_cutverz->SetTitle(Form("Range Theta_LAB (verz > %d )", (int)th_verz));
 
    /*
    TCanvas *c6 = new TCanvas("c6", "c6");
@@ -497,6 +550,7 @@ void kine(){
    h_ntra->Write();
    h_charge_range->Write();
    h_charge_range_cutphi->Write();
+
    // dEdx Vs Total Range
    //   h_dEdx_range->Write();
    //   h_dEdx_range_backwards->Write();
@@ -521,6 +575,7 @@ void kine(){
    // angle correlations
    h_range_thetalab->Write();
    h_range_thetalab_cutphi->Write();
+   h_range_thetalab_cutverz->Write();
    h_thetalab_thetalab_cutphi->Write();
    h_philab_philab_cutphi->Write();
 
@@ -551,18 +606,22 @@ void kine(){
    Results->Close();
 
    // save canvases as .C macros
-   Results_c << "void kine_canvases(){\n" << std::endl;
-   TSeqCollection *canList = gROOT->GetListOfCanvases();
-   TIter next(canList);
-   TCanvas *c;
+   TSeqCollection *canlist = gROOT->GetListOfCanvases();
+   TIter next(canlist);
    Int_t can_num = 1;
-   while ((c = (TCanvas *)next())) {
+   Int_t n_can = canlist->GetEntries();
+   Results_c << "void kine_canvases(){\n" << std::endl;
+   Results_c <<  Form("std::cout << \"load %d canvases... \" << std::endl;\n", n_can); << std::endl;
+   TCanvas *c;
+      while ((c = (TCanvas *)next())) {
       Results_c << Form("TCanvas *c%d = new TCanvas(\"c%d\", \"c%d\");\n", can_num, can_num, can_num);
       Results_c << Form("c%d->cd();\n", can_num);
       c->SavePrimitive(Results_c, "");
       Results_c << "\n";
+      Results_c << Form("std::cout << \"Loading canvases: %d / %d \\r\" << std::flush;\n", can_num, n_can);
       can_num++;
    }
+   Results_c <<  Form("std::cout << \"Drawing canvases... \" << std::endl;\n") << std::endl;
    Results_c << "}\n" << std::endl;
    Results_c.close();
 }
