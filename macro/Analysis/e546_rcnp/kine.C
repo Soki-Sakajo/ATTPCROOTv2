@@ -8,6 +8,11 @@ Double_t omega(Double_t x, Double_t y, Double_t z);
 std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Double_t thetalab, Double_t K_eject);
 
 void kine(){
+
+   //set timer
+   TStopwatch timer;
+   timer.Start();
+
    // set parameters
    Double_t del_phi = 10; // cut value; phi1 - phi2 - 180 deg < del_phi
    Double_t th_verz = 500; // cut value; vertex z > th_verz
@@ -139,7 +144,9 @@ void kine(){
    // ... track vertex
    TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 1010, -10, 1000);
    TH2F *h_verxy = new TH2F("h_verxy", "h_verxy", 100, -50, 50, 100, -50, 50);
-   TH2F *h_verz_ntra = new TH2F("h_verz_ntra", "h_verz_ntra", 11, -0.5, 10.5, 1010, -10, 1000);
+   TH2F *h_verxz = new TH2F("h_verxz", "h_verxz", 1010, -10, 1000, 100, -50, 50);
+   TH2F *h_veryz = new TH2F("h_veryz", "h_veryz", 1010, -10, 1000, 100, -50, 50);
+   TH2F *h_ntra_verz = new TH2F("h_ntra_verz", "h_ntra_verz", 1010, -10, 1000, 11, -0.5, 10.5);
 
    /*
    // ... Excitation energy 
@@ -381,7 +388,9 @@ void kine(){
          }
          h_verxy->Fill(track_verx, track_very);
          h_verz->Fill(track_verz);
-         h_verz_ntra->Fill(ntrack, track_verz);
+         h_verxz->Fill(track_verz, track_verx);
+         h_veryz->Fill(track_verz, track_very);
+         h_ntra_verz->Fill(track_verz, ntrack);
          if(track_verz > th_verz){
             for(Int_t k=0; k<ntrack; k++){
                h_range_thetalab_cutverz->Fill(track_theta[k], track_range[k]);
@@ -424,81 +433,108 @@ void kine(){
 
    // Draw histograms in TCanvas.
    TCanvas *c1 = new TCanvas("c1", "c1");
+   c1->cd();
    h_rmax->SetDirectory(0);
-   h_rmax->Draw();
    h_rmax->GetXaxis()->SetTitle("Rmax [mm]");
+   h_rmax->Draw();
 
    TCanvas *c2 = new TCanvas("c2", "c2");
+   c2->cd();
    h_ntra->SetDirectory(0);
-   h_ntra->Draw();
    h_ntra->GetXaxis()->SetTitle("Number of tracks");
+   gPad->SetLogy();
+   h_ntra->Draw();
 
    TCanvas *c3 = new TCanvas("c3", "c3");
+   c3->cd();
    h_charge_range->SetDirectory(0);
-   h_charge_range->Draw("colz");
    h_charge_range->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range->GetYaxis()->SetTitle("Charge [ADC]");
+   h_charge_range->Draw("colz");
 
    TCanvas *c4 = new TCanvas("c4", "c4");
+   c4->cd();
    h_range_thetalab->SetDirectory(0);
-   h_range_thetalab->Draw("colz");
    h_range_thetalab->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab->Draw("colz");
 
    TCanvas *c5 = new TCanvas("c5", "c5");
+   c5->cd();
    h_dEdx_range->SetDirectory(0);
+   h_dEdx_range->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range->GetYaxis()->SetTitle("dEdx [ADC/mm]");
    h_dEdx_range->Draw("colz");
    //   cutPIDproton->Draw("same");
    //   cutPIDdeuteron->Draw("same");
-   h_dEdx_range->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range->GetYaxis()->SetTitle("dEdx [ADC/mm]");
 
    TCanvas *c6 = new TCanvas("c6", "c6");
+   c6->cd();
    h_range_thetalab_cutphi->SetDirectory(0);
-   h_range_thetalab_cutphi->Draw("colz");
    h_range_thetalab_cutphi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cutphi->GetYaxis()->SetTitle("roughRange [mm]");
    h_range_thetalab_cutphi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_range_thetalab_cutphi->Draw("colz");
 
    TCanvas *c7 = new TCanvas("c7", "c7");
+   c7->cd();
    h_thetalab_thetalab_cutphi->SetDirectory(0);
-   h_thetalab_thetalab_cutphi->Draw("colz");
-   //kine_d3He_tt->Draw("same");
    h_thetalab_thetalab_cutphi->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_thetalab_thetalab_cutphi->Draw("colz");
+   //kine_d3He_tt->Draw("same");
 
    TCanvas *c8 = new TCanvas("c8", "c8");
+   c8->cd();
    h_philab_philab_cutphi->SetDirectory(0);
-   h_philab_philab_cutphi->Draw("colz");
-   //kine_d3He_tt->Draw("same");
    h_philab_philab_cutphi->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_cutphi->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
    h_philab_philab_cutphi->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_philab_philab_cutphi->Draw("colz");
+   //kine_d3He_tt->Draw("same");
 
    TCanvas *c9 = new TCanvas("c9", "c9");
+   c9->cd();
    h_verxy->SetDirectory(0);
-   h_verxy->Draw("colz");
    h_verxy->GetXaxis()->SetTitle("Vertex X [mm]");
    h_verxy->GetYaxis()->SetTitle("Vertex Y [mm]");
+   h_verxy->Draw("colz");
 
    TCanvas *c10 = new TCanvas("c10", "c10");
+   c10->cd();
    h_verz->SetDirectory(0);
-   h_verz->Draw();
    h_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
+   h_verz->Draw();
 
    TCanvas *c11 = new TCanvas("c11", "c11");
-   h_verz_ntra->SetDirectory(0);
-   h_verz_ntra->Draw("colz");
-   h_verz_ntra->GetXaxis()->SetTitle("Number of tracks");
-   h_verz_ntra->GetYaxis()->SetTitle("Vertex Z [mm]");
+   c11->cd();
+   h_verxz->SetDirectory(0);
+   h_verxz->GetXaxis()->SetTitle("Vertex Z [mm]");
+   h_verxz->GetYaxis()->SetTitle("Vertex X [mm]");
+   h_verxz->Draw("colz");
 
    TCanvas *c12 = new TCanvas("c12", "c12");
+   c12->cd();
+   h_veryz->SetDirectory(0);
+   h_veryz->GetXaxis()->SetTitle("Vertex Z [mm]");
+   h_veryz->GetYaxis()->SetTitle("Vertex Y [mm]");
+   h_veryz->Draw("colz");
+
+   TCanvas *c13 = new TCanvas("c13", "c13");
+   c13->cd();
+   h_ntra_verz->SetDirectory(0);
+   h_ntra_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
+   h_ntra_verz->GetYaxis()->SetTitle("Number of tracks");
+   h_ntra_verz->Draw("colz");
+
+   TCanvas *c14 = new TCanvas("c14", "c14");
+   c14->cd();
    h_range_thetalab_cutverz->SetDirectory(0);
-   h_range_thetalab_cutverz->Draw("colz");
    h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->SetTitle(Form("Range Theta_LAB (verz > %d )", (int)th_verz));
+   h_range_thetalab_cutverz->Draw("colz");
 
    /*
    TCanvas *c6 = new TCanvas("c6", "c6");
@@ -582,7 +618,9 @@ void kine(){
    // track vertex
    h_verxy->Write();
    h_verz->Write();
-   h_verz_ntra->Write();
+   h_verxz->Write();
+   h_veryz->Write();
+   h_ntra_verz->Write();
 
    /*
    // Excitation energy spectra
@@ -624,6 +662,15 @@ void kine(){
    Results_c <<  Form("std::cout << \"Drawing canvases... \" << std::endl;\n") << std::endl;
    Results_c << "}\n" << std::endl;
    Results_c.close();
+
+
+   // stop timer
+   timer.Stop();
+   Double_t rtime = timer.RealTime();
+   Double_t ctime = timer.CpuTime();
+   cout << endl;
+   cout << "Real time: " << rtime << " s, CPU time: " << ctime << " s" << endl << endl;
+
 }
 
 TGraph* ReadKinematics(TString kineFile){
