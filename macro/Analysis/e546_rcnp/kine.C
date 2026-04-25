@@ -14,13 +14,13 @@ void kine(){
    TStopwatch timer;
    timer.Start();
 
-   cout<<endl<<endl;
+   cout<<endl;
 #ifdef find_vertex
    cout<<"find vertex: ON!! "<<endl;
 #else
    cout<<"find vertex: OFF!! "<<endl;
 #endif
-   cout<<endl<<endl;
+   cout<<endl;
 
    // set parameters
    //   Int_t verntra = 7; // number of tracks to find vertex.
