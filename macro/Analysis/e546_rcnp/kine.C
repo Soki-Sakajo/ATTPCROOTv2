@@ -1,3 +1,4 @@
+#define find_vertex
 #include <fstream>
 #include "TFile.h"
 #include "TObject.h"
@@ -13,7 +14,17 @@ void kine(){
    TStopwatch timer;
    timer.Start();
 
+   cout<<endl<<endl;
+#ifdef find_vertex
+   cout<<"find vertex: ON!! "<<endl;
+#else
+   cout<<"find vertex: OFF!! "<<endl;
+#endif
+   cout<<endl<<endl;
+
    // set parameters
+   //   Int_t verntra = 7; // number of tracks to find vertex.
+   Int_t verntra = 4; // number of tracks to find vertex.
    Double_t del_phi = 10; // cut value; phi1 - phi2 - 180 deg < del_phi
    Double_t th_verz = 500; // cut value; vertex z > th_verz
    /*
@@ -324,27 +335,10 @@ void kine(){
          }
          check_tracks = false;
 
+#ifdef find_vertex
          // find vertex.
          /*
-         if (ntrack == 0){
-            //            cout<<"No tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
-            continue;
-         }
-         else if (ntrack == 1){
-            fver->FindVertexSingleLine(tracks);
-            check_tracks = true;
-         }
-         else if (ntrack > 1 && ntrack < 7){
-            fver->FindVertexMultipleLines(tracks, ntrack);
-            check_tracks = true;
-         }
-         else {
-            //            cout<<"More than 6 tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
-            continue;
-         }
-         */
-
-         for(Int_t k=1; k<4; k++){
+         for(Int_t k=1; k< verntra; k++){
             if(tracks.size() != k && tracks.size() != 1){continue;}
             else if(tracks.size() == 1){
                fver->FindVertexSingleLine(tracks);
@@ -354,15 +348,8 @@ void kine(){
                fver->FindVertexMultipleLines(tracks, ntrack);
                check_tracks=true;
             }
-            auto vtxlist = fver->GetTracksVertex();
-            for(auto &v:vtxlist){
-               //	 cout<<"run number: "<<run_num<<endl;
-               //	 cout<<"Found vertex at ("<<v.vertex.X()<<", "<<v.vertex.Y()<<", "<<v.vertex.Z()<<")"<<endl;
-               track_verx = v.vertex.X();
-               track_very = v.vertex.Y();
-               track_verz = v.vertex.Z();
-            }
          }
+         */
          if (ntrack == 0){
             //            cout<<"No tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
             continue;
@@ -371,7 +358,7 @@ void kine(){
             fver->FindVertexSingleLine(tracks);
             check_tracks = true;
          }
-         else if (ntrack > 1 && ntrack < 7){
+         else if (ntrack > 1 && ntrack < verntra){
             fver->FindVertexMultipleLines(tracks, ntrack);
             check_tracks = true;
          }
@@ -396,6 +383,7 @@ void kine(){
                h_range_thetalab_cutverz->Fill(track_theta[k], track_range[k]);
             }
          }
+#endif
 
          h_rmax->Fill(r_max);
          if(r_tri > r_max && r_max > 0){
