@@ -637,17 +637,23 @@ void kine(){
    Int_t can_num = 1;
    Int_t n_can = canlist->GetEntries();
    Results_c << "void kine_canvases(){\n" << std::endl;
-   Results_c <<  Form("std::cout << \"load %d canvases... \" << std::endl;\n", n_can) << std::endl;
+   Results_c << "   TStopwatch timer;\n" << std::endl;
+   Results_c << "   timer.Start();\n" << std::endl;
+   Results_c <<  Form("   std::cout << \"load %d canvases... \" << std::endl;\n", n_can) << std::endl;
    TCanvas *c;
       while ((c = (TCanvas *)next())) {
-      Results_c << Form("TCanvas *c%d = new TCanvas(\"c%d\", \"c%d\");\n", can_num, can_num, can_num);
-      Results_c << Form("c%d->cd();\n", can_num);
+      Results_c << Form("   std::cout << \"Loading canvases: %d / %d \\r\" << std::flush;\n", can_num, n_can);
+      Results_c << Form("   TCanvas *c%d = new TCanvas(\"c%d\", \"c%d\");\n", can_num, can_num, can_num);
+      Results_c << Form("   c%d->cd();\n", can_num);
       c->SavePrimitive(Results_c, "");
       Results_c << "\n";
-      Results_c << Form("std::cout << \"Loading canvases: %d / %d \\r\" << std::flush;\n", can_num, n_can);
       can_num++;
    }
-   Results_c <<  Form("std::cout << \"Drawing canvases... \" << std::endl;\n") << std::endl;
+   Results_c <<  Form("   std::cout << \"Drawing canvases... \" << std::endl;\n") << std::endl;
+   Results_c << "   timer.Stop();\n" << std::endl;
+   Results_c << "   Double_t rtime = timer.RealTime();\n" << std::endl;
+   Results_c << "   Double_t ctime = timer.CpuTime();\n" << std::endl;
+   Results_c << "   std::cout << \"Real time: \" << rtime << \" s, CPU time: \" << ctime << \" s\" << std::endl << std::endl;\n" << std::endl;
    Results_c << "}\n" << std::endl;
    Results_c.close();
 
