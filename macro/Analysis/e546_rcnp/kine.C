@@ -458,14 +458,22 @@ void kine(){
 
    TCanvas *c6 = new TCanvas("c6", "c6");
    c6->cd();
+   h_charge_range_cutphi->SetDirectory(0);
+   h_charge_range_cutphi->Draw("colz");
+   h_charge_range_cutphi->GetXaxis()->SetTitle("roughRange [mm]");
+   h_charge_range_cutphi->GetYaxis()->SetTitle("Charge [ADC]");
+   h_charge_range_cutphi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", (int)del_phi));
+
+   TCanvas *c7 = new TCanvas("c7", "c7");
+   c7->cd();
    h_range_thetalab_cutphi->SetDirectory(0);
    h_range_thetalab_cutphi->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cutphi->GetYaxis()->SetTitle("roughRange [mm]");
    h_range_thetalab_cutphi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
    h_range_thetalab_cutphi->Draw("colz");
 
-   TCanvas *c7 = new TCanvas("c7", "c7");
-   c7->cd();
+   TCanvas *c8 = new TCanvas("c8", "c8");
+   c8->cd();
    h_thetalab_thetalab_cutphi->SetDirectory(0);
    h_thetalab_thetalab_cutphi->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -473,8 +481,8 @@ void kine(){
    h_thetalab_thetalab_cutphi->Draw("colz");
    //kine_d3He_tt->Draw("same");
 
-   TCanvas *c8 = new TCanvas("c8", "c8");
-   c8->cd();
+   TCanvas *c9 = new TCanvas("c9", "c9");
+   c9->cd();
    h_philab_philab_cutphi->SetDirectory(0);
    h_philab_philab_cutphi->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_cutphi->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
@@ -482,42 +490,42 @@ void kine(){
    h_philab_philab_cutphi->Draw("colz");
    //kine_d3He_tt->Draw("same");
 
-   TCanvas *c9 = new TCanvas("c9", "c9");
-   c9->cd();
+   TCanvas *c10 = new TCanvas("c10", "c10");
+   c10->cd();
    h_verxy->SetDirectory(0);
    h_verxy->GetXaxis()->SetTitle("Vertex X [mm]");
    h_verxy->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_verxy->Draw("colz");
 
-   TCanvas *c10 = new TCanvas("c10", "c10");
-   c10->cd();
+   TCanvas *c11 = new TCanvas("c11", "c11");
+   c11->cd();
    h_verz->SetDirectory(0);
    h_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verz->Draw();
 
-   TCanvas *c11 = new TCanvas("c11", "c11");
-   c11->cd();
+   TCanvas *c12 = new TCanvas("c12", "c12");
+   c12->cd();
    h_verxz->SetDirectory(0);
    h_verxz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verxz->GetYaxis()->SetTitle("Vertex X [mm]");
    h_verxz->Draw("colz");
 
-   TCanvas *c12 = new TCanvas("c12", "c12");
-   c12->cd();
+   TCanvas *c13 = new TCanvas("c13", "c13");
+   c13->cd();
    h_veryz->SetDirectory(0);
    h_veryz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_veryz->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_veryz->Draw("colz");
 
-   TCanvas *c13 = new TCanvas("c13", "c13");
-   c13->cd();
+   TCanvas *c14 = new TCanvas("c14", "c14");
+   c14->cd();
    h_ntra_verz->SetDirectory(0);
    h_ntra_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_ntra_verz->GetYaxis()->SetTitle("Number of tracks");
    h_ntra_verz->Draw("colz");
 
-   TCanvas *c14 = new TCanvas("c14", "c14");
-   c14->cd();
+   TCanvas *c15 = new TCanvas("c15", "c15");
+   c15->cd();
    h_range_thetalab_cutverz->SetDirectory(0);
    h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -532,13 +540,6 @@ void kine(){
    //   cutPIDdeuteron->Draw("same");
    h_dEdx_range_backwards->GetXaxis()->SetTitle("roughRange [mm]");
    h_dEdx_range_backwards->GetYaxis()->SetTitle("#frac{dE}{dx} [ADC/mm]");
-
-   TCanvas *c7 = new TCanvas("c7", "c7");
-   h_charge_range_cutphi->SetDirectory(0);
-   h_charge_range_cutphi->Draw("colz");
-   h_charge_range_cutphi->GetXaxis()->SetTitle("roughRange [mm]");
-   h_charge_range_cutphi->GetYaxis()->SetTitle("Charge [ADC]");
-   h_charge_range_cutphi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", (int)del_phi));
 
    TCanvas *c5 = new TCanvas();
    histEstimatedKinEVThetaLABTotal->SetDirectory(0);
@@ -649,7 +650,7 @@ void kine(){
       Results_c << "\n";
       can_num++;
    }
-   Results_c <<  Form("   std::cout << \"Drawing canvases... \" << std::endl;\n") << std::endl;
+   Results_c <<  Form("   std::cout << \"Drawing canvases...                    \" << std::endl;\n") << std::endl;
    Results_c << "   timer.Stop();\n" << std::endl;
    Results_c << "   Double_t rtime = timer.RealTime();\n" << std::endl;
    Results_c << "   Double_t ctime = timer.CpuTime();\n" << std::endl;
