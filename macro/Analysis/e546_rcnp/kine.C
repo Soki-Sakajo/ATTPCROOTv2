@@ -93,16 +93,16 @@ void kine(){
 
    // Cut files.
    gROOT->ProcessLine(".x ./cut_files/charge_range_12c.C");
-   TCutG *cut12c = charge_range_12c;
+   TCutG *cut12c = (TCutG*) gROOT->FindObject("charge_range_12c");
 
    gROOT->ProcessLine(".x ./cut_files/charge_range_alpha.C");
-   TCutG *cutalpha = charge_range_alpha;
+   TCutG *cutalpha = (TCutG*) gROOT->FindObject("charge_range_alpha");
 
    gROOT->ProcessLine(".x ./cut_files/charge_range_p.C");
-   TCutG *cutproton = charge_range_p;
+   TCutG *cutproton = (TCutG*) gROOT->FindObject("charge_range_p");
 
    gROOT->ProcessLine(".x ./cut_files/range_theta_ext.C");
-   TCutG *cutext = range_theta_ext;
+   TCutG *cutext = (TCutG*) gROOT->FindObject("range_theta_ext");
 
    /*
    TFile *cutATTPCPIDFile = new TFile("./cutFiles/ATTPC_PID.root", "READ"); 
