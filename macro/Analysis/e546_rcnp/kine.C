@@ -130,12 +130,12 @@ void kine(){
    Double_t track_verx = 0;
    Double_t track_very = 0;
    Double_t track_verz = 0;
-   bool track_12c[narray]= {false};
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
    Double_t track_charge[narray];
    Double_t track_r[narray];
+   std::vector<bool> track_12c(narray, false);
    std::vector<Int_t> track6(0);
 
    // Histogram definitions.
