@@ -1,24 +1,21 @@
 {
-//========= Macro generated from object: CUTG/Graph
+//========= Macro generated from object: charge_range_12c/Graph
 //========= by ROOT version6.26/10
    
-   cutg = new TCutG("CUTG",13);
+   TCutG *cutg = new TCutG("charge_range_12c",10);
    cutg->SetVarX("Charge Range (phi1-phi2-180 < 10 )");
    cutg->SetVarY("");
    cutg->SetTitle("Graph");
    cutg->SetFillStyle(1000);
-   cutg->SetPoint(0,43.4097,59493.7);
-   cutg->SetPoint(1,238.968,364873);
-   cutg->SetPoint(2,348.567,445570);
-   cutg->SetPoint(3,557.02,456646);
-   cutg->SetPoint(4,604.298,548418);
-   cutg->SetPoint(5,361.461,562658);
-   cutg->SetPoint(6,198.138,518354);
-   cutg->SetPoint(7,94.9857,355380);
-   cutg->SetPoint(8,21.9198,102215);
-   cutg->SetPoint(9,15.4728,65822.8);
-   cutg->SetPoint(10,41.2607,61075.9);
-   cutg->SetPoint(11,41.2607,61075.9);
-   cutg->SetPoint(12,43.4097,59493.7);
+   cutg->SetPoint(0,2.57879,68987.3);
+   cutg->SetPoint(1,159.456,519937);
+   cutg->SetPoint(2,372.206,587975);
+   cutg->SetPoint(3,574.212,554747);
+   cutg->SetPoint(4,576.361,474051);
+   cutg->SetPoint(5,266.905,404430);
+   cutg->SetPoint(6,97.1347,127532);
+   cutg->SetPoint(7,41.2607,56329.1);
+   cutg->SetPoint(8,6.87678,72151.9);
+   cutg->SetPoint(9,2.57879,68987.3);
    cutg->Draw("");
 }

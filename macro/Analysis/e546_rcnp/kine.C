@@ -86,14 +86,15 @@ void kine(){
    //   eLossModelC4H10_12C->SetPDGCode("1000120060");
 
    // Cut files.
-
-   TFile *cutKineFile1 = new TFile("./cutFiles/charge_range_12c.C", "READ");
+/*
+   TFile *cutKineFile1 = new TFile("./cut_files/charge_range_12c.C", "READ");
    TCutG *cutkine12c = (TCutG *)cutKineFile1->Get("CUTG");
    cutKineFile1->Close();
 
-   TFile *cutKineFile2 = new TFile("./cutFiles/range_theta_ext.C", "READ");
+   TFile *cutKineFile2 = new TFile("./cut_files/range_theta_ext.C", "READ");
    TCutG *cutkineout = (TCutG *)cutKineFile2->Get("CUTG");
    cutKineFile2->Close();
+   */
    /*
    TFile *cutATTPCPIDFile = new TFile("./cutFiles/ATTPC_PID.root", "READ"); 
    TCutG *cutPIDproton = (TCutG *)cutATTPCPIDFile->Get("cutATTPCPIDproton");
@@ -141,7 +142,7 @@ void kine(){
    // Histogram definitions.
    // ... TH1 hist for checking something.
    TH1D *h_ntra = new TH1D("h_ntra", "h_ntra;NTracks", 11, -0.5, 10.5);
-   TH1D *h_rmax = new TH1D("h_rmax", "h_rmax;Rmax [mm]", 100, 0, 200);
+   TH1D *h_rmax = new TH1D("h_rmax", "h_rmax;Rmax [mm]", 150, 0, 300);
 
    // ... ATTPC PID
    TH2F *h_charge_range = new TH2F("h_charge_range", "h_charge_range;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
@@ -294,11 +295,11 @@ void kine(){
             if (track_theta[itrack] > 100){
                h_dEdx_range_backwards->Fill(track_range[itrack], dEdx);
             }
-
+/*
             if (cutkine12c->IsInside(track_range[itrack], track_charge[itrack])) {
                track_12c[itrack]=true;
             }
-
+*/
             double estimatedKinE{0.1};
             // While we don't have cut files defined, assume deuteron.
             //while (eLossModelC3D8_d->GetRange(estimatedKinE) < roughRangeEstimation)
@@ -414,10 +415,12 @@ void kine(){
             if (ntrack == 2){
                h_charge_range_cutphi_2tra -> Fill(track_range[itrack], track_charge[itrack]);
                h_thetalab_thetalab_cutphi_2tra -> Fill(track_theta[0], track_theta[1]);
+/*
                if (track_12c[0] && track_12c[1]){
                   h_charge_range_cut12c_ela -> Fill(track_range[itrack], track_charge[itrack]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
                }
+*/
             }
          }
 
@@ -473,7 +476,7 @@ void kine(){
    h_charge_range->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range->Draw("colz");
-   cutkine12c->Draw("same");
+//   cutkine12c->Draw("same");
 
    TCanvas *c4 = new TCanvas("c4", "c4");
    c4->cd();
@@ -489,7 +492,7 @@ void kine(){
    h_charge_range_cutphi->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range_cutphi->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range_cutphi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", (int)del_phi));
-   cutkine12c->Draw("same");
+//   cutkine12c->Draw("same");
 
    TCanvas *c6 = new TCanvas("c6", "c6");
    c6->cd();
@@ -524,7 +527,7 @@ void kine(){
    h_charge_range_cutphi_2tra->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range_cutphi_2tra->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range_cutphi_2tra->SetTitle(Form("Charge Range (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
-   cutkine12c->Draw("same");
+//   cutkine12c->Draw("same");
 
    TCanvas *c10 = new TCanvas("c10", "c10");
    c10->cd();
@@ -541,7 +544,7 @@ void kine(){
    h_charge_range_cut12c_ela->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range_cut12c_ela->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range_cut12c_ela->SetTitle(Form("Charge Range (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
-   cutkine12c->Draw("same");
+//   cutkine12c->Draw("same");
 
    TCanvas *c12 = new TCanvas("c12", "c12");
    c12->cd();
