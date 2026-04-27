@@ -116,7 +116,6 @@ void kine(){
 
    // Characteristic definitions
    bool check_tracks = false; 
-   bool track_12c[narray]= {false};
    Int_t narray = 10;
    Int_t ntrack = 0;
    Int_t itrack = 0;
@@ -131,6 +130,7 @@ void kine(){
    Double_t track_verx = 0;
    Double_t track_very = 0;
    Double_t track_verz = 0;
+   bool track_12c[narray]= {false};
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
