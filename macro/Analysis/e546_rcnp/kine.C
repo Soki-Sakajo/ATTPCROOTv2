@@ -73,6 +73,12 @@ void kine(){
    materialComponents.push_back(std::make_tuple(12, 6, 4));
    materialComponents.push_back(std::make_tuple(1, 1, 10));
 
+   std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_p = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_p");
+   eLossModelC4H10_p->SetMaterial(materialComponents);
+   eLossModelC4H10_p->SetProjectile(1, 1, 1.007825031898);
+   //   eLossModels.push_back(std::move(eLossModelC4H10_p));
+   //   eLossModelC4H10_p->SetPDGCode("1000010010");
+
    std::unique_ptr<AtTools::AtELossCATIMA> eLossModelC4H10_alpha = std::make_unique<AtTools::AtELossCATIMA>(density, "CATima_C4H10_alpha");
    eLossModelC4H10_alpha->SetMaterial(materialComponents);
    eLossModelC4H10_alpha->SetProjectile(4, 2, 4.00260325413);
@@ -87,16 +93,16 @@ void kine(){
 
    // Cut files.
    gROOT->ProcessLine(".L ./cut_files/charge_range_12c.C");
-   TCutG *cut12c = charge_range_12c();
+   TCutG *cut12c = charge_range_12c;
 
    gROOT->ProcessLine(".L ./cut_files/charge_range_alpha.C");
-   TCutG *cutalpha = charge_range_alpha();
+   TCutG *cutalpha = charge_range_alpha;
 
    gROOT->ProcessLine(".L ./cut_files/charge_range_p.C");
-   TCutG *cutp = charge_range_p();
+   TCutG *cutproton = charge_range_p;
 
    gROOT->ProcessLine(".L ./cut_files/range_theta_ext.C");
-   TCutG *cutext = range_theta_ext();
+   TCutG *cutext = range_theta_ext;
 
    /*
    TFile *cutATTPCPIDFile = new TFile("./cutFiles/ATTPC_PID.root", "READ"); 
@@ -162,9 +168,9 @@ void kine(){
    TH2F *h_dEdx_range_backwards = new TH2F("h_dEdx_range_backwards", "h_dEdx_range_backwards;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
 
    // ... kinematics 
-   TH2F *h_kinE_thetalab = new TH2F("h_kinE_thetalab", "h_kinE_thetalab;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
-   TH2F *h_kinE_thetalab_carbon = new TH2F("h_kinE_thetalab_carbon", "h_kinE_thetalab_carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
-   TH2F *h_kinE_thetalab_alpha = new TH2F("h_kinE_thetalab_alpha", "h_kinE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
+   TH2F *h_kineE_thetalab = new TH2F("h_kineE_thetalab", "h_kineE_thetalab;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
+   TH2F *h_kineE_thetalab_carbon = new TH2F("h_kineE_thetalab_carbon", "h_kineE_thetalab_carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
+   TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
 
    // ... angle correlations
    TH2F *h_range_thetalab = new TH2F("h_range_thetalab", "h_range_thetalab", 180, 0, 180, 1030, 0, 1030);
@@ -172,6 +178,7 @@ void kine(){
    TH2F *h_range_thetalab_cutphi_2tra = new TH2F("h_range_thetalab_cutphi_2tra", "h_range_thetalab_cutphi_2tra", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_range_thetalab_cut12c_ela = new TH2F("h_range_thetalab_cut12c_ela", "h_range_thetalab_cut12c_ela", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_range_thetalab_cutalpha = new TH2F("h_range_thetalab_cutalpha", "h_range_thetalab_cutalpha", 180, 0, 180, 1030, 0, 1030);
+   TH2F *h_range_thetalab_cutproton = new TH2F("h_range_thetalab_cutproton", "h_range_thetalab_cutproton", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_range_thetalab_cutverz = new TH2F("h_range_thetalab_cutverz", "h_range_thetalab_cutverz", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_thetalab_thetalab_cutphi = new TH2F("h_thetalab_thetalab_cutphi", "h_thetalab_thetalab_cutphi", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_cutphi_2tra = new TH2F("h_thetalab_thetalab_cutphi_2tra", "h_thetalab_thetalab_cutphi_2tra", 200, 0, 100, 200, 0, 100);
@@ -203,8 +210,8 @@ void kine(){
 
    TH2F *h_Esmall_range = new TH2F("h_ESmallVTotalRange", "h_ESmallVTotalRange", 500, 0, 1030, 1600, 0, 160000);
    TH2F *h_Ebig_rangebig = new TH2F("h_EBigVBigRange", "h_EBigVBigRange", 500, 0, 1030, 1600, 0, 160000);
-   TH2F *h_kinE_thetalab_2H  = new TH2F("h_kinE_thetalab_2H", "h_kinE_thetalab_2H", 180, 0, 180, 250, 0, 20);
-   TH2F *h_kinE_thetalab_1H  = new TH2F("h_kinE_thetalab_1H", "h_kinE_thetalab_1H", 180, 0, 180, 250, 0, 20);
+   TH2F *h_kineE_thetalab_2H  = new TH2F("h_kineE_thetalab_2H", "h_kineE_thetalab_2H", 180, 0, 180, 250, 0, 20);
+   TH2F *h_kineE_thetalab_1H  = new TH2F("h_kineE_thetalab_1H", "h_kineE_thetalab_1H", 180, 0, 180, 250, 0, 20);
 
    for (int runNum: runNums) {
       // Open the digitalization file and get the TTree.
@@ -320,22 +327,61 @@ void kine(){
             */
 
             double estimatedKinE{0.1};
-            // While we don't have cut files defined, assume deuteron.
-            //while (eLossModelC3D8_d->GetRange(estimatedKinE) < roughRangeEstimation)
-            // estimatedKinE += 0.01;
-            // h_kinE_thetalab->Fill(trackThetaLAB, estimatedKinE);
+            if (cut12c->IsInside(track_range[itrack], track_charge[itrack])){
+               while (eLossModelC4H10_12C->GetRange(estimatedKinE) < track_range[itrack]){
+                  estimatedKinE += 0.01;
+               }
+            }
+            else if (cutalpha->IsInside(track_range[itrack], track_charge[itrack])){
+               while (eLossModelC4H10_alpha->GetRange(estimatedKinE) < track_range[itrack]){
+                  estimatedKinE += 0.01;
+               }
+            }
+            else if (cutproton->IsInside(track_range[itrack], track_charge[itrack])){
+               while (eLossModelC4H10_p->GetRange(estimatedKinE) < track_range[itrack]){
+                  estimatedKinE += 0.01;
+               }
+            }
+            else {
+               estimatedKinE = -1;
+            }
 
-            /*
             // Kinematics plots
+            h_kineE_thetalab->Fill(track_theta[itrack], estimatedKinE);
+            /*
+            // .... 12c in ATTPC
+            if (cutPIDdeuteron->IsInside(track_range[itrack], dEdx)) {
+               histSiPIDADCMax_DeuteronATTPC->Fill(maxADCFront2, maxADCFront1);
+               histEstimatedKinEVThetaLAB_DeuteronATTPC->Fill(trackThetaLAB, estimatedKinE);
+
+               auto [Ex, thetaCM] = kine_2b(m_17C, m_d, m_d, m_17C, eLossModelC3D8_17C->GetEnergy(E_beam, 1000 - pseudoVertex.z() * 1000), trackThetaLAB * TMath::DegToRad(), estimatedKinE);
+               histExdd->Fill(Ex);
+
+               if ((Ex >= -4.75) && (Ex <= 4.73)) {
+                  histAngDist_elastic->Fill(thetaCM, 1 / TMath::Sin(thetaCM * TMath::DegToRad()));
+               }
+            }
+            // .... alpha in ATTPC
+            if (cutPIDdeuteron->IsInside(track_range[itrack], dEdx)) {
+               histSiPIDADCMax_DeuteronATTPC->Fill(maxADCFront2, maxADCFront1);
+               histEstimatedKinEVThetaLAB_DeuteronATTPC->Fill(trackThetaLAB, estimatedKinE);
+
+               auto [Ex, thetaCM] = kine_2b(m_17C, m_d, m_d, m_17C, eLossModelC3D8_17C->GetEnergy(E_beam, 1000 - pseudoVertex.z() * 1000), trackThetaLAB * TMath::DegToRad(), estimatedKinE);
+               histExdd->Fill(Ex);
+
+               if ((Ex >= -4.75) && (Ex <= 4.73)) {
+                  histAngDist_elastic->Fill(thetaCM, 1 / TMath::Sin(thetaCM * TMath::DegToRad()));
+               }
+            }
             // .... protons in ATTPC
-            if (cutPIDproton->IsInside(roughRangeEstimation, dEdx)) {
+            if (cutPIDproton->IsInside(track_range[itrack], dEdx)) {
                histSiPIDADCMax_ProtonATTPC->Fill(maxADCFront2, maxADCFront1);
                histEstimatedKinEVThetaLAB_ProtonATTPC->Fill(trackThetaLAB, estimatedKinE);
 
                auto [Ex, thetaCM] = kine_2b(m_17C, m_d, m_p, m_18C, eLossModelC3D8_17C->GetEnergy(E_beam, 1000 - pseudoVertex.z() * 1000), trackThetaLAB * TMath::DegToRad(), estimatedKinE);
                histExdp->Fill(Ex);            
             }
-            if (cutPIDproton->IsInside(roughRangeEstimation, dEdx) or cutPIDproton_extension->IsInside(roughRangeEstimation, dEdx)) {
+            if (cutPIDproton->IsInside(track_range[itrack], dEdx) or cutPIDproton_extension->IsInside(track_range[itrack], dEdx)) {
                histEstimatedKinEVThetaLAB_ProtonATTPC_extended->Fill(trackThetaLAB, estimatedKinE);
 
                auto [Ex, thetaCM] = kine_2b(m_17C, m_d, m_p, m_18C, eLossModelC3D8_17C->GetEnergy(E_beam, 1000 - pseudoVertex.z() * 1000), trackThetaLAB * TMath::DegToRad(), estimatedKinE);
@@ -348,18 +394,6 @@ void kine(){
                   histEstimatedKinEVThetaLAB_ProtonATTPC_CarbonSi->Fill(trackThetaLAB, estimatedKinE);
                   histExdp_CarbonSi->Fill(Ex);
                   histAngDist_dp_CarbonSi->Fill(thetaCM, 1 / TMath::Sin(thetaCM * TMath::DegToRad()));
-               }
-            }
-            // .... deuterons in ATTPC
-            if (cutPIDdeuteron->IsInside(roughRangeEstimation, dEdx)) {
-               histSiPIDADCMax_DeuteronATTPC->Fill(maxADCFront2, maxADCFront1);
-               histEstimatedKinEVThetaLAB_DeuteronATTPC->Fill(trackThetaLAB, estimatedKinE);
-
-               auto [Ex, thetaCM] = kine_2b(m_17C, m_d, m_d, m_17C, eLossModelC3D8_17C->GetEnergy(E_beam, 1000 - pseudoVertex.z() * 1000), trackThetaLAB * TMath::DegToRad(), estimatedKinE);
-               histExdd->Fill(Ex);
-
-               if ((Ex >= -4.75) && (Ex <= 4.73)) {
-                  histAngDist_elastic->Fill(thetaCM, 1 / TMath::Sin(thetaCM * TMath::DegToRad()));
                }
             }
             */
@@ -635,49 +669,65 @@ void kine(){
 
    TCanvas *c16 = new TCanvas("c16", "c16");
    c16->cd();
+   h_range_thetalab_cutalpha->SetDirectory(0);
+   h_range_thetalab_cutalpha->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cutalpha->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cutalpha->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, )", (int)del_phi));
+   h_range_thetalab_cutalpha->Draw("colz");
+
+   TCanvas *c17 = new TCanvas("c17", "c17");
+   c17->cd();
    h_npro_ntra->SetDirectory(0);
    h_npro_ntra->GetXaxis()->SetTitle("number of tracks");
    h_npro_ntra->GetYaxis()->SetTitle("number of protons tracks");
    h_npro_ntra->SetTitle(Form("n_tracks n_proton_tracks"));
    h_npro_ntra->Draw("colz");
 
+   TCanvas *c18 = new TCanvas("c18", "c18");
+   c18->cd();
+   h_range_thetalab_cut12c_ela->SetDirectory(0);
+   h_range_thetalab_cut12c_ela->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cut12c_ela->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_range_thetalab_cut12c_ela->Draw("colz");
+
 #ifdef find_vertex
-   TCanvas *c17 = new TCanvas("c17", "c17");
-   c17->cd();
+   TCanvas *c19 = new TCanvas("c19", "c19");
+   c19->cd();
    h_verxy->SetDirectory(0);
    h_verxy->GetXaxis()->SetTitle("Vertex X [mm]");
    h_verxy->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_verxy->Draw("colz");
 
-   TCanvas *c18 = new TCanvas("c18", "c18");
-   c18->cd();
+   TCanvas *c20 = new TCanvas("c20", "c20");
+   c20->cd();
    h_verz->SetDirectory(0);
    h_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verz->Draw();
 
-   TCanvas *c19 = new TCanvas("c19", "c19");
-   c19->cd();
+   TCanvas *c21 = new TCanvas("c21", "c21");
+   c21->cd();
    h_verxz->SetDirectory(0);
    h_verxz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verxz->GetYaxis()->SetTitle("Vertex X [mm]");
    h_verxz->Draw("colz");
 
-   TCanvas *c20 = new TCanvas("c20", "c20");
-   c20->cd();
+   TCanvas *c22 = new TCanvas("c22", "c22");
+   c22->cd();
    h_veryz->SetDirectory(0);
    h_veryz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_veryz->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_veryz->Draw("colz");
 
-   TCanvas *c21 = new TCanvas("c21", "c21");
-   c21->cd();
+   TCanvas *c23 = new TCanvas("c23", "c23");
+   c23->cd();
    h_ntra_verz->SetDirectory(0);
    h_ntra_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_ntra_verz->GetYaxis()->SetTitle("Number of tracks");
    h_ntra_verz->Draw("colz");
 
-   TCanvas *c22 = new TCanvas("c22", "c22");
-   c22->cd();
+   TCanvas *c24 = new TCanvas("c24", "c24");
+   c24->cd();
    h_range_thetalab_cutverz->SetDirectory(0);
    h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -686,15 +736,6 @@ void kine(){
 #endif
 
    /*
-   TCanvas *c5 = new TCanvas();
-   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
-   histEstimatedKinEVThetaLABTotal->Draw("colz");
-   //kine_d3He->Draw("same");
-   //kine_d3HeEx2_2->Draw("same");
-   //kine_d3HeEx2_7->Draw("same");
-   histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
-
    TCanvas *c6 = new TCanvas();
    histEstimatedKinEVThetaLABTotal->SetDirectory(0);
    histEstimatedKinEVThetaLABTotal->Draw("colz");
@@ -733,8 +774,8 @@ void kine(){
    //   cutPIDdeuteron->Write("PIDCutDeuteron");
 
    // Kinematics
+   h_kineE_thetalab->Write();
    /*
-   h_kinE_thetalab->Write();
    histEstimatedKinEVThetaLAB_ProtonATTPC->Write();
    histEstimatedKinEVThetaLAB_ProtonATTPC_extended->Write();
    histEstimatedKinEVThetaLAB_DeuteronATTPC->Write();
@@ -752,6 +793,7 @@ void kine(){
    h_range_thetalab_cutphi_2tra->Write();
    h_range_thetalab_cut12c_ela->Write();
    h_range_thetalab_cutalpha->Write();
+   h_range_thetalab_cutproton->Write();
    h_range_thetalab_cutverz->Write();
    h_thetalab_thetalab_cutphi->Write();
    h_thetalab_thetalab_cutphi_2tra->Write();
