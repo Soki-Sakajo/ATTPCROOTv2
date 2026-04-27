@@ -92,16 +92,16 @@ void kine(){
    //   eLossModelC4H10_12C->SetPDGCode("1000120060");
 
    // Cut files.
-   gROOT->ProcessLine(".L ./cut_files/charge_range_12c.C");
+   gROOT->ProcessLine(".x ./cut_files/charge_range_12c.C");
    TCutG *cut12c = charge_range_12c;
 
-   gROOT->ProcessLine(".L ./cut_files/charge_range_alpha.C");
+   gROOT->ProcessLine(".x ./cut_files/charge_range_alpha.C");
    TCutG *cutalpha = charge_range_alpha;
 
-   gROOT->ProcessLine(".L ./cut_files/charge_range_p.C");
+   gROOT->ProcessLine(".x ./cut_files/charge_range_p.C");
    TCutG *cutproton = charge_range_p;
 
-   gROOT->ProcessLine(".L ./cut_files/range_theta_ext.C");
+   gROOT->ProcessLine(".x ./cut_files/range_theta_ext.C");
    TCutG *cutext = range_theta_ext;
 
    /*
@@ -581,7 +581,7 @@ void kine(){
    h_charge_range_cutphi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", (int)del_phi));
    cut12c->Draw("same");
    cutalpha->Draw("same");
-   cutp->Draw("same");
+   cutproton->Draw("same");
 
    TCanvas *c6 = new TCanvas("c6", "c6");
    c6->cd();
