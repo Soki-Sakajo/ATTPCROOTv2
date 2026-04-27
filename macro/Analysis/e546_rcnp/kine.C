@@ -86,15 +86,18 @@ void kine(){
    //   eLossModelC4H10_12C->SetPDGCode("1000120060");
 
    // Cut files.
-/*
-   TFile *cutKineFile1 = new TFile("./cut_files/charge_range_12c.C", "READ");
-   TCutG *cutkine12c = (TCutG *)cutKineFile1->Get("CUTG");
-   cutKineFile1->Close();
+   gROOT->ProcessLine(".L ./cut_files/charge_range_12c.C");
+   TCutG *cut12c = charge_range_12c();
 
-   TFile *cutKineFile2 = new TFile("./cut_files/range_theta_ext.C", "READ");
-   TCutG *cutkineout = (TCutG *)cutKineFile2->Get("CUTG");
-   cutKineFile2->Close();
-   */
+   gROOT->ProcessLine(".L ./cut_files/charge_range_alpha.C");
+   TCutG *cutalpha = charge_range_alpha();
+
+   gROOT->ProcessLine(".L ./cut_files/charge_range_p.C");
+   TCutG *cutp = charge_range_p();
+
+   gROOT->ProcessLine(".L ./cut_files/range_theta_ext.C");
+   TCutG *cutext = range_theta_ext();
+
    /*
    TFile *cutATTPCPIDFile = new TFile("./cutFiles/ATTPC_PID.root", "READ"); 
    TCutG *cutPIDproton = (TCutG *)cutATTPCPIDFile->Get("cutATTPCPIDproton");
@@ -116,10 +119,14 @@ void kine(){
    legend->SetFillColor(0);*/
 
    // Characteristic definitions
-   bool check_tracks = false; 
+   bool check_tracks = false;
+   bool alpha_tracks = false;
+   bool proton_tracks = false;
    Int_t narray = 10;
    Int_t ntrack = 0;
    Int_t itrack = 0;
+   Int_t nalpha = 0;
+   Int_t nproton = 0;
    Double_t rad = -100;
    Double_t r_tem = 0;
    Double_t r_max = 0;
@@ -137,6 +144,8 @@ void kine(){
    Double_t track_charge[narray];
    Double_t track_r[narray];
    std::vector<bool> track_12c(narray, false);
+   std::vector<bool> track_alpha(narray, false);
+   std::vector<bool> track_proton(narray, false);
    std::vector<Int_t> track6(0);
 
    // Histogram definitions.
@@ -158,13 +167,16 @@ void kine(){
    TH2F *h_kinE_thetalab_alpha = new TH2F("h_kinE_thetalab_alpha", "h_kinE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
 
    // ... angle correlations
+   TH2F *h_range_thetalab = new TH2F("h_range_thetalab", "h_range_thetalab", 180, 0, 180, 1030, 0, 1030);
+   TH2F *h_range_thetalab_cutphi = new TH2F("h_range_thetalab_cutphi", "h_range_thetalab_cutphi", 180, 0, 180, 1030, 0, 1030);
+   TH2F *h_range_thetalab_cutphi_2tra = new TH2F("h_range_thetalab_cutphi_2tra", "h_range_thetalab_cutphi_2tra", 180, 0, 180, 1030, 0, 1030);
+   TH2F *h_range_thetalab_cut12c_ela = new TH2F("h_range_thetalab_cut12c_ela", "h_range_thetalab_cut12c_ela", 180, 0, 180, 1030, 0, 1030);
+   TH2F *h_range_thetalab_cutalpha = new TH2F("h_range_thetalab_cutalpha", "h_range_thetalab_cutalpha", 180, 0, 180, 1030, 0, 1030);
+   TH2F *h_range_thetalab_cutverz = new TH2F("h_range_thetalab_cutverz", "h_range_thetalab_cutverz", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_thetalab_thetalab_cutphi = new TH2F("h_thetalab_thetalab_cutphi", "h_thetalab_thetalab_cutphi", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_cutphi_2tra = new TH2F("h_thetalab_thetalab_cutphi_2tra", "h_thetalab_thetalab_cutphi_2tra", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_cut12c_ela = new TH2F("h_thetalab_thetalab_cut12c_ela", "h_thetalab_thetalab_cut12c_ela", 200, 0, 100, 200, 0, 100);
    TH2F *h_philab_philab_cutphi = new TH2F("h_philab_philab_cutphi", "h_philab_philab_cutphi", 360, -180, 180, 360, -180, 180);
-   TH2F *h_range_thetalab = new TH2F("h_range_thetalab", "h_range_thetalab", 180, 0, 180, 1030, 0, 1030);
-   TH2F *h_range_thetalab_cutphi = new TH2F("h_range_thetalab_cutphi", "h_range_thetalab_cutphi", 180, 0, 180, 1030, 0, 1030);
-   TH2F *h_range_thetalab_cutverz = new TH2F("h_range_thetalab_cutverz", "h_range_thetalab_cutverz", 180, 0, 180, 1030, 0, 1030);
 
    // ... track vertex
    TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 1010, -10, 1000);
@@ -186,6 +198,9 @@ void kine(){
    TH1F *h_AngDist_dp_CarbonSi = new TH1F("h_AngDist_dp_CarbonSi", "h_AngDist_dp_CarbonSi;#theta_{c.m.} [deg];Counts / deg", 180, 0, 180);
    */
    // ... others ...
+   TH2F *h_nalp_ntra = new TH2F("h_nalp_ntra", "h_nalp_ntra", 11, -0.5, 10.5, 11, -0.5, 10.5);
+   TH2F *h_npro_ntra = new TH2F("h_npro_ntra", "h_npro_ntra", 11, -0.5, 10.5, 11, -0.5, 10.5);
+
    TH2F *h_Esmall_range = new TH2F("h_ESmallVTotalRange", "h_ESmallVTotalRange", 500, 0, 1030, 1600, 0, 160000);
    TH2F *h_Ebig_rangebig = new TH2F("h_EBigVBigRange", "h_EBigVBigRange", 500, 0, 1030, 1600, 0, 160000);
    TH2F *h_kinE_thetalab_2H  = new TH2F("h_kinE_thetalab_2H", "h_kinE_thetalab_2H", 180, 0, 180, 250, 0, 20);
@@ -214,10 +229,15 @@ void kine(){
          auto &tracks = patternEvent->GetTrackCand();
          ntrack = tracks.size();
          h_ntra->Fill(ntrack);
+         check_tracks = false;
+         alpha_tracks = false;
+         proton_tracks = false;
          rad = 0;
          r_max = 0;
          r_tem = 0;
          itrack = 0;
+         nalpha = 0;
+         nproton = 0;
          if (ntrack == 6){
             track6.push_back(i);
          }
@@ -243,6 +263,8 @@ void kine(){
             auto &hits = track.GetHitArray();
 
             track_12c[itrack] = false;
+            track_alpha[itrack] = false;
+            track_proton[itrack] = false;
             track_range[itrack] = pattern->DistanceAlongPattern(lastPoint, firstPoint);
             track_charge[itrack] = track.GetGeoQEnergy();
             track_theta[itrack] = 180 - track.GetGeoTheta() * 180 / TMath::Pi();
@@ -284,6 +306,7 @@ void kine(){
 
             h_charge_range->Fill(track_range[itrack],track_charge[itrack]);
             h_range_thetalab->Fill(track_theta[itrack], track_range[itrack]);
+            /*
             h_dEdx_range->Fill(track_range[itrack], dEdx);
             if (!reachedBigPads){
                h_Esmall_range->Fill(track_range[itrack], smallPadCharge);
@@ -291,15 +314,11 @@ void kine(){
             else {
                h_Ebig_rangebig->Fill(rangeInBigPads, bigPadCharge);
             }
-
             if (track_theta[itrack] > 100){
                h_dEdx_range_backwards->Fill(track_range[itrack], dEdx);
             }
-/*
-            if (cutkine12c->IsInside(track_range[itrack], track_charge[itrack])) {
-               track_12c[itrack]=true;
-            }
-*/
+            */
+
             double estimatedKinE{0.1};
             // While we don't have cut files defined, assume deuteron.
             //while (eLossModelC3D8_d->GetRange(estimatedKinE) < roughRangeEstimation)
@@ -346,7 +365,6 @@ void kine(){
             */
             itrack ++;
          }
-         check_tracks = false;
 
 #ifdef find_vertex
          // find vertex.
@@ -407,21 +425,54 @@ void kine(){
          }
 
          if(abs(abs(track_phi[0] - track_phi[1]) - 180) < del_phi){
+            // pid
+            for (Int_t k = 0; k < ntrack; k++){
+               if (cut12c->IsInside(track_range[itrack], track_charge[itrack])) {
+                  track_12c[itrack]=true;
+               }
+               else if (cutalpha->IsInside(track_range[itrack], track_charge[itrack])) {
+                  track_alpha[itrack]=true;
+                  h_range_thetalab_cutalpha->Fill(track_theta[itrack], track_range[itrack]);
+               }
+               else if (cutproton->IsInside(track_range[itrack], track_charge[itrack])) {
+                  track_proton[itrack]=true;
+                  h_range_thetalab_cutproton->Fill(track_theta[itrack], track_range[itrack]);
+               }
+            }
+
+            // fill to histograms
             h_charge_range_cutphi -> Fill(track_range[0], track_charge[0]);
             h_charge_range_cutphi -> Fill(track_range[1], track_charge[1]);
-            h_thetalab_thetalab_cutphi -> Fill(track_theta[0], track_theta[1]);
             h_range_thetalab_cutphi -> Fill(track_theta[0], track_range[0]);
+            h_range_thetalab_cutphi -> Fill(track_theta[1], track_range[1]);
+            h_thetalab_thetalab_cutphi -> Fill(track_theta[0], track_theta[1]);
             h_philab_philab_cutphi -> Fill(track_phi[0], track_phi[1]);
             if (ntrack == 2){
                h_charge_range_cutphi_2tra -> Fill(track_range[itrack], track_charge[itrack]);
+               h_range_thetalab_cutphi_2tra -> Fill(track_theta[0], track_range[0]);
                h_thetalab_thetalab_cutphi_2tra -> Fill(track_theta[0], track_theta[1]);
-/*
                if (track_12c[0] && track_12c[1]){
                   h_charge_range_cut12c_ela -> Fill(track_range[itrack], track_charge[itrack]);
+                  h_range_thetalab_cut12c_ela -> Fill(track_theta[0], track_range[0]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
                }
-*/
             }
+         }
+         for (Int_t k = 0; k < ntrack; k++){
+            if (track_alpha[k]){
+               nalpha ++;
+               alpha_tracks = true;
+            }
+            if (track_proton[k]){
+               nproton ++;
+               proton_tracks = true;
+            }
+         }
+         if (alpha_tracks){
+            h_nalp_ntra->Fill(ntrack, nalpha);
+         }
+         if (proton_tracks){
+            h_npro_ntra->Fill(ntrack, nproton);
          }
 
          if(i%100==0){
@@ -476,7 +527,9 @@ void kine(){
    h_charge_range->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range->Draw("colz");
-//   cutkine12c->Draw("same");
+   //   cut12c->Draw("same");
+   //   cutalpha->Draw("same");
+   //   cutp->Draw("same");
 
    TCanvas *c4 = new TCanvas("c4", "c4");
    c4->cd();
@@ -492,7 +545,9 @@ void kine(){
    h_charge_range_cutphi->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range_cutphi->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range_cutphi->SetTitle(Form("Charge Range (phi1-phi2-180 < %d )", (int)del_phi));
-//   cutkine12c->Draw("same");
+   cut12c->Draw("same");
+   cutalpha->Draw("same");
+   cutp->Draw("same");
 
    TCanvas *c6 = new TCanvas("c6", "c6");
    c6->cd();
@@ -527,74 +582,108 @@ void kine(){
    h_charge_range_cutphi_2tra->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range_cutphi_2tra->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range_cutphi_2tra->SetTitle(Form("Charge Range (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
-//   cutkine12c->Draw("same");
+   //   cut12c->Draw("same");
 
    TCanvas *c10 = new TCanvas("c10", "c10");
    c10->cd();
+   h_range_thetalab_cutphi_2tra->SetDirectory(0);
+   h_range_thetalab_cutphi_2tra->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cutphi_2tra->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cutphi_2tra->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_range_thetalab_cutphi_2tra->Draw("colz");
+
+   TCanvas *c11 = new TCanvas("c11", "c11");
+   c11->cd();
    h_thetalab_thetalab_cutphi_2tra->SetDirectory(0);
    h_thetalab_thetalab_cutphi_2tra->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi_2tra->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi_2tra->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
    h_thetalab_thetalab_cutphi_2tra->Draw("colz");
 
-   TCanvas *c11 = new TCanvas("c11", "c11");
-   c11->cd();
+   TCanvas *c12 = new TCanvas("c12", "c12");
+   c12->cd();
    h_charge_range_cut12c_ela->SetDirectory(0);
    h_charge_range_cut12c_ela->Draw("colz");
    h_charge_range_cut12c_ela->GetXaxis()->SetTitle("roughRange [mm]");
    h_charge_range_cut12c_ela->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range_cut12c_ela->SetTitle(Form("Charge Range (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
-//   cutkine12c->Draw("same");
+   //   cut12c->Draw("same");
 
-   TCanvas *c12 = new TCanvas("c12", "c12");
-   c12->cd();
+   TCanvas *c13 = new TCanvas("c13", "c13");
+   c13->cd();
+   h_range_thetalab_cut12c_ela->SetDirectory(0);
+   h_range_thetalab_cut12c_ela->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cut12c_ela->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_range_thetalab_cut12c_ela->Draw("colz");
+
+   TCanvas *c14 = new TCanvas("c14", "c14");
+   c14->cd();
    h_thetalab_thetalab_cut12c_ela->SetDirectory(0);
    h_thetalab_thetalab_cut12c_ela->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cut12c_ela->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
    h_thetalab_thetalab_cut12c_ela->Draw("colz");
 
-   TCanvas *c13 = new TCanvas("c13", "c13");
-   c13->cd();
+   TCanvas *c15 = new TCanvas("c15", "c15");
+   c15->cd();
+   h_nalp_ntra->SetDirectory(0);
+   h_nalp_ntra->GetXaxis()->SetTitle("number of tracks");
+   h_nalp_ntra->GetYaxis()->SetTitle("number of alphas tracks");
+   h_nalp_ntra->SetTitle(Form("n_tracks n_alpha_tracks"));
+   h_nalp_ntra->Draw("colz");
+
+   TCanvas *c16 = new TCanvas("c16", "c16");
+   c16->cd();
+   h_npro_ntra->SetDirectory(0);
+   h_npro_ntra->GetXaxis()->SetTitle("number of tracks");
+   h_npro_ntra->GetYaxis()->SetTitle("number of protons tracks");
+   h_npro_ntra->SetTitle(Form("n_tracks n_proton_tracks"));
+   h_npro_ntra->Draw("colz");
+
+#ifdef find_vertex
+   TCanvas *c17 = new TCanvas("c17", "c17");
+   c17->cd();
    h_verxy->SetDirectory(0);
    h_verxy->GetXaxis()->SetTitle("Vertex X [mm]");
    h_verxy->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_verxy->Draw("colz");
 
-   TCanvas *c14 = new TCanvas("c14", "c14");
-   c14->cd();
+   TCanvas *c18 = new TCanvas("c18", "c18");
+   c18->cd();
    h_verz->SetDirectory(0);
    h_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verz->Draw();
 
-   TCanvas *c15 = new TCanvas("c15", "c15");
-   c15->cd();
+   TCanvas *c19 = new TCanvas("c19", "c19");
+   c19->cd();
    h_verxz->SetDirectory(0);
    h_verxz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verxz->GetYaxis()->SetTitle("Vertex X [mm]");
    h_verxz->Draw("colz");
 
-   TCanvas *c16 = new TCanvas("c16", "c16");
-   c16->cd();
+   TCanvas *c20 = new TCanvas("c20", "c20");
+   c20->cd();
    h_veryz->SetDirectory(0);
    h_veryz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_veryz->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_veryz->Draw("colz");
 
-   TCanvas *c17 = new TCanvas("c17", "c17");
-   c17->cd();
+   TCanvas *c21 = new TCanvas("c21", "c21");
+   c21->cd();
    h_ntra_verz->SetDirectory(0);
    h_ntra_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_ntra_verz->GetYaxis()->SetTitle("Number of tracks");
    h_ntra_verz->Draw("colz");
 
-   TCanvas *c18 = new TCanvas("c18", "c18");
-   c18->cd();
+   TCanvas *c22 = new TCanvas("c22", "c22");
+   c22->cd();
    h_range_thetalab_cutverz->SetDirectory(0);
    h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->SetTitle(Form("Range Theta_LAB (verz > %d )", (int)th_verz));
    h_range_thetalab_cutverz->Draw("colz");
+#endif
 
    /*
    TCanvas *c5 = new TCanvas();
@@ -629,6 +718,8 @@ void kine(){
    Results->cd();
    h_rmax->Write();
    h_ntra->Write();
+
+   // charge range
    h_charge_range->Write();
    h_charge_range_cutphi->Write();
    h_charge_range_cutphi_2tra->Write();
@@ -658,18 +749,23 @@ void kine(){
    // angle correlations
    h_range_thetalab->Write();
    h_range_thetalab_cutphi->Write();
+   h_range_thetalab_cutphi_2tra->Write();
+   h_range_thetalab_cut12c_ela->Write();
+   h_range_thetalab_cutalpha->Write();
    h_range_thetalab_cutverz->Write();
    h_thetalab_thetalab_cutphi->Write();
    h_thetalab_thetalab_cutphi_2tra->Write();
    h_thetalab_thetalab_cut12c_ela->Write();
    h_philab_philab_cutphi->Write();
 
+#ifdef find_vertex
    // track vertex
    h_verxy->Write();
    h_verz->Write();
    h_verxz->Write();
    h_veryz->Write();
    h_ntra_verz->Write();
+#endif
 
    /*
    // Excitation energy spectra
@@ -684,6 +780,8 @@ void kine(){
    */
 
    // Others ...
+   h_nalp_ntra->Write();
+   h_npro_ntra->Write();
    /*
    histESmallVTotalRange->Write();
    histEBigVBigRange->Write();
@@ -741,7 +839,8 @@ TGraph* ReadKinematics(TString kineFile){
 
    if (!kineStr->fail()){
       while (!kineStr->eof()){
-	         *kineStr >> ThetaCMS[numKin] >> ThetaLabRec[numKin] >> EnerLabRec[numKin] >> ThetaLabSca[numKin] >> EnerLabSca[numKin];
+      //	      *kineStr >> ThetaCMS[numKin] >> ThetaLabRec[numKin] >> EnerLabRec[numKin] >> ThetaLabSca[numKin] >> EnerLabSca[numKin];
+	      *kineStr >> ThetaLabRec[numKin] >> EnerLabRec[numKin];
          numKin++;
       }
    } else if (kineStr->fail())
