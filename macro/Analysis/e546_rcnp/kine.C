@@ -525,7 +525,6 @@ void kine(){
    h_charge_range_cutphi_2tra->GetYaxis()->SetTitle("Charge [ADC]");
    h_charge_range_cutphi_2tra->SetTitle(Form("Charge Range (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
    cutkine12c->Draw("same");
-   
 
    TCanvas *c10 = new TCanvas("c10", "c10");
    c10->cd();
@@ -565,29 +564,29 @@ void kine(){
    h_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verz->Draw();
 
-   TCanvas *c11 = new TCanvas("c11", "c11");
-   c11->cd();
+   TCanvas *c15 = new TCanvas("c15", "c15");
+   c15->cd();
    h_verxz->SetDirectory(0);
    h_verxz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verxz->GetYaxis()->SetTitle("Vertex X [mm]");
    h_verxz->Draw("colz");
 
-   TCanvas *c12 = new TCanvas("c12", "c12");
-   c12->cd();
+   TCanvas *c16 = new TCanvas("c16", "c16");
+   c16->cd();
    h_veryz->SetDirectory(0);
    h_veryz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_veryz->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_veryz->Draw("colz");
 
-   TCanvas *c13 = new TCanvas("c13", "c13");
-   c13->cd();
+   TCanvas *c17 = new TCanvas("c17", "c17");
+   c17->cd();
    h_ntra_verz->SetDirectory(0);
    h_ntra_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_ntra_verz->GetYaxis()->SetTitle("Number of tracks");
    h_ntra_verz->Draw("colz");
 
-   TCanvas *c14 = new TCanvas("c14", "c14");
-   c14->cd();
+   TCanvas *c18 = new TCanvas("c18", "c18");
+   c18->cd();
    h_range_thetalab_cutverz->SetDirectory(0);
    h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
