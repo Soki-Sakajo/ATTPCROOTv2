@@ -459,24 +459,18 @@ void kine(){
             // pid
             for (Int_t k = 0; k < ntrack; k++){
                if (cut12c->IsInside(track_range[k], track_charge[k])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: "<< k << ", particle: 12c " << std::endl;
+                  //                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: "<< k << ", particle: 12c " << std::endl;
                   track_12c[k]=true;
-                  //                  std::cout << "  check flag: "<< track_12c[k] << std::endl;
                }
                else if (cutalpha->IsInside(track_range[k], track_charge[k])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: alpha " << std::endl;
+                  //                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: alpha " << std::endl;
                   track_alpha[k]=true;
                   h_range_thetalab_cutalpha->Fill(track_theta[k], track_range[k]);
-                  std::cout << "  check flag: "<< track_alpha[k] << std::endl;
                }
                else if (cutproton->IsInside(track_range[k], track_charge[k])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: proton " << std::endl;
+                  //                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: proton " << std::endl;
                   track_proton[k]=true;
                   h_range_thetalab_cutproton->Fill(track_theta[k], track_range[k]);
-                  std::cout << "  check flag: "<< track_proton[k] << std::endl;
-               }
-               if(track_12c[k] || track_alpha[k] || track_proton[k]){
-                  std::cout << "  check flag 12c: "<< track_12c[k] << ", alpha: " << track_alpha[k] << ", proton: " << track_proton[k] << std::endl;
                }
             }
 
@@ -488,32 +482,38 @@ void kine(){
             h_thetalab_thetalab_cutphi -> Fill(track_theta[0], track_theta[1]);
             h_philab_philab_cutphi -> Fill(track_phi[0], track_phi[1]);
             if (ntrack == 2){
-               h_charge_range_cutphi_2tra -> Fill(track_range[itrack], track_charge[itrack]);
+               h_charge_range_cutphi_2tra -> Fill(track_range[0], track_charge[0]);
+               h_charge_range_cutphi_2tra -> Fill(track_range[1], track_charge[1]);
                h_range_thetalab_cutphi_2tra -> Fill(track_theta[0], track_range[0]);
+               h_range_thetalab_cutphi_2tra -> Fill(track_theta[1], track_range[1]);
                h_thetalab_thetalab_cutphi_2tra -> Fill(track_theta[0], track_theta[1]);
-               if (track_12c[0] || track_12c[1]){
-                  std::cout << "  12C event found event num: " << i << std::endl;
-                  h_charge_range_cut12c_ela -> Fill(track_range[itrack], track_charge[itrack]);
+               if (track_12c[0] && track_12c[1]){
+                  h_charge_range_cut12c_ela -> Fill(track_range[0], track_charge[0]);
+                  h_charge_range_cut12c_ela -> Fill(track_range[1], track_charge[1]);
                   h_range_thetalab_cut12c_ela -> Fill(track_theta[0], track_range[0]);
+                  h_range_thetalab_cut12c_ela -> Fill(track_theta[1], track_range[1]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
                }
             }
          }
          for (Int_t k = 0; k < ntrack; k++){
-            //            cout<< "check for sentence: " << k << " , track_12c: " << track_12c[k] << " , track_alpha: " << track_alpha[k] << " , track_proton: " << track_proton[k] << endl;
             if (track_alpha[k]){
                nalpha ++;
                alpha_tracks = true;
-               std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << std::endl;
+               //                  std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << std::endl;
             }
             if (track_proton[k]){
                nproton ++;
                proton_tracks = true;
-               std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << std::endl;
+               //                  std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << std::endl;
             }
          }
+         if (alpha_tracks){
          h_nalp_ntra->Fill(ntrack, nalpha);
+         }
+         if (proton_tracks){
          h_npro_ntra->Fill(ntrack, nproton);
+         }
 
          /*
          if (alpha_tracks){
@@ -537,12 +537,13 @@ void kine(){
    std::cout << std::endl;
    std::cout << " Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
    std::cout << " 6 track events: " << track6.size() << std::endl;
+   /*
    std::cout << "  Event with 6 tracks: " << std::flush;
    for (auto &eventIndex: track6){
       std::cout << eventIndex << " , " << std::flush;
    }
    std::cout << std::endl;
-
+   */
 
     // Write results to file.
 
@@ -679,6 +680,7 @@ void kine(){
    h_nalp_ntra->GetXaxis()->SetTitle("number of tracks");
    h_nalp_ntra->GetYaxis()->SetTitle("number of alphas tracks");
    h_nalp_ntra->SetTitle(Form("n_tracks n_alpha_tracks"));
+   gPad->SetLogz();
    h_nalp_ntra->Draw("colz");
 
    TCanvas *c16 = new TCanvas("c16", "c16");
@@ -695,6 +697,7 @@ void kine(){
    h_npro_ntra->GetXaxis()->SetTitle("number of tracks");
    h_npro_ntra->GetYaxis()->SetTitle("number of protons tracks");
    h_npro_ntra->SetTitle(Form("n_tracks n_proton_tracks"));
+   gPad->SetLogz();
    h_npro_ntra->Draw("colz");
 
    TCanvas *c18 = new TCanvas("c18", "c18");
@@ -847,6 +850,7 @@ void kine(){
    Results->Close();
 
    // save canvases as .C macros
+   cout<< "save canvases as .C macros" <<endl;
    TSeqCollection *canlist = gROOT->GetListOfCanvases();
    TIter next(canlist);
    Int_t can_num = 1;
