@@ -210,6 +210,9 @@ void kine(){
    TH2F *h_kineE_thetalab_2H  = new TH2F("h_kineE_thetalab_2H", "h_kineE_thetalab_2H", 180, 0, 180, 250, 0, 20);
    TH2F *h_kineE_thetalab_1H  = new TH2F("h_kineE_thetalab_1H", "h_kineE_thetalab_1H", 180, 0, 180, 250, 0, 20);
 
+   // Line definitions.
+   TF1 *xy90 = new TF1("xy90", "-x + 90", 0, 90);
+
    std::cout << std::endl;
    for (int runNum: runNums) {
       // Open the digitalization file and get the TTree.
@@ -593,6 +596,7 @@ void kine(){
    h_range_thetalab_cutphi->GetYaxis()->SetTitle("roughRange [mm]");
    h_range_thetalab_cutphi->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
    h_range_thetalab_cutphi->Draw("colz");
+   //kine_d3He_tt->Draw("same");
 
    TCanvas *c7 = new TCanvas("c7", "c7");
    c7->cd();
@@ -601,7 +605,9 @@ void kine(){
    h_thetalab_thetalab_cutphi->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
    h_thetalab_thetalab_cutphi->Draw("colz");
-   //kine_d3He_tt->Draw("same");
+   xy90->SetLineColor(kRed);
+   xy90->SetLineWidth(2);
+   xy90->Draw("same");
 
    TCanvas *c8 = new TCanvas("c8", "c8");
    c8->cd();
@@ -636,6 +642,9 @@ void kine(){
    h_thetalab_thetalab_cutphi_2tra->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi_2tra->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
    h_thetalab_thetalab_cutphi_2tra->Draw("colz");
+   xy90->SetLineColor(kRed);
+   xy90->SetLineWidth(2);
+   xy90->Draw("same");
 
    TCanvas *c12 = new TCanvas("c12", "c12");
    c12->cd();
@@ -661,6 +670,9 @@ void kine(){
    h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cut12c_ela->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
    h_thetalab_thetalab_cut12c_ela->Draw("colz");
+   xy90->SetLineColor(kRed);
+   xy90->SetLineWidth(2);
+   xy90->Draw("same");
 
    TCanvas *c15 = new TCanvas("c15", "c15");
    c15->cd();
