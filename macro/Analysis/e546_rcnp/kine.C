@@ -41,7 +41,7 @@ void kine(){
 
    // files.
    //   std::vector runNums = {52};
-   std::vector runNums = {52,53,54,55,56,57,58,59};
+   std::vector runNums = {50,51,52,53,54,55,56,57,58};
    Int_t run_start = runNums.front();
    Int_t run_end = runNums.back();
    TFile * Results = new TFile(Form("data/kine_results_run%d-run%d.root", run_start, run_end),"recreate");

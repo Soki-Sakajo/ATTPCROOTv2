@@ -1,4 +1,4 @@
-void kine_canvases(){
+void kine_canvases_run52(){
 
    TStopwatch timer;
 
