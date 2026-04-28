@@ -210,13 +210,14 @@ void kine(){
    TH2F *h_kineE_thetalab_2H  = new TH2F("h_kineE_thetalab_2H", "h_kineE_thetalab_2H", 180, 0, 180, 250, 0, 20);
    TH2F *h_kineE_thetalab_1H  = new TH2F("h_kineE_thetalab_1H", "h_kineE_thetalab_1H", 180, 0, 180, 250, 0, 20);
 
+   std::cout << std::endl;
    for (int runNum: runNums) {
       // Open the digitalization file and get the TTree.
       TString unpackFileName = TString::Format("./decode_data/run_%04d.root", runNum);
       TFile *unpackFile = new TFile(unpackFileName, "READ");
       TTree *unpackTree = (TTree *)unpackFile->Get("cbmsim");
       int nUnpackEvents = unpackTree->GetEntries();
-      std::cout << " Number of unpacked events in run " << runNum << ": " << nUnpackEvents << std::endl;
+      std::cout << "Number of unpacked events in run " << runNum << ": " << nUnpackEvents << std::endl;
       int nEventsWith2Tracks = 0;
       // Creare the TTreeReader to read the AtTrackingEvents and simulation.
       TTreeReader unpackReader("cbmsim", unpackFile);
@@ -521,9 +522,9 @@ void kine(){
    }
 
    // cout of information
-   std::cout << std::endl;
-   std::cout << " Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
-   std::cout << " 6 track events: " << track6.size() << std::endl;
+   std::cout << "                                                                " << std::endl;
+   std::cout << "Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
+   std::cout << "6 track events: " << track6.size() << std::endl;
    /*
    std::cout << "  Event with 6 tracks: " << std::flush;
    for (auto &eventIndex: track6){
