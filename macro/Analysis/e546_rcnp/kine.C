@@ -500,10 +500,13 @@ void kine(){
             if (track_alpha[k]){
                nalpha ++;
                alpha_tracks = true;
+               std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << std::endl;
+
             }
             if (track_proton[k]){
                nproton ++;
                proton_tracks = true;
+               std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << std::endl;
             }
          }
          h_nalp_ntra->Fill(ntrack, nalpha);
