@@ -459,21 +459,24 @@ void kine(){
             // pid
             for (Int_t k = 0; k < ntrack; k++){
                if (cut12c->IsInside(track_range[itrack], track_charge[itrack])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", 12c track: "<< k << std::endl;
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", 12c track: "<< k << ", flag: " << track_12c[itrack] << std::endl;
                   track_12c[itrack]=true;
                   std::cout << "  check flag: "<< track_12c[itrack] << std::endl;
                }
                else if (cutalpha->IsInside(track_range[itrack], track_charge[itrack])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << std::endl;
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << ", flag: " << track_alpha[itrack] << std::endl;
                   track_alpha[itrack]=true;
                   h_range_thetalab_cutalpha->Fill(track_theta[itrack], track_range[itrack]);
                   std::cout << "  check flag: "<< track_alpha[itrack] << std::endl;
                }
                else if (cutproton->IsInside(track_range[itrack], track_charge[itrack])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << std::endl;
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << ", flag: " << track_proton[itrack] << std::endl;
                   track_proton[itrack]=true;
                   h_range_thetalab_cutproton->Fill(track_theta[itrack], track_range[itrack]);
                   std::cout << "  check flag: "<< track_proton[itrack] << std::endl;
+               }
+               if(track_12c[itrack] || track_alpha[itrack] || track_proton[itrack]){
+                  std::cout << "  check flag 12c: "<< track_12c[itrack] << ", alpha: " << track_alpha[itrack] << ", proton: " << track_proton[itrack] << std::endl;
                }
             }
 
@@ -497,7 +500,7 @@ void kine(){
             }
          }
          for (Int_t k = 0; k < ntrack; k++){
-            cout<< "check for sentence" << k << " , track_12c: " << track_12c[k] << " , track_alpha: " << track_alpha[k] << " , track_proton: " << track_proton[k] << endl;
+            //            cout<< "check for sentence: " << k << " , track_12c: " << track_12c[k] << " , track_alpha: " << track_alpha[k] << " , track_proton: " << track_proton[k] << endl;
             if (track_alpha[k]){
                nalpha ++;
                alpha_tracks = true;
