@@ -149,9 +149,6 @@ void kine(){
    Double_t track_range[narray];
    Double_t track_charge[narray];
    Double_t track_r[narray];
-   std::vector<bool> track_12c(narray, false);
-   std::vector<bool> track_alpha(narray, false);
-   std::vector<bool> track_proton(narray, false);
    std::vector<Int_t> track6(0);
 
    // Histogram definitions.
@@ -236,6 +233,9 @@ void kine(){
          auto &tracks = patternEvent->GetTrackCand();
          ntrack = tracks.size();
          h_ntra->Fill(ntrack);
+         std::vector<bool> track_12c(ntrack, false);
+         std::vector<bool> track_alpha(ntrack, false);
+         std::vector<bool> track_proton(ntrack, false);
          check_tracks = false;
          alpha_tracks = false;
          proton_tracks = false;
@@ -269,9 +269,6 @@ void kine(){
             auto braggCurvePairs = track.GetBraggCurveValues();
             auto &hits = track.GetHitArray();
 
-            track_12c[itrack] = false;
-            track_alpha[itrack] = false;
-            track_proton[itrack] = false;
             track_range[itrack] = pattern->DistanceAlongPattern(lastPoint, firstPoint);
             track_charge[itrack] = track.GetGeoQEnergy();
             track_theta[itrack] = 180 - track.GetGeoTheta() * 180 / TMath::Pi();
@@ -464,16 +461,19 @@ void kine(){
                if (cut12c->IsInside(track_range[itrack], track_charge[itrack])) {
                   std::cout << "event num:" << i << ", tracks: " << ntrack << ", 12c track: "<< k << std::endl;
                   track_12c[itrack]=true;
+                  std::cout << "  check flag: "<< track_12c[itrack] << std::endl;
                }
                else if (cutalpha->IsInside(track_range[itrack], track_charge[itrack])) {
                   std::cout << "event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << std::endl;
                   track_alpha[itrack]=true;
                   h_range_thetalab_cutalpha->Fill(track_theta[itrack], track_range[itrack]);
+                  std::cout << "  check flag: "<< track_alpha[itrack] << std::endl;
                }
                else if (cutproton->IsInside(track_range[itrack], track_charge[itrack])) {
                   std::cout << "event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << std::endl;
                   track_proton[itrack]=true;
                   h_range_thetalab_cutproton->Fill(track_theta[itrack], track_range[itrack]);
+                  std::cout << "  check flag: "<< track_proton[itrack] << std::endl;
                }
             }
 
@@ -497,11 +497,11 @@ void kine(){
             }
          }
          for (Int_t k = 0; k < ntrack; k++){
+            cout<< "check for sentence" << k << " , track_12c: " << track_12c[k] << " , track_alpha: " << track_alpha[k] << " , track_proton: " << track_proton[k] << endl;
             if (track_alpha[k]){
                nalpha ++;
                alpha_tracks = true;
                std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << std::endl;
-
             }
             if (track_proton[k]){
                nproton ++;
