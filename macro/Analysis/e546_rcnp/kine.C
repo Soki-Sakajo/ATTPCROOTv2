@@ -693,11 +693,11 @@ void kine(){
 
    TCanvas *c18 = new TCanvas("c18", "c18");
    c18->cd();
-   h_range_thetalab_cut12c_ela->SetDirectory(0);
-   h_range_thetalab_cut12c_ela->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   h_range_thetalab_cut12c_ela->GetYaxis()->SetTitle("roughRange [mm]");
-   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
-   h_range_thetalab_cut12c_ela->Draw("colz");
+   h_range_thetalab_cutproton->SetDirectory(0);
+   h_range_thetalab_cutproton->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cutproton->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cutproton->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
+   h_range_thetalab_cutproton->Draw("colz");
 
 #ifdef find_vertex
    TCanvas *c19 = new TCanvas("c19", "c19");
