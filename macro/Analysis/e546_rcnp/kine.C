@@ -485,7 +485,7 @@ void kine(){
                h_charge_range_cutphi_2tra -> Fill(track_range[itrack], track_charge[itrack]);
                h_range_thetalab_cutphi_2tra -> Fill(track_theta[0], track_range[0]);
                h_thetalab_thetalab_cutphi_2tra -> Fill(track_theta[0], track_theta[1]);
-               if (track_12c[0] && track_12c[1]){
+               if (track_12c[0] || track_12c[1]){
                   h_charge_range_cut12c_ela -> Fill(track_range[itrack], track_charge[itrack]);
                   h_range_thetalab_cut12c_ela -> Fill(track_theta[0], track_range[0]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
@@ -502,16 +502,25 @@ void kine(){
                proton_tracks = true;
             }
          }
+         // check test
+         std::cout << "event num:" << i << "tracks: " << ntrack << "alpha: " << nalpha << "proton: " << nproton << std::endl;
+         if(track_12c[0] || track_12c[1]){
+            std::cout << "  12C event found event num: " << i << std::endl;
+         }
+         h_nalp_ntra->Fill(ntrack, nalpha);
+         h_npro_ntra->Fill(ntrack, nproton);
+
+         /*
          if (alpha_tracks){
             h_nalp_ntra->Fill(ntrack, nalpha);
          }
          if (proton_tracks){
             h_npro_ntra->Fill(ntrack, nproton);
          }
-
          if(i%100==0){
-            std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
+            //            std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
          }
+         */
       }
       //      std::cout << "  Filled data: 100 %!, " << nUnpackEvents << " events" << std::endl;
       //      std::cout << "Number of 2 tracks events in run" << runNum << ":" << nEventsWith2Tracks << std::endl;
@@ -623,7 +632,7 @@ void kine(){
    h_range_thetalab_cutphi_2tra->SetDirectory(0);
    h_range_thetalab_cutphi_2tra->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cutphi_2tra->GetYaxis()->SetTitle("roughRange [mm]");
-   h_range_thetalab_cutphi_2tra->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_range_thetalab_cutphi_2tra->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
    h_range_thetalab_cutphi_2tra->Draw("colz");
 
    TCanvas *c11 = new TCanvas("c11", "c11");
@@ -648,7 +657,7 @@ void kine(){
    h_range_thetalab_cut12c_ela->SetDirectory(0);
    h_range_thetalab_cut12c_ela->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cut12c_ela->GetYaxis()->SetTitle("roughRange [mm]");
-   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
    h_range_thetalab_cut12c_ela->Draw("colz");
 
    TCanvas *c14 = new TCanvas("c14", "c14");
@@ -672,7 +681,7 @@ void kine(){
    h_range_thetalab_cutalpha->SetDirectory(0);
    h_range_thetalab_cutalpha->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cutalpha->GetYaxis()->SetTitle("roughRange [mm]");
-   h_range_thetalab_cutalpha->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, )", (int)del_phi));
+   h_range_thetalab_cutalpha->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, alpha)", (int)del_phi));
    h_range_thetalab_cutalpha->Draw("colz");
 
    TCanvas *c17 = new TCanvas("c17", "c17");
@@ -688,7 +697,7 @@ void kine(){
    h_range_thetalab_cut12c_ela->SetDirectory(0);
    h_range_thetalab_cut12c_ela->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cut12c_ela->GetYaxis()->SetTitle("roughRange [mm]");
-   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
    h_range_thetalab_cut12c_ela->Draw("colz");
 
 #ifdef find_vertex
