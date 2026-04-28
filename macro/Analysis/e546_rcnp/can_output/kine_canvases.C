@@ -81733,6 +81733,13 @@ void kine_canvases(){
    c15->SetFrameBorderMode(0);
    
    TH2F *h_nalp_ntra = new TH2F("h_nalp_ntra","n_tracks n_alpha_tracks",11,-0.5,10.5,11,-0.5,10.5);
+   h_nalp_ntra->SetBinContent(14,1689);
+   h_nalp_ntra->SetBinContent(15,27613);
+   h_nalp_ntra->SetBinContent(16,19111);
+   h_nalp_ntra->SetBinContent(17,6579);
+   h_nalp_ntra->SetBinContent(18,1146);
+   h_nalp_ntra->SetBinContent(19,146);
+   h_nalp_ntra->SetBinContent(20,17);
    h_nalp_ntra->SetBinContent(28,42);
    h_nalp_ntra->SetBinContent(29,426);
    h_nalp_ntra->SetBinContent(30,271);
@@ -81746,7 +81753,7 @@ void kine_canvases(){
    h_nalp_ntra->SetBinContent(56,1);
    h_nalp_ntra->SetBinContent(57,1);
    h_nalp_ntra->SetBinContent(70,1);
-   h_nalp_ntra->SetEntries(848);
+   h_nalp_ntra->SetEntries(57149);
    h_nalp_ntra->SetDirectory(0);
 
    ci = TColor::GetColor("#000099");
@@ -82609,6 +82616,13 @@ void kine_canvases(){
    c17->SetFrameBorderMode(0);
    
    TH2F *h_npro_ntra = new TH2F("h_npro_ntra","n_tracks n_proton_tracks",11,-0.5,10.5,11,-0.5,10.5);
+   h_npro_ntra->SetBinContent(14,1689);
+   h_npro_ntra->SetBinContent(15,26992);
+   h_npro_ntra->SetBinContent(16,19180);
+   h_npro_ntra->SetBinContent(17,6578);
+   h_npro_ntra->SetBinContent(18,1153);
+   h_npro_ntra->SetBinContent(19,149);
+   h_npro_ntra->SetBinContent(20,17);
    h_npro_ntra->SetBinContent(28,663);
    h_npro_ntra->SetBinContent(29,345);
    h_npro_ntra->SetBinContent(30,252);
@@ -82620,7 +82634,7 @@ void kine_canvases(){
    h_npro_ntra->SetBinContent(44,10);
    h_npro_ntra->SetBinContent(56,1);
    h_npro_ntra->SetBinContent(57,1);
-   h_npro_ntra->SetEntries(1391);
+   h_npro_ntra->SetEntries(57149);
    h_npro_ntra->SetDirectory(0);
 
    ci = TColor::GetColor("#000099");
