@@ -508,24 +508,11 @@ void kine(){
                //                  std::cout << " double check. event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << std::endl;
             }
          }
-         if (alpha_tracks){
          h_nalp_ntra->Fill(ntrack, nalpha);
-         }
-         if (proton_tracks){
          h_npro_ntra->Fill(ntrack, nproton);
-         }
-
-         /*
-         if (alpha_tracks){
-            h_nalp_ntra->Fill(ntrack, nalpha);
-         }
-         if (proton_tracks){
-            h_npro_ntra->Fill(ntrack, nproton);
-         }
          if(i%100==0){
-            //            std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
+            std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
          }
-         */
       }
       //      std::cout << "  Filled data: 100 %!, " << nUnpackEvents << " events" << std::endl;
       //      std::cout << "Number of 2 tracks events in run" << runNum << ":" << nEventsWith2Tracks << std::endl;
@@ -850,7 +837,6 @@ void kine(){
    Results->Close();
 
    // save canvases as .C macros
-   cout<< "save canvases as .C macros" <<endl;
    TSeqCollection *canlist = gROOT->GetListOfCanvases();
    TIter next(canlist);
    Int_t can_num = 1;
