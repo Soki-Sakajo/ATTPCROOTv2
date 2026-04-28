@@ -462,13 +462,16 @@ void kine(){
             // pid
             for (Int_t k = 0; k < ntrack; k++){
                if (cut12c->IsInside(track_range[itrack], track_charge[itrack])) {
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", 12c track: "<< k << std::endl;
                   track_12c[itrack]=true;
                }
                else if (cutalpha->IsInside(track_range[itrack], track_charge[itrack])) {
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << std::endl;
                   track_alpha[itrack]=true;
                   h_range_thetalab_cutalpha->Fill(track_theta[itrack], track_range[itrack]);
                }
                else if (cutproton->IsInside(track_range[itrack], track_charge[itrack])) {
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << std::endl;
                   track_proton[itrack]=true;
                   h_range_thetalab_cutproton->Fill(track_theta[itrack], track_range[itrack]);
                }
@@ -486,6 +489,7 @@ void kine(){
                h_range_thetalab_cutphi_2tra -> Fill(track_theta[0], track_range[0]);
                h_thetalab_thetalab_cutphi_2tra -> Fill(track_theta[0], track_theta[1]);
                if (track_12c[0] || track_12c[1]){
+                  std::cout << "  12C event found event num: " << i << std::endl;
                   h_charge_range_cut12c_ela -> Fill(track_range[itrack], track_charge[itrack]);
                   h_range_thetalab_cut12c_ela -> Fill(track_theta[0], track_range[0]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
@@ -501,11 +505,6 @@ void kine(){
                nproton ++;
                proton_tracks = true;
             }
-         }
-         // check test
-         std::cout << "event num:" << i << "tracks: " << ntrack << "alpha: " << nalpha << "proton: " << nproton << std::endl;
-         if(track_12c[0] || track_12c[1]){
-            std::cout << "  12C event found event num: " << i << std::endl;
          }
          h_nalp_ntra->Fill(ntrack, nalpha);
          h_npro_ntra->Fill(ntrack, nproton);
