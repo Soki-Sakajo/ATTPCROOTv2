@@ -458,25 +458,25 @@ void kine(){
          if(abs(abs(track_phi[0] - track_phi[1]) - 180) < del_phi){
             // pid
             for (Int_t k = 0; k < ntrack; k++){
-               if (cut12c->IsInside(track_range[itrack], track_charge[itrack])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", 12c track: "<< k << ", flag: " << track_12c[itrack] << std::endl;
-                  track_12c[itrack]=true;
-                  std::cout << "  check flag: "<< track_12c[itrack] << std::endl;
+               if (cut12c->IsInside(track_range[k], track_charge[k])) {
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: "<< k << ", particle: 12c " << std::endl;
+                  track_12c[k]=true;
+                  //                  std::cout << "  check flag: "<< track_12c[k] << std::endl;
                }
-               else if (cutalpha->IsInside(track_range[itrack], track_charge[itrack])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", alpha track: " << k << ", flag: " << track_alpha[itrack] << std::endl;
-                  track_alpha[itrack]=true;
-                  h_range_thetalab_cutalpha->Fill(track_theta[itrack], track_range[itrack]);
-                  std::cout << "  check flag: "<< track_alpha[itrack] << std::endl;
+               else if (cutalpha->IsInside(track_range[k], track_charge[k])) {
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: alpha " << std::endl;
+                  track_alpha[k]=true;
+                  h_range_thetalab_cutalpha->Fill(track_theta[k], track_range[k]);
+                  std::cout << "  check flag: "<< track_alpha[k] << std::endl;
                }
-               else if (cutproton->IsInside(track_range[itrack], track_charge[itrack])) {
-                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", proton track: " << k << ", flag: " << track_proton[itrack] << std::endl;
-                  track_proton[itrack]=true;
-                  h_range_thetalab_cutproton->Fill(track_theta[itrack], track_range[itrack]);
-                  std::cout << "  check flag: "<< track_proton[itrack] << std::endl;
+               else if (cutproton->IsInside(track_range[k], track_charge[k])) {
+                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: proton " << std::endl;
+                  track_proton[k]=true;
+                  h_range_thetalab_cutproton->Fill(track_theta[k], track_range[k]);
+                  std::cout << "  check flag: "<< track_proton[k] << std::endl;
                }
-               if(track_12c[itrack] || track_alpha[itrack] || track_proton[itrack]){
-                  std::cout << "  check flag 12c: "<< track_12c[itrack] << ", alpha: " << track_alpha[itrack] << ", proton: " << track_proton[itrack] << std::endl;
+               if(track_12c[k] || track_alpha[k] || track_proton[k]){
+                  std::cout << "  check flag 12c: "<< track_12c[k] << ", alpha: " << track_alpha[k] << ", proton: " << track_proton[k] << std::endl;
                }
             }
 
