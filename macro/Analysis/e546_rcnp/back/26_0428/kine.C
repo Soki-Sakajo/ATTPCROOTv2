@@ -50,6 +50,7 @@ void kine(){
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
    //   TFile *outfile=new TFile(outfname,"recreate");
+   AtFindVertex *fver = new AtFindVertex();
 
    // AtMap to check if a hit belong to a big pad or small pad.
    TString scriptfile = "rcnp_map_size.xml";
@@ -248,9 +249,6 @@ void kine(){
          itrack = 0;
          nalpha = 0;
          nproton = 0;
-         track_verx = 0;
-         track_very = 0;
-         track_verz = 0;
          if (ntrack == 6){
             track6.push_back(i);
          }
@@ -405,7 +403,6 @@ void kine(){
 
 #ifdef find_vertex
          // find vertex.
-         AtFindVertex *fver = new AtFindVertex();
          /*
          for(Int_t k=1; k< verntra; k++){
             if(tracks.size() != k && tracks.size() != 1){continue;}
@@ -452,7 +449,6 @@ void kine(){
                h_range_thetalab_cutverz->Fill(track_theta[k], track_range[k]);
             }
          }
-         delete fver;
 #endif
 
          h_rmax->Fill(r_max);

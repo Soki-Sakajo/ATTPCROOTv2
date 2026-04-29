@@ -19,7 +19,7 @@ GasPressure:Double_t           800   # Gas pressure in torr
 Density:Double_t             0.175   # Gas density (kg/m3 or mg/cm3)
 DriftVelocity:Double_t         3.5   # cm/us
 Gain:Double_t                 1000   # Average gain of micromegas
-SamplingRate:Int_t            12.5   # Real value is 6.25 MHz
+SamplingRate:Int_t            12.5 # Real value is 6.25 MHz
 GETGain:Double_t              1000   # Gain of the GET electronics in fC
 PeakingTime:Int_t              720   # Electronic peaking time in ns
 ################################################################################
