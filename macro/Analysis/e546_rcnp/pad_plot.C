@@ -21,7 +21,7 @@ void pad_plot(Int_t runNum = 52, Int_t eve_num = 1){
   auto fPadPlane = fAtMapPtr->GetPadPlane();
   
   // generate the pad plane histogram
-  gSystem->Load("/home/attpc/fair_install/ATTPCROOTv2/build/lib/libAtMap.so");
+  gSystem->Load("/home/attpc/fair_install/ATTPCROOTv2_e546_branch/build/lib/libAtMap.so");
   AtMap *maptest = new AtTpcMap();
   maptest->GeneratePadPlane();
   TH2Poly *padplane = maptest->GetPadPlane();
