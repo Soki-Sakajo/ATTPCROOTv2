@@ -5,8 +5,6 @@ void pad_plot(Int_t runNum = 52, Int_t eve_num = 24858){
   tpc_tree.Add(Form("./decode_data/run_%04d.root", runNum));
 
   TString outcan="test.pdf";
-  //  TString outcan="can_padplane/can_padplane_sequential_hoylehoyle_70matm_0-"+ to_string(eve_num) +".pdf";
-  //  TString outcan="can_padplane/can_padplane_sequential_hoylehoyle_100matm_0-"+ to_string(eve_num) +".pdf";
 
   TTreeReader reader(&tpc_tree);
   TTreeReaderValue<TClonesArray> event(reader,"AtEventH");
@@ -57,10 +55,10 @@ void pad_plot(Int_t runNum = 52, Int_t eve_num = 24858){
     padplane->Fill(x,y,q);
   }
   /*
-  TCanvas *can=new TCanvas("hists","hists",1000,900);
-  can->cd(1);
-  can->SetLeftMargin(0.12);
-  can->SetRightMargin(0.2);
+  TCanvas *c1=new TCanvas("hists","hists",1000,900);
+  c1->cd(1);
+  c1->SetLeftMargin(0.12);
+  c1->SetRightMargin(0.2);
   padplane->SetStats(0);
   padplane->Draw("colz");
 
