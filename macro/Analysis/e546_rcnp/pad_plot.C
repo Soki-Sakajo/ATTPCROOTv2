@@ -1,4 +1,4 @@
-void pad_plot(Int_t runNum = 52, Int_t eve_num = 1){
+void pad_plot(Int_t runNum = 52, Int_t eve_num = 24858){
 
   double fThreshold =0; //Only save hits if they're above this threshold
   TChain tpc_tree("cbmsim");
@@ -83,7 +83,8 @@ void pad_plot(Int_t runNum = 52, Int_t eve_num = 1){
   padplane->GetXaxis()->SetTitle("x [mm]");
   padplane->GetYaxis()->SetTitle("y [mm]");
   padplane->GetZaxis()->SetTitle("charge");
-  padplane->Draw("colz");
+  //padplane->Draw("colz");
+  padplane->Draw();
   padplane->GetXaxis()->SetLabelSize(0.06);
   padplane->GetYaxis()->SetLabelSize(0.06);
   padplane->GetZaxis()->SetLabelSize(0.06);
