@@ -1,4 +1,4 @@
-void pad_plot(Int_t runNum, Int_t eve_num=1){
+void pad_plot(Int_t runNum = 52, Int_t eve_num = 1){
 
   double fThreshold =0; //Only save hits if they're above this threshold
   TChain tpc_tree("cbmsim");
@@ -76,6 +76,7 @@ void pad_plot(Int_t runNum, Int_t eve_num=1){
   can->SetRightMargin(0.23);
   can->SetTopMargin(0.08);
   can->SetBottomMargin(0.13);
+  padplane->SetDirectory(0);
   padplane->SetStats(0);
   //  padplane->SetMinimum(0);
   //  padplane->SetMaximum(3e4);
