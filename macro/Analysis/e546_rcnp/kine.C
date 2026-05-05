@@ -816,11 +816,11 @@ void kine(){
 
    TCanvas *c31 = new TCanvas("c31", "c31");
    c31->cd();
-   h_philab_philab_cutphi_alpha->SetDirectory(0);
-   h_philab_philab_cutphi_alpha->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
-   h_philab_philab_cutphi_alpha->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
-   h_philab_philab_cutphi_alpha->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
-   h_philab_philab_cutphi_alpha->Draw("colz");
+   h_philab_philab_cutphi_proton->SetDirectory(0);
+   h_philab_philab_cutphi_proton->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_proton->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_proton->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
+   h_philab_philab_cutphi_proton->Draw("colz");
 
 #ifdef find_vertex
    TCanvas *c32 = new TCanvas("c32", "c32");
