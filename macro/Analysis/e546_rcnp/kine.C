@@ -150,12 +150,15 @@ void kine(){
    TH2F *h_charge_range_cutphi = new TH2F("h_charge_range_cutphi", "h_charge_range_cutphi;roughRange [mm];Charge [ADC]", 300, 0, 1200, 300, 0, 6e5);
    TH2F *h_charge_range_cutphi_2tra = new TH2F("h_charge_range_cutphi_2tra", "h_charge_range_cutphi_2tra;roughRange [mm];Charge [ADC]", 300, 0, 1200, 300, 0, 6e5);
    TH2F *h_charge_range_cut12c_ela = new TH2F("h_charge_range_cut12c_ela", "h_charge_range_cut12c_ela;roughRange [mm];Charge [ADC]", 300, 0, 1200, 300, 0, 6e5);
+   /*
+   // ... .. using dEdx
    TH2F *h_dEdx_range = new TH2F("h_dEdx_range", "h_dEdx_range;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
    TH2F *h_dEdx_range_backwards = new TH2F("h_dEdx_range_backwards", "h_dEdx_range_backwards;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
    TH2F *h_dEdx_range_cutphi = new TH2F("h_dEdx_range_cutphi", "h_dEdx_range_cutphi;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
    TH2F *h_dEdx_range_cutphi_12c = new TH2F("h_dEdx_range_cutphi_12c", "h_dEdx_range_cutphi_12c;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
    TH2F *h_dEdx_range_cutphi_alpha = new TH2F("h_dEdx_range_cutphi_alpha", "h_dEdx_range_cutphi_alpha;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
    TH2F *h_dEdx_range_cutphi_proton = new TH2F("h_dEdx_range_cutphi_proton", "h_dEdx_range_cutphi_proton;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
+   */
 
    // ... kinematics 
    TH2F *h_kineE_thetalab = new TH2F("h_kineE_thetalab", "h_kineE_thetalab;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 600, 0, 60);
@@ -317,8 +320,8 @@ void kine(){
 
             h_charge_range->Fill(track_range[itrack],track_charge[itrack]);
             h_range_thetalab->Fill(track_theta[itrack], track_range[itrack]);
-            h_dEdx_range->Fill(track_range[itrack], track_dedx[itrack]);
             /*
+            h_dEdx_range->Fill(track_range[itrack], track_dedx[itrack]);
             if (!reachedBigPads){
                h_Esmall_range->Fill(track_range[itrack], smallPadCharge);
             }
@@ -472,13 +475,13 @@ void kine(){
                if (cut12c->IsInside(track_range[k], track_charge[k])) {
                   //                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: "<< k << ", particle: 12c " << std::endl;
                   track_12c[k]=true;
-                  h_dEdx_range_cutphi_12c->Fill(track_range[k], track_dedx[k]);
+                  //                  h_dEdx_range_cutphi_12c->Fill(track_range[k], track_dedx[k]);
                   h_philab_philab_cutphi_12c -> Fill(track_phi[0], track_phi[1]);                  
                }
                else if (cutalpha->IsInside(track_range[k], track_charge[k])) {
                   //                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: alpha " << std::endl;
                   track_alpha[k]=true;
-                  h_dEdx_range_cutphi_alpha->Fill(track_range[k], track_dedx[k]);
+                  //                  h_dEdx_range_cutphi_alpha->Fill(track_range[k], track_dedx[k]);
                   h_range_thetalab_cutalpha->Fill(track_theta[k], track_range[k]);
                   h_kineE_thetalab_alpha->Fill(track_theta[k], track_KinE[k]);
                   h_philab_philab_cutphi_alpha -> Fill(track_phi[0], track_phi[1]);
@@ -486,7 +489,7 @@ void kine(){
                else if (cutproton->IsInside(track_range[k], track_charge[k])) {
                   //                  std::cout << "event num:" << i << ", tracks: " << ntrack << ", track: " << k << ", particle: proton " << std::endl;
                   track_proton[k]=true;
-                  h_dEdx_range_cutphi_proton->Fill(track_range[k], track_dedx[k]);
+                  //                  h_dEdx_range_cutphi_proton->Fill(track_range[k], track_dedx[k]);
                   h_range_thetalab_cutproton->Fill(track_theta[k], track_range[k]);
                   h_kineE_thetalab_proton->Fill(track_theta[k], track_KinE[k]);
                   h_philab_philab_cutphi_proton -> Fill(track_phi[0], track_phi[1]);
@@ -496,8 +499,8 @@ void kine(){
             // fill to histograms
             h_charge_range_cutphi -> Fill(track_range[0], track_charge[0]);
             h_charge_range_cutphi -> Fill(track_range[1], track_charge[1]);
-            h_dEdx_range_cutphi->Fill(track_range[0], track_dedx[0]);
-            h_dEdx_range_cutphi->Fill(track_range[1], track_dedx[1]);
+            //            h_dEdx_range_cutphi->Fill(track_range[0], track_dedx[0]);
+            //            h_dEdx_range_cutphi->Fill(track_range[1], track_dedx[1]);
             h_range_thetalab_cutphi -> Fill(track_theta[0], track_range[0]);
             h_range_thetalab_cutphi -> Fill(track_theta[1], track_range[1]);
             h_thetalab_thetalab_cutphi -> Fill(track_theta[0], track_theta[1]);
@@ -579,13 +582,6 @@ void kine(){
    //   cutalpha->Draw("same");
    //   cutp->Draw("same");
 
-   TCanvas *c4 = new TCanvas("c4", "c4");
-   c4->cd();
-   h_dEdx_range->SetDirectory(0);
-   h_dEdx_range->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
-   h_dEdx_range->Draw("colz");
-
    TCanvas *c5 = new TCanvas("c5", "c5");
    c5->cd();
    h_range_thetalab->SetDirectory(0);
@@ -618,17 +614,6 @@ void kine(){
    cut12c->Draw("same");
    cutalpha->Draw("same");
    cutproton->Draw("same");
-
-   TCanvas *c9 = new TCanvas("c9", "c9");
-   c9->cd();
-   h_dEdx_range_cutphi->SetDirectory(0);
-   h_dEdx_range_cutphi->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range_cutphi->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
-   h_dEdx_range_cutphi->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d )", (int)del_phi));
-   h_dEdx_range_cutphi->Draw("colz");
-   //   cut12c_dedx->Draw("same");
-   //   cutalpha_dedx->Draw("same");
-   //   cutproton_dedx->Draw("same");
 
    TCanvas *c10 = new TCanvas("c10", "c10");
    c10->cd();
@@ -774,30 +759,6 @@ void kine(){
    h_kineE_thetalab_proton->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
    h_kineE_thetalab_proton->Draw("colz");
 
-   TCanvas *c26 = new TCanvas("c26", "c26");
-   c26->cd();
-   h_dEdx_range_cutphi_12c->SetDirectory(0);
-   h_dEdx_range_cutphi_12c->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range_cutphi_12c->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
-   h_dEdx_range_cutphi_12c->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, 12c)", (int)del_phi));
-   h_dEdx_range_cutphi_12c->Draw("colz");
-
-   TCanvas *c27 = new TCanvas("c27", "c27");
-   c27->cd();
-   h_dEdx_range_cutphi_alpha->SetDirectory(0);
-   h_dEdx_range_cutphi_alpha->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range_cutphi_alpha->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
-   h_dEdx_range_cutphi_alpha->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
-   h_dEdx_range_cutphi_alpha->Draw("colz");
-
-   TCanvas *c28 = new TCanvas("c28", "c28");
-   c28->cd();
-   h_dEdx_range_cutphi_proton->SetDirectory(0);
-   h_dEdx_range_cutphi_proton->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range_cutphi_proton->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
-   h_dEdx_range_cutphi_proton->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
-   h_dEdx_range_cutphi_proton->Draw("colz");
-
    TCanvas *c29 = new TCanvas("c29", "c29");
    c29->cd();
    h_philab_philab_cutphi_12c->SetDirectory(0);
@@ -867,13 +828,47 @@ void kine(){
 #endif
 
    /*
-   TCanvas *c6 = new TCanvas();
-   histEstimatedKinEVThetaLABTotal->SetDirectory(0);
-   histEstimatedKinEVThetaLABTotal->Draw("colz");
-   //   kine_dp_gs->Draw("same");
-   //   kine_dd_gs->Draw("same");
-   histEstimatedKinEVThetaLABTotal->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
-   histEstimatedKinEVThetaLABTotal->GetYaxis()->SetTitle("roughKinE [MeV]");
+   TCanvas *c4 = new TCanvas("c4", "c4");
+   c4->cd();
+   h_dEdx_range->SetDirectory(0);
+   h_dEdx_range->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range->Draw("colz");
+
+   TCanvas *c9 = new TCanvas("c9", "c9");
+   c9->cd();
+   h_dEdx_range_cutphi->SetDirectory(0);
+   h_dEdx_range_cutphi->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range_cutphi->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range_cutphi->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d )", (int)del_phi));
+   h_dEdx_range_cutphi->Draw("colz");
+   //   cut12c_dedx->Draw("same");
+   //   cutalpha_dedx->Draw("same");
+   //   cutproton_dedx->Draw("same");
+
+   TCanvas *c26 = new TCanvas("c26", "c26");
+   c26->cd();
+   h_dEdx_range_cutphi_12c->SetDirectory(0);
+   h_dEdx_range_cutphi_12c->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range_cutphi_12c->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range_cutphi_12c->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, 12c)", (int)del_phi));
+   h_dEdx_range_cutphi_12c->Draw("colz");
+
+   TCanvas *c27 = new TCanvas("c27", "c27");
+   c27->cd();
+   h_dEdx_range_cutphi_alpha->SetDirectory(0);
+   h_dEdx_range_cutphi_alpha->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range_cutphi_alpha->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range_cutphi_alpha->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
+   h_dEdx_range_cutphi_alpha->Draw("colz");
+
+   TCanvas *c28 = new TCanvas("c28", "c28");
+   c28->cd();
+   h_dEdx_range_cutphi_proton->SetDirectory(0);
+   h_dEdx_range_cutphi_proton->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range_cutphi_proton->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range_cutphi_proton->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
+   h_dEdx_range_cutphi_proton->Draw("colz");
 
    TCanvas *c8 = new TCanvas();
    histExdp->SetDirectory(0);
@@ -896,7 +891,7 @@ void kine(){
    h_charge_range_cutphi->Write();
    h_charge_range_cutphi_2tra->Write();
    h_charge_range_cut12c_ela->Write();
-
+   /*
    // dEdx Vs Total Range
    h_dEdx_range->Write();
    //   h_dEdx_range_backwards->Write();
@@ -904,6 +899,7 @@ void kine(){
    //   cutPIDproton->Write("PIDCutProton");
    //   cutPIDproton_extension->Write("PIDCutProtonExtension");
    //   cutPIDdeuteron->Write("PIDCutDeuteron");
+   */
 
    // Kinematics
    h_kineE_thetalab->Write();
@@ -933,6 +929,9 @@ void kine(){
    //  phi vs phi
    h_philab_philab->Write();
    h_philab_philab_cutphi->Write();
+   h_philab_philab_cutphi_12c->Write();
+   h_philab_philab_cutphi_alpha->Write();
+   h_philab_philab_cutphi_proton->Write();
 
 #ifdef find_vertex
    // track vertex
@@ -966,6 +965,7 @@ void kine(){
    */
    Results->Close();
 
+   /*
    // save canvases as .C macros
    TSeqCollection *canlist = gROOT->GetListOfCanvases();
    TIter next(canlist);
@@ -991,6 +991,7 @@ void kine(){
    Results_c << "   std::cout << \"Real time: \" << rtime << \" s, CPU time: \" << ctime << \" s\" << std::endl << std::endl;\n" << std::endl;
    Results_c << "}\n" << std::endl;
    Results_c.close();
+   */
 
 
    // stop timer
