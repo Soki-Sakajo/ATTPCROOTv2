@@ -587,7 +587,7 @@ void kine(){
    h_kineE_thetalab->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab->GetYaxis()->SetTitle("roughKinE [MeV]");
    h_kineE_thetalab->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same")
+   kine_12c12c_ela_60_7->Draw("same");
 
    TCanvas *c7 = new TCanvas("c7", "c7");
    c7->cd();
@@ -699,7 +699,7 @@ void kine(){
    h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_carbon->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
    h_kineE_thetalab_carbon->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same")
+   kine_12c12c_ela_60_7->Draw("same");
 
    TCanvas *c19 = new TCanvas("c19", "c19");
    c19->cd();
