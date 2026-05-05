@@ -489,7 +489,7 @@ void kine(){
                   h_dEdx_range_cutphi_proton->Fill(track_range[k], track_dedx[k]);
                   h_range_thetalab_cutproton->Fill(track_theta[k], track_range[k]);
                   h_kineE_thetalab_proton->Fill(track_theta[k], track_KinE[k]);
-                  h_philab_philab_cutphi_proton -> Fill(track_phi[k], track_phi[k]);
+                  h_philab_philab_cutphi_proton -> Fill(track_phi[0], track_phi[1]);
                }
             }
 
