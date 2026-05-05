@@ -1,0 +1,31 @@
+reset
+set size square
+set parametric
+
+#set plot
+set xrange[-300:300]
+set yrange[-300:300]
+set xlabel 'pad x [mm]'
+set ylabel 'pad y [mm]'
+set title "pad hit pattern"
+set title font "Arial,30"
+set xlabel font "Arial,20"
+set ylabel font "Arial,20"
+set tics font "Arial,20"  #scale marks
+set xlabel offset 0,0
+set ylabel offset -5,0
+set bmargin 4  #margin of xlabel
+set lmargin 15 #margin of ylabel
+
+#difine hit pattern
+#plot 'out_hit_rcnp.dat' w p pt 1 lc "blue"
+plot 'out_hit_rcnp.dat' w p pt 1 lc "black"
+
+#set circle of ATTPC pad
+#replot[0:2*pi] 275*cos(t), 275*sin(t) linecolor 'dark-goldenrod' title "ATTPC pad"
+replot[0:2*pi] 275*cos(t), 275*sin(t) linecolor 'black' title "ATTPC pad"
+
+#set (0,0)
+#set obj circle at 0,0 fc rgb "black" size 5 fs solid
+#set obj circle at 0,0 fc rgb "dark-goldenrod" size 275 fs transparent solid 0.7
+set obj circle at 0,0 fc rgb "light-goldenrod" size 275 fs solid
