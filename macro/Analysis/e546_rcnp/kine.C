@@ -775,7 +775,7 @@ void kine(){
    h_kineE_thetalab_proton->Draw("colz");
 
    TCanvas *c26 = new TCanvas("c26", "c26");
-   c26->Divide(3,2)
+   c26->Divide(3,2);
    c26->cd(1);
    h_dEdx_range->SetDirectory(0);
    h_dEdx_range->GetXaxis()->SetTitle("roughRange [mm]");
@@ -808,7 +808,7 @@ void kine(){
    h_dEdx_range_cutphi_proton->Draw("colz");
 
    TCanvas *c27 = new TCanvas("c27", "c27");
-   c27->Divide(3,2)
+   c27->Divide(3,2);
    c27->cd(1);
    h_philab_philab->SetDirectory(0);
    h_philab_philab->GetXaxis()->SetTitle("#phi_{LAB} [deg]");
@@ -1042,8 +1042,8 @@ TGraph* ReadKinematics(TString kineFile){
          numKin++;
       }
       */
-      Double_t tcm, tlabr, elabr, tlabs, elabs,
-      while (kineStr >> tlabr >> elabr){
+      double tcm, tlabr, elabr, tlabs, elabs;
+      while ( *kineStr >> tlabr >> elabr){
          ThetalabR.push_back(tlabr);
          ElabR.push_back(elabr);
       }
