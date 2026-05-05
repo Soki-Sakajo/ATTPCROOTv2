@@ -155,10 +155,10 @@ void kine(){
    TH2F *h_dEdx_range_cutphi = new TH2F("h_dEdx_range_cutphi", "h_dEdx_range_cutphi;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
 
    // ... kinematics 
-   TH2F *h_kineE_thetalab = new TH2F("h_kineE_thetalab", "h_kineE_thetalab;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
-   TH2F *h_kineE_thetalab_carbon = new TH2F("h_kineE_thetalab_carbon", "h_kineE_thetalab_carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
-   TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
-   TH2F *h_kineE_thetalab_proton = new TH2F("h_kineE_thetalab_proton", "h_kineE_thetalab_proton;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 300, 0, 30);
+   TH2F *h_kineE_thetalab = new TH2F("h_kineE_thetalab", "h_kineE_thetalab;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 70, 0, 70);
+   TH2F *h_kineE_thetalab_carbon = new TH2F("h_kineE_thetalab_carbon", "h_kineE_thetalab_carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 700, 0, 70);
+   TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 50, 0, 5);
+   TH2F *h_kineE_thetalab_proton = new TH2F("h_kineE_thetalab_proton", "h_kineE_thetalab_proton;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 50, 0, 5);
 
    // ... angle correlations
    TH2F *h_range_thetalab = new TH2F("h_range_thetalab", "h_range_thetalab", 180, 0, 180, 1030, 0, 1030);
@@ -484,8 +484,8 @@ void kine(){
             // fill to histograms
             h_charge_range_cutphi -> Fill(track_range[0], track_charge[0]);
             h_charge_range_cutphi -> Fill(track_range[1], track_charge[1]);
-            h_dEdx_range->Fill(track_range[0], track_dedx[0]);
-            h_dEdx_range->Fill(track_range[1], track_dedx[1]);
+            h_dEdx_range_cutphi->Fill(track_range[0], track_dedx[0]);
+            h_dEdx_range_cutphi->Fill(track_range[1], track_dedx[1]);
             h_range_thetalab_cutphi -> Fill(track_theta[0], track_range[0]);
             h_range_thetalab_cutphi -> Fill(track_theta[1], track_range[1]);
             h_thetalab_thetalab_cutphi -> Fill(track_theta[0], track_theta[1]);
