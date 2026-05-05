@@ -155,9 +155,9 @@ void kine(){
    TH2F *h_dEdx_range_cutphi = new TH2F("h_dEdx_range_cutphi", "h_dEdx_range_cutphi;roughRange [mm];dEdx [ADC/mm]", 515, 0, 1030, 2000, 0, 4000);
 
    // ... kinematics 
-   TH2F *h_kineE_thetalab = new TH2F("h_kineE_thetalab", "h_kineE_thetalab;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 70, 0, 70);
+   TH2F *h_kineE_thetalab = new TH2F("h_kineE_thetalab", "h_kineE_thetalab;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 700, 0, 70);
    TH2F *h_kineE_thetalab_carbon = new TH2F("h_kineE_thetalab_carbon", "h_kineE_thetalab_carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 700, 0, 70);
-   TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 50, 0, 5);
+   TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 100, 0, 10);
    TH2F *h_kineE_thetalab_proton = new TH2F("h_kineE_thetalab_proton", "h_kineE_thetalab_proton;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 50, 0, 5);
 
    // ... angle correlations
@@ -173,7 +173,7 @@ void kine(){
    TH2F *h_thetalab_thetalab_cutphi_2tra = new TH2F("h_thetalab_thetalab_cutphi_2tra", "h_thetalab_thetalab_cutphi_2tra", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_cut12c_ela = new TH2F("h_thetalab_thetalab_cut12c_ela", "h_thetalab_thetalab_cut12c_ela", 200, 0, 100, 200, 0, 100);
    // ... .. phi vs phi
-   TH2F *h_philab_philab = new TH2F("h_philab_philab", "h_philab_philab", 360, -180, 180, 360, -180, 180);
+   TH2F *h_philab_philab = new TH2F("h_philab_philab", "h_philab_philab", 400, -200, 200, 400, -200, 200);
    TH2F *h_philab_philab_cutphi = new TH2F("h_philab_philab_cutphi", "h_philab_philab_cutphi", 360, -180, 180, 360, -180, 180);
 
    // ... track vertex
@@ -635,7 +635,7 @@ void kine(){
    h_thetalab_thetalab_cutphi->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
    h_thetalab_thetalab_cutphi->Draw("colz");
    xy90->SetLineColor(kRed);
-   xy90->SetLineWidth(1.5);
+   xy90->SetLineWidth(1);
    xy90->Draw("same");
 
    TCanvas *c12 = new TCanvas("c12", "c12");
@@ -672,7 +672,7 @@ void kine(){
    h_thetalab_thetalab_cutphi_2tra->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
    h_thetalab_thetalab_cutphi_2tra->Draw("colz");
    xy90->SetLineColor(kRed);
-   xy90->SetLineWidth(1.5);
+   xy90->SetLineWidth(1);
    xy90->Draw("same");
 
    TCanvas *c16 = new TCanvas("c16", "c16");
@@ -709,7 +709,7 @@ void kine(){
    h_thetalab_thetalab_cut12c_ela->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
    h_thetalab_thetalab_cut12c_ela->Draw("colz");
    xy90->SetLineColor(kRed);
-   xy90->SetLineWidth(1.5);
+   xy90->SetLineWidth(1);
    xy90->Draw("same");
 
    TCanvas *c20 = new TCanvas("c20", "c20");
