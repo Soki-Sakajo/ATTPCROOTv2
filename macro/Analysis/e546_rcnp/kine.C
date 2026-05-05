@@ -775,108 +775,90 @@ void kine(){
    h_kineE_thetalab_proton->Draw("colz");
 
    TCanvas *c26 = new TCanvas("c26", "c26");
-   c26->Divide(3,2);
-   c26->cd(1);
-   h_dEdx_range->SetDirectory(0);
-   h_dEdx_range->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
-   h_dEdx_range->SetTitle("dE/dx Range");
-   h_dEdx_range->Draw("colz");
-   c26->cd(2);
-   h_dEdx_range_cutphi->SetDirectory(0);
-   h_dEdx_range_cutphi->GetXaxis()->SetTitle("roughRange [mm]");
-   h_dEdx_range_cutphi->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
-   h_dEdx_range_cutphi->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d )", (int)del_phi));
-   h_dEdx_range_cutphi->Draw("colz");
-   c26->cd(4);
+   c26->cd();
    h_dEdx_range_cutphi_12c->SetDirectory(0);
    h_dEdx_range_cutphi_12c->GetXaxis()->SetTitle("roughRange [mm]");
    h_dEdx_range_cutphi_12c->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
    h_dEdx_range_cutphi_12c->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, 12c)", (int)del_phi));
    h_dEdx_range_cutphi_12c->Draw("colz");
-   c26->cd(5);
+
+   TCanvas *c27 = new TCanvas("c27", "c27");
+   c27->cd();
    h_dEdx_range_cutphi_alpha->SetDirectory(0);
    h_dEdx_range_cutphi_alpha->GetXaxis()->SetTitle("roughRange [mm]");
    h_dEdx_range_cutphi_alpha->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
    h_dEdx_range_cutphi_alpha->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
    h_dEdx_range_cutphi_alpha->Draw("colz");
-   c26->cd(6);
+
+   TCanvas *c28 = new TCanvas("c28", "c28");
+   c28->cd();
    h_dEdx_range_cutphi_proton->SetDirectory(0);
    h_dEdx_range_cutphi_proton->GetXaxis()->SetTitle("roughRange [mm]");
    h_dEdx_range_cutphi_proton->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
    h_dEdx_range_cutphi_proton->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
    h_dEdx_range_cutphi_proton->Draw("colz");
 
-   TCanvas *c27 = new TCanvas("c27", "c27");
-   c27->Divide(3,2);
-   c27->cd(1);
-   h_philab_philab->SetDirectory(0);
-   h_philab_philab->GetXaxis()->SetTitle("#phi_{LAB} [deg]");
-   h_philab_philab->GetYaxis()->SetTitle("#phi_{LAB} [deg]");
-   h_philab_philab->SetTitle("dE/dx Range");
-   h_philab_philab->Draw("colz");
-   c27->cd(2);
-   h_philab_philab_cutphi->SetDirectory(0);
-   h_philab_philab_cutphi->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
-   h_philab_philab_cutphi->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
-   h_philab_philab_cutphi->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d )", (int)del_phi));
-   h_philab_philab_cutphi->Draw("colz");
-   c27->cd(4);
+   TCanvas *c29 = new TCanvas("c29", "c29");
+   c29->cd();
    h_philab_philab_cutphi_12c->SetDirectory(0);
    h_philab_philab_cutphi_12c->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_cutphi_12c->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
    h_philab_philab_cutphi_12c->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, 12c)", (int)del_phi));
    h_philab_philab_cutphi_12c->Draw("colz");
-   c27->cd(5);
+
+   TCanvas *c30 = new TCanvas("c30", "c30");
+   c30->cd();
    h_philab_philab_cutphi_alpha->SetDirectory(0);
    h_philab_philab_cutphi_alpha->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_cutphi_alpha->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
    h_philab_philab_cutphi_alpha->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, alpha)", (int)del_phi));
    h_philab_philab_cutphi_alpha->Draw("colz");
-   c27->cd(6);
+
+   TCanvas *c31 = new TCanvas("c31", "c31");
+   c31->cd();
    h_philab_philab_cutphi_alpha->SetDirectory(0);
    h_philab_philab_cutphi_alpha->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_cutphi_alpha->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
    h_philab_philab_cutphi_alpha->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
    h_philab_philab_cutphi_alpha->Draw("colz");
 
-   #ifdef find_vertex
-   TCanvas *c28 = new TCanvas("c28", "c28");
-   c28->cd();
+#ifdef find_vertex
+   TCanvas *c32 = new TCanvas("c32", "c32");
+   c32->cd();
    h_verxy->SetDirectory(0);
    h_verxy->GetXaxis()->SetTitle("Vertex X [mm]");
    h_verxy->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_verxy->Draw("colz");
 
-   TCanvas *c29 = new TCanvas("c29", "c29");
-   c29->cd();
+   TCanvas *c33 = new TCanvas("c33", "c33");
+   c33->cd();
    h_verz->SetDirectory(0);
    h_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verz->Draw();
 
-   TCanvas *c30 = new TCanvas("c30", "c30");
-   c30->cd();
+   TCanvas *c34 = new TCanvas("c34", "c34");
+   c34->cd();
    h_verxz->SetDirectory(0);
    h_verxz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_verxz->GetYaxis()->SetTitle("Vertex X [mm]");
    h_verxz->Draw("colz");
 
-   TCanvas *c30 = new TCanvas("c30", "c30");
-   c30->cd();
+   TCanvas *c35 = new TCanvas("c35", "c35");
+   c35->cd();
    h_veryz->SetDirectory(0);
    h_veryz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_veryz->GetYaxis()->SetTitle("Vertex Y [mm]");
    h_veryz->Draw("colz");
 
-   TCanvas *c31 = new TCanvas("c31", "c31");
-   c31->cd();
+   TCanvas *c36 = new TCanvas("c36", "c36");
+   c36->cd();
    h_ntra_verz->SetDirectory(0);
    h_ntra_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
    h_ntra_verz->GetYaxis()->SetTitle("Number of tracks");
    h_ntra_verz->Draw("colz");
 
-   TCanvas *c32 = new TCanvas("c32", "c32");
-   c32->cd();
+   TCanvas *c37 = new TCanvas("c37", "c37");
+   c37->cd();
    h_range_thetalab_cutverz->SetDirectory(0);
    h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
