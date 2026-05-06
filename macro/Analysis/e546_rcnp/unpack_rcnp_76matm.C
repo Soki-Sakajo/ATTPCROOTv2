@@ -17,11 +17,12 @@ void unpack_rcnp_76matm(int run_num = 52){
 
   TString fileName = TString::Format("run_%04d", run_num);
   TString mappath = "";
-  TString parameterFile = "ATTPC.E546.par"; // need to check
+  TString parameterFile = "ATTPC.E546_76matm.par"; // need to check
   TString beampadsfile = "BeamPads_RCNP.csv";
   TString filepath = "./h5_file/";
   TString fileExt = ".h5";
-  TString outputpath = "./decode_data/";
+  //  TString outputpath = "./decode_data/";
+  TString outputpath = "./vd_check_data/";
 
   TString inputFile = filepath + fileName + fileExt;
   TString scriptfile = "rcnp_map_size.xml";

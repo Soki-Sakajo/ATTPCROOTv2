@@ -1,4 +1,3 @@
-//#define find_vertex
 #include <fstream>
 #include "TFile.h"
 #include "TObject.h"
@@ -8,25 +7,15 @@ TGraph* ReadKinematics(TString kineFile);
 Double_t omega(Double_t x, Double_t y, Double_t z);
 std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Double_t thetalab, Double_t K_eject);
 
-void kine(){
+void check_vd_76matm(){
+   //copy from kine.C 2026/05/06 12:20
 
    //set timer
    TStopwatch timer;
    timer.Start();
 
-   cout<<endl;
-#ifdef find_vertex
-   cout<<"find vertex: ON!! "<<endl;
-#else
-   cout<<"find vertex: OFF!! "<<endl;
-#endif
-   cout<<endl;
-
    // set parameters
-   //   Int_t verntra = 7; // number of tracks to find vertex.
-   Int_t verntra = 4; // number of tracks to find vertex.
    Double_t del_phi = 10; // cut value; phi1 - phi2 - 180 deg < del_phi
-   Double_t th_verz = 500; // cut value; vertex z > th_verz
    /*
    // Masses.
    double u_to_MeV = 931.49401;
@@ -44,7 +33,7 @@ void kine(){
    std::vector runNums = {50,51,52,53,54,55,56,57,58};
    Int_t run_start = runNums.front();
    Int_t run_end = runNums.back();
-   TFile * Results = new TFile(Form("data/kine_results_run%d-run%d.root", run_start, run_end),"recreate");
+   TFile * Results = new TFile(Form("data/check_vd_results_run%d-run%d.root", run_start, run_end),"recreate");
       
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
@@ -133,9 +122,6 @@ void kine(){
    Double_t track_lastx = 0;
    Double_t track_lasty = 0;
    Double_t track_lastz = 0;
-   Double_t track_verx = 0;
-   Double_t track_very = 0;
-   Double_t track_verz = 0;
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
@@ -179,7 +165,6 @@ void kine(){
    TH2F *h_range_thetalab_cut12c_ela = new TH2F("h_range_thetalab_cut12c_ela", "h_range_thetalab_cut12c_ela", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_range_thetalab_cutalpha = new TH2F("h_range_thetalab_cutalpha", "h_range_thetalab_cutalpha", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_range_thetalab_cutproton = new TH2F("h_range_thetalab_cutproton", "h_range_thetalab_cutproton", 180, 0, 180, 1030, 0, 1030);
-   TH2F *h_range_thetalab_cutverz = new TH2F("h_range_thetalab_cutverz", "h_range_thetalab_cutverz", 180, 0, 180, 1030, 0, 1030);
    // ... .. theta vs theta
    TH2F *h_thetalab_thetalab_cutphi = new TH2F("h_thetalab_thetalab_cutphi", "h_thetalab_thetalab_cutphi", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_cutphi_2tra = new TH2F("h_thetalab_thetalab_cutphi_2tra", "h_thetalab_thetalab_cutphi_2tra", 200, 0, 100, 200, 0, 100);
@@ -190,13 +175,6 @@ void kine(){
    TH2F *h_philab_philab_cutphi_12c = new TH2F("h_philab_philab_cutphi_12c", "h_philab_philab_cutphi_12c", 360, -180, 180, 360, -180, 180);
    TH2F *h_philab_philab_cutphi_alpha = new TH2F("h_philab_philab_cutphi_alpha", "h_philab_philab_cutphi_alpha", 360, -180, 180, 360, -180, 180);
    TH2F *h_philab_philab_cutphi_proton = new TH2F("h_philab_philab_cutphi_proton", "h_philab_philab_cutphi_proton", 360, -180, 180, 360, -180, 180);
-
-   // ... track vertex
-   TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 1010, -10, 1000);
-   TH2F *h_verxy = new TH2F("h_verxy", "h_verxy", 100, -50, 50, 100, -50, 50);
-   TH2F *h_verxz = new TH2F("h_verxz", "h_verxz", 1010, -10, 1000, 100, -50, 50);
-   TH2F *h_veryz = new TH2F("h_veryz", "h_veryz", 1010, -10, 1000, 100, -50, 50);
-   TH2F *h_ntra_verz = new TH2F("h_ntra_verz", "h_ntra_verz", 1010, -10, 1000, 11, -0.5, 10.5);
 
    /*
    // ... Excitation energy 
@@ -225,7 +203,7 @@ void kine(){
    std::cout << std::endl;
    for (int runNum: runNums) {
       // Open the digitalization file and get the TTree.
-      TString unpackFileName = TString::Format("./decode_data/run_%04d.root", runNum);
+      TString unpackFileName = TString::Format("./vd_check_data/run_%04d.root", runNum);
       TFile *unpackFile = new TFile(unpackFileName, "READ");
       TTree *unpackTree = (TTree *)unpackFile->Get("cbmsim");
       int nUnpackEvents = unpackTree->GetEntries();
@@ -258,9 +236,6 @@ void kine(){
          itrack = 0;
          nalpha = 0;
          nproton = 0;
-         track_verx = 0;
-         track_very = 0;
-         track_verz = 0;
          if (ntrack == 6){
             track6.push_back(i);
          }
@@ -413,59 +388,6 @@ void kine(){
             */
             itrack ++;
          }
-
-#ifdef find_vertex
-         // find vertex.
-         AtFindVertex *fver = new AtFindVertex();
-         /*
-         for(Int_t k=1; k< verntra; k++){
-            if(tracks.size() != k && tracks.size() != 1){continue;}
-            else if(tracks.size() == 1){
-               fver->FindVertexSingleLine(tracks);
-               check_tracks=true;
-            }
-            else if(tracks.size() == k){
-               fver->FindVertexMultipleLines(tracks, ntrack);
-               check_tracks=true;
-            }
-         }
-         */
-         if (ntrack == 0){
-            //            cout<<"No tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
-            continue;
-         }
-         else if (ntrack == 1){
-            fver->FindVertexSingleLine(tracks);
-            check_tracks = true;
-         }
-         else if (ntrack > 1 && ntrack < verntra){
-            fver->FindVertexMultipleLines(tracks, ntrack);
-            check_tracks = true;
-         }
-         else {
-            //            cout<<"More than 6 tracks found in this event. run: "<<runNum<<" , event: "<<i<<endl;
-            continue;
-         }
-
-         auto vtxlist = fver->GetTracksVertex();
-         for (auto &v: vtxlist){
-            track_verx = v.vertex.X();
-            track_very = v.vertex.Y();
-            track_verz = v.vertex.Z();
-         }
-         h_verxy->Fill(track_verx, track_very);
-         h_verz->Fill(track_verz);
-         h_verxz->Fill(track_verz, track_verx);
-         h_veryz->Fill(track_verz, track_very);
-         h_ntra_verz->Fill(track_verz, ntrack);
-         if(track_verz > th_verz){
-            for(Int_t k=0; k<ntrack; k++){
-               h_range_thetalab_cutverz->Fill(track_theta[k], track_range[k]);
-            }
-         }
-         delete fver;
-#endif
-
          h_rmax->Fill(r_max);
          if(r_tri > r_max && r_max > 0){
             r_tri = r_max;
@@ -830,50 +752,6 @@ void kine(){
 
    */
 
-#ifdef find_vertex
-   TCanvas *c32 = new TCanvas("c32", "c32");
-   c32->cd();
-   h_verxy->SetDirectory(0);
-   h_verxy->GetXaxis()->SetTitle("Vertex X [mm]");
-   h_verxy->GetYaxis()->SetTitle("Vertex Y [mm]");
-   h_verxy->Draw("colz");
-
-   TCanvas *c33 = new TCanvas("c33", "c33");
-   c33->cd();
-   h_verz->SetDirectory(0);
-   h_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
-   h_verz->Draw();
-
-   TCanvas *c34 = new TCanvas("c34", "c34");
-   c34->cd();
-   h_verxz->SetDirectory(0);
-   h_verxz->GetXaxis()->SetTitle("Vertex Z [mm]");
-   h_verxz->GetYaxis()->SetTitle("Vertex X [mm]");
-   h_verxz->Draw("colz");
-
-   TCanvas *c35 = new TCanvas("c35", "c35");
-   c35->cd();
-   h_veryz->SetDirectory(0);
-   h_veryz->GetXaxis()->SetTitle("Vertex Z [mm]");
-   h_veryz->GetYaxis()->SetTitle("Vertex Y [mm]");
-   h_veryz->Draw("colz");
-
-   TCanvas *c36 = new TCanvas("c36", "c36");
-   c36->cd();
-   h_ntra_verz->SetDirectory(0);
-   h_ntra_verz->GetXaxis()->SetTitle("Vertex Z [mm]");
-   h_ntra_verz->GetYaxis()->SetTitle("Number of tracks");
-   h_ntra_verz->Draw("colz");
-
-   TCanvas *c37 = new TCanvas("c37", "c37");
-   c37->cd();
-   h_range_thetalab_cutverz->SetDirectory(0);
-   h_range_thetalab_cutverz->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
-   h_range_thetalab_cutverz->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-   h_range_thetalab_cutverz->SetTitle(Form("Range Theta_LAB (verz > %d )", (int)th_verz));
-   h_range_thetalab_cutverz->Draw("colz");
-#endif
-
    /*
    TCanvas *c26 = new TCanvas("c26", "c26");
    c26->cd();
@@ -949,7 +827,6 @@ void kine(){
    h_range_thetalab_cut12c_ela->Write();
    h_range_thetalab_cutalpha->Write();
    h_range_thetalab_cutproton->Write();
-   h_range_thetalab_cutverz->Write();
    //  theta vs theta
    h_thetalab_thetalab_cutphi->Write();
    h_thetalab_thetalab_cutphi_2tra->Write();
@@ -960,15 +837,6 @@ void kine(){
    h_philab_philab_cutphi_12c->Write();
    h_philab_philab_cutphi_alpha->Write();
    h_philab_philab_cutphi_proton->Write();
-
-#ifdef find_vertex
-   // track vertex
-   h_verxy->Write();
-   h_verz->Write();
-   h_verxz->Write();
-   h_veryz->Write();
-   h_ntra_verz->Write();
-#endif
 
    /*
    // Excitation energy spectra
