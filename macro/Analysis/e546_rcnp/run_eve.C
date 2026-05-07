@@ -10,7 +10,7 @@
 void run_eve(int runNum = 52)  
 {
   TString InputDataFile = TString::Format("./decode_data/run_%04d.root", runNum);
-  TString OutputDataFile = TString::Format("./display/run_%04d_display.root", runNum);
+  TString OutputDataFile = TString::Format("./data/run_%04d_display.root", runNum);
   //  TString OutputDataFile = "./run_0038_display.root";
   std::cout << "Opening: " << InputDataFile << std::endl;
 

@@ -7,12 +7,14 @@
 #include "FairRunAna.h"
 */
 
-void run_eve_test()
-{
+void run_eve_test(int runNum = 52){
+
+  TString InputDataFile = TString::Format("./vd_check_data/vd3.06_files/run_%04d.root", runNum);
+  TString OutputDataFile = TString::Format("./data/run_%04d_display.root", runNum);
   //  TString InputDataFile = TString::Format("./decode_data/test.root");
   //  TString OutputDataFile = TString::Format("./display/run_test_display.root");
-  TString InputDataFile = TString::Format("./decode_data/test3.root");
-  TString OutputDataFile = TString::Format("./display/run_test3_display.root");
+  //  TString InputDataFile = TString::Format("./decode_data/test3.root");
+  //  TString OutputDataFile = TString::Format("./display/run_test3_display.root");
   std::cout << "Opening: " << InputDataFile << std::endl;
 
    TString dir = getenv("VMCWORKDIR");
