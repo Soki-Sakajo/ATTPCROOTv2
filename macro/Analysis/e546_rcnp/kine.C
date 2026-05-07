@@ -287,7 +287,8 @@ void kine(){
 
             track_range[itrack] = pattern->DistanceAlongPattern(lastPoint, firstPoint);
             track_charge[itrack] = track.GetGeoQEnergy();
-            track_theta[itrack] = 180 - track.GetGeoTheta() * 180 / TMath::Pi();
+            //            track_theta[itrack] = 180 - track.GetGeoTheta() * 180 / TMath::Pi();
+            track_theta[itrack] = track.GetGeoTheta() * 180 / TMath::Pi();
             track_phi[itrack] = track.GetGeoPhi() * 180 / TMath::Pi();
 
             track_lastx = lastPoint.X();
