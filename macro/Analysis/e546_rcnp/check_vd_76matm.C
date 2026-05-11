@@ -1,3 +1,4 @@
+#define eve_check
 #include <fstream>
 #include "TFile.h"
 #include "TObject.h"
@@ -27,6 +28,18 @@ void check_vd_76matm(){
    // Beam energy.
    double E_beam = 27.091 * 17.022578650;
    */
+
+   // directory
+   //   double vd_val = 3.06;
+   //   double vd_val = 3.50;
+   //   double vd_val = 3.89;
+   //   double vd_val = 4.00;
+   double vd_val = 4.05;
+   //   double vd_val = 4.07;
+   //   double vd_val = 4.08;
+   //   double vd_val = 4.10;
+   //   double vd_val = 4.20;
+   //   double vd_val = 4.50;
 
    // files.
    //   std::vector runNums = {52};
@@ -130,11 +143,20 @@ void check_vd_76matm(){
    Double_t track_dedx[narray];
    Double_t track_KinE[narray];
    std::vector<Int_t> track6(0);
+   std::vector<Int_t> peak1(0);
+   std::vector<Int_t> peak2(0);
+   std::vector<Int_t> peak3(0);
 
    // Histogram definitions.
    // ... TH1 hist for checking something.
    TH1D *h_ntra = new TH1D("h_ntra", "h_ntra;NTracks", 11, -0.5, 10.5);
    TH1D *h_rmax = new TH1D("h_rmax", "h_rmax;Rmax [mm]", 150, 0, 300);
+   //   TH1D *h_sum_theta_cut12c_ela = new TH1D("h_sum_theta_cut12c_ela", "h_sum_theta_cut12c_ela;theta", 100, 40, 140);
+   TH1D *h_sum_theta_cut12c_ela = new TH1D("h_sum_theta_cut12c_ela", "h_sum_theta_cut12c_ela;theta", 200, 40, 140);
+   TH1D *h_sum_theta_cut12c_run52 = new TH1D("h_sum_theta_cut12c_run52", "h_sum_theta_cut12c_run52;theta", 200, 40, 140);
+   TH1D *h_sum_theta_cut12c_peak1 = new TH1D("h_sum_theta_cut12c_peak1", "h_sum_theta_cut12c_peak1;theta", 60, 70, 100);
+   TH1D *h_sum_theta_cut12c_peak2 = new TH1D("h_sum_theta_cut12c_peak2", "h_sum_theta_cut12c_peak2;theta", 60, 70, 100);
+   TH1D *h_sum_theta_cut12c_peak3 = new TH1D("h_sum_theta_cut12c_peak3", "h_sum_theta_cut12c_peak3;theta", 60, 70, 100);
 
    // ... ATTPC PID
    TH2F *h_charge_range = new TH2F("h_charge_range", "h_charge_range;roughRange [mm];Charge [ADC]", 600, 0, 1200, 600, 0, 6e5);
@@ -203,7 +225,8 @@ void check_vd_76matm(){
    std::cout << std::endl;
    for (int runNum: runNums) {
       // Open the digitalization file and get the TTree.
-      TString unpackFileName = TString::Format("./vd_check_data/run_%04d.root", runNum);
+      //      TString unpackFileName = TString::Format("./vd_check_data/run_%04d.root", runNum);
+      TString unpackFileName = TString::Format("./vd_check_data/vd%.2f_files/run_%04d.root", vd_val, runNum);
       TFile *unpackFile = new TFile(unpackFileName, "READ");
       TTree *unpackTree = (TTree *)unpackFile->Get("cbmsim");
       int nUnpackEvents = unpackTree->GetEntries();
@@ -262,7 +285,8 @@ void check_vd_76matm(){
 
             track_range[itrack] = pattern->DistanceAlongPattern(lastPoint, firstPoint);
             track_charge[itrack] = track.GetGeoQEnergy();
-            track_theta[itrack] = 180 - track.GetGeoTheta() * 180 / TMath::Pi();
+            //            track_theta[itrack] = 180 - track.GetGeoTheta() * 180 / TMath::Pi();
+            track_theta[itrack] = track.GetGeoTheta() * 180 / TMath::Pi();
             track_phi[itrack] = track.GetGeoPhi() * 180 / TMath::Pi();
 
             track_lastx = lastPoint.X();
@@ -447,13 +471,30 @@ void check_vd_76matm(){
                h_range_thetalab_cutphi_2tra -> Fill(track_theta[1], track_range[1]);
                h_thetalab_thetalab_cutphi_2tra -> Fill(track_theta[0], track_theta[1]);
                if (track_12c[0] && track_12c[1]){
+                  Double_t sum_theta = track_theta[0]+track_theta[1];
                   h_charge_range_cut12c_ela -> Fill(track_range[0], track_charge[0]);
                   h_charge_range_cut12c_ela -> Fill(track_range[1], track_charge[1]);
                   h_range_thetalab_cut12c_ela -> Fill(track_theta[0], track_range[0]);
                   h_range_thetalab_cut12c_ela -> Fill(track_theta[1], track_range[1]);
-                  h_kineE_thetalab_carbon->Fill(track_theta[0], track_KinE[0]);
-                  h_kineE_thetalab_carbon->Fill(track_theta[1], track_KinE[1]);
+                  h_kineE_thetalab_carbon -> Fill(track_theta[0], track_KinE[0]);
+                  h_kineE_thetalab_carbon -> Fill(track_theta[1], track_KinE[1]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
+                  h_sum_theta_cut12c_ela -> Fill(sum_theta);
+                  if (runNum == 52){
+                     h_sum_theta_cut12c_run52 -> Fill(sum_theta);
+                     if (sum_theta > 76.0 && sum_theta < 84.0){
+                        peak1.push_back(i);
+                        h_sum_theta_cut12c_peak1 -> Fill(sum_theta);
+                     } 
+                     else if (sum_theta >= 84.0 && sum_theta < 88.0){
+                        peak2.push_back(i);
+                        h_sum_theta_cut12c_peak2 -> Fill(sum_theta);
+                     }
+                     else if (sum_theta > 88.0 && sum_theta < 94.0){
+                        peak3.push_back(i);
+                        h_sum_theta_cut12c_peak3 -> Fill(sum_theta);
+                     }
+                  }
                }
             }
          }
@@ -481,19 +522,8 @@ void check_vd_76matm(){
       unpackFile->Close();
    }
 
-   // cout of information
-   std::cout << "                                                                " << std::endl;
-   std::cout << "Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
-   //   std::cout << "6 track events: " << track6.size() << std::endl;
-   /*
-   std::cout << "  Event with 6 tracks: " << std::flush;
-   for (auto &eventIndex: track6){
-      std::cout << eventIndex << " , " << std::flush;
-   }
-   std::cout << std::endl;
-   */
-
    // Draw histograms in TCanvas.
+#ifndef eve_check
    TCanvas *c1 = new TCanvas("c1", "c1");
    c1->cd();
    h_rmax->SetDirectory(0);
@@ -664,6 +694,12 @@ void check_vd_76matm(){
 
    TCanvas *c20 = new TCanvas("c20", "c20");
    c20->cd();
+   h_sum_theta_cut12c_ela->SetDirectory(0);
+   h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
+   h_sum_theta_cut12c_ela->Draw();
+
+   TCanvas *c21 = new TCanvas("c21", "c21");
+   c21->cd();
    h_nalp_ntra->SetDirectory(0);
    h_nalp_ntra->GetXaxis()->SetTitle("number of tracks");
    h_nalp_ntra->GetYaxis()->SetTitle("number of alphas tracks");
@@ -671,24 +707,24 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_nalp_ntra->Draw("colz");
 
-   TCanvas *c21 = new TCanvas("c21", "c21");
-   c21->cd();
+   TCanvas *c22 = new TCanvas("c22", "c22");
+   c22->cd();
    h_range_thetalab_cutalpha->SetDirectory(0);
    h_range_thetalab_cutalpha->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cutalpha->GetYaxis()->SetTitle("roughRange [mm]");
    h_range_thetalab_cutalpha->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, alpha)", (int)del_phi));
    h_range_thetalab_cutalpha->Draw("colz");
 
-   TCanvas *c22 = new TCanvas("c22", "c22");
-   c22->cd();
+   TCanvas *c23 = new TCanvas("c23", "c23");
+   c23->cd();
    h_kineE_thetalab_alpha->SetDirectory(0);
    h_kineE_thetalab_alpha->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_alpha->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_alpha->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, alpha)", (int)del_phi));
    h_kineE_thetalab_alpha->Draw("colz");
 
-   TCanvas *c23 = new TCanvas("c23", "c23");
-   c23->cd();
+   TCanvas *c24 = new TCanvas("c24", "c24");
+   c24->cd();
    h_npro_ntra->SetDirectory(0);
    h_npro_ntra->GetXaxis()->SetTitle("number of tracks");
    h_npro_ntra->GetYaxis()->SetTitle("number of protons tracks");
@@ -696,21 +732,56 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_npro_ntra->Draw("colz");
 
-   TCanvas *c24 = new TCanvas("c24", "c24");
-   c24->cd();
+   TCanvas *c25 = new TCanvas("c25", "c25");
+   c25->cd();
    h_range_thetalab_cutproton->SetDirectory(0);
    h_range_thetalab_cutproton->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_range_thetalab_cutproton->GetYaxis()->SetTitle("roughRange [mm]");
    h_range_thetalab_cutproton->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
    h_range_thetalab_cutproton->Draw("colz");
 
-   TCanvas *c25 = new TCanvas("c25", "c25");
-   c25->cd();
+   TCanvas *c26 = new TCanvas("c26", "c26");
+   c26->cd();
    h_kineE_thetalab_proton->SetDirectory(0);
    h_kineE_thetalab_proton->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_proton->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_proton->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
    h_kineE_thetalab_proton->Draw("colz");
+#endif
+
+#ifdef eve_check
+   TCanvas *c30 = new TCanvas("c30", "c30");
+   c30->Divide(3,2);
+   c30->cd(1);
+   h_thetalab_thetalab_cut12c_ela->SetDirectory(0);
+   h_thetalab_thetalab_cut12c_ela->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_cut12c_ela->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
+   h_thetalab_thetalab_cut12c_ela->Draw("colz");
+   xy90->SetLineColor(kRed);
+   xy90->SetLineWidth(1);
+   xy90->Draw("same");
+   c30->cd(2);
+   h_sum_theta_cut12c_ela->SetDirectory(0);
+   h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
+   h_sum_theta_cut12c_ela->Draw();
+   c30->cd(3);
+   h_sum_theta_cut12c_run52->SetDirectory(0);
+   h_sum_theta_cut12c_run52->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52");
+   h_sum_theta_cut12c_run52->Draw();
+   c30->cd(4);
+   h_sum_theta_cut12c_peak1->SetDirectory(0);
+   h_sum_theta_cut12c_peak1->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52 peak1");
+   h_sum_theta_cut12c_peak1->Draw();
+   c30->cd(5);
+   h_sum_theta_cut12c_peak2->SetDirectory(0);
+   h_sum_theta_cut12c_peak2->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52 peak2");
+   h_sum_theta_cut12c_peak2->Draw();
+   c30->cd(6);
+   h_sum_theta_cut12c_peak3->SetDirectory(0);
+   h_sum_theta_cut12c_peak3->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52 peak1");
+   h_sum_theta_cut12c_peak3->Draw();
+#endif
 
    /*
    TCanvas *c29 = new TCanvas("c29", "c29");
@@ -792,6 +863,7 @@ void check_vd_76matm(){
    Results->cd();
    h_rmax->Write();
    h_ntra->Write();
+   h_sum_theta_cut12c_ela->Write();
 
    // charge range
    h_charge_range->Write();
@@ -860,6 +932,30 @@ void check_vd_76matm(){
    histEstimatedKinEVThetaLAB1H->Write();
    */
    Results->Close();
+
+   // cout of information
+   std::cout << "                                                                " << std::endl;
+   std::cout << "Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
+#ifdef eve_check
+   std::cout << "peak1 events: " << peak1.size() << std::endl;
+   std::cout << "  Event of peak1: " << std::flush;
+   for (auto &eventIndex: peak1){
+      std::cout << eventIndex << ", " << std::flush;
+   }
+   std::cout << std::endl;
+   std::cout << "peak2 events: " << peak2.size() << std::endl;
+   std::cout << "  Event of peak2: " << std::flush;
+   for (auto &eventIndex: peak2){
+      std::cout << eventIndex << ", " << std::flush;
+   }
+   std::cout << std::endl;
+   std::cout << "peak3 events: " << peak3.size() << std::endl;
+   std::cout << "  Event of peak3: " << std::flush;
+   for (auto &eventIndex: peak3){
+      std::cout << eventIndex << ", " << std::flush;
+   }
+   std::cout << std::endl;
+#endif
 
    // stop timer
    timer.Stop();

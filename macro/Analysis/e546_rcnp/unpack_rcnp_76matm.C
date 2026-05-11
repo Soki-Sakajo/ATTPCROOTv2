@@ -167,7 +167,7 @@ void unpack_rcnp_76matm(int run_num = 52){
   run->AddTask(psaTask);
   run->AddTask(SCTask);
   run->AddTask(ransacTask);
-  run->AddTask(patternModTask);
+  //  run->AddTask(patternModTask);
   run->AddTask(fitterTask);
 
   std::cout << "***** Starting Init ******" << std::endl;
