@@ -20,6 +20,7 @@ NCORE=$(($(nproc)/3))
 #seq 113 176 | parallel -j "$NCORE" --load 70%  --memfree 6G --joblog joblog_129matm.log \
 #		       'nice -n 10 root -l -q "unpack_rcnp_129matm.C({})"'
 
-for i in $(seq 50 58); do
+#for i in $(seq 50 58); do
+for i in $(seq 28 112); do
 	nice -n 10 root -l -q "unpack_rcnp_76matm.C(${i})"
 done

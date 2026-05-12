@@ -23,7 +23,8 @@ void unpack_rcnp_76matm(int run_num = 52){
   TString fileExt = ".h5";
   //  TString outputpath = "./decode_data/";
   //  TString outputpath = "./vd_check_data/";
-  TString outputpath = "./vd_check_data/for_raw_eve_ana/";
+  //  TString outputpath = "./vd_check_data/for_raw_eve_ana/";
+  TString outputpath = "./vd_check_data/vd4.05_files/";
 
   TString inputFile = filepath + fileName + fileExt;
   TString scriptfile = "rcnp_map_size.xml";
