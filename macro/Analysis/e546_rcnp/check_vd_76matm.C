@@ -111,7 +111,11 @@ void check_vd_76matm(){
    TCutG *cutmul2 = (TCutG*) gROOT->FindObject("charge_range_mult_2");
 
    // Kinematic lines.
-   TGraph *kine_12c12c_ela_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_ela_60_7.txt");
+   TGraph *kine_12c12c_gsgs_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_60.7.txt");
+   TGraph *kine_12c12c_gsex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsex_4.44_60.7.txt");
+   TGraph *kine_12c12c_exex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_exex_4.44_60.7.txt");
+   TGraph *angle_12c12c_gsex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_gsex_4.44_60.7.txt");
+   TGraph *angle_12c12c_exex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_exex_4.44_60.7.txt");
    /*
    TGraph *kine_dp_gs = ReadKinematics("./kineFiles/kine17C_dp_gs.txt");
    TGraph *kine_dd_gs_25MeVu = ReadKinematics("./kineFiles/kine17C_dd_gs_25MeVu.txt");
@@ -591,7 +595,7 @@ void check_vd_76matm(){
    h_kineE_thetalab->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab->GetYaxis()->SetTitle("roughKinE [MeV]");
    h_kineE_thetalab->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
 
    TCanvas *c7 = new TCanvas("c7", "c7");
    c7->cd();
@@ -703,7 +707,7 @@ void check_vd_76matm(){
    h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_carbon->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
    h_kineE_thetalab_carbon->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
 
    TCanvas *c19 = new TCanvas("c19", "c19");
    c19->cd();
@@ -785,6 +789,8 @@ void check_vd_76matm(){
    xy90->SetLineColor(kRed);
    xy90->SetLineWidth(1);
    xy90->Draw("same");
+   angle_12c12c_gsex_60_7->Draw("same");
+   angle_12c12c_exex_60_7->Draw("same");
    c90->cd(2);
    h_sum_theta_cut12c_ela->SetDirectory(0);
    h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
@@ -842,28 +848,36 @@ void check_vd_76matm(){
    h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_carbon->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
    h_kineE_thetalab_carbon->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
    c91->cd(10);
    h_kineE_thetalab_peak1->SetDirectory(0);
    h_kineE_thetalab_peak1->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_peak1->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_peak1->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak1)", (int)del_phi));
    h_kineE_thetalab_peak1->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
    c91->cd(11);
    h_kineE_thetalab_peak2->SetDirectory(0);
    h_kineE_thetalab_peak2->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_peak2->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_peak2->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak2)", (int)del_phi));
    h_kineE_thetalab_peak2->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
    c91->cd(12);
    h_kineE_thetalab_peak3->SetDirectory(0);
    h_kineE_thetalab_peak3->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_peak3->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_peak3->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak3)", (int)del_phi));
    h_kineE_thetalab_peak3->Draw("colz");
-   kine_12c12c_ela_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
 
 #endif
 
