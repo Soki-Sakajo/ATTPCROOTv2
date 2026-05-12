@@ -21,8 +21,9 @@ void unpack_rcnp_76matm(int run_num = 52){
   TString beampadsfile = "BeamPads_RCNP.csv";
   TString filepath = "./h5_file/";
   TString fileExt = ".h5";
-  TString outputpath = "./decode_data/";
+  //  TString outputpath = "./decode_data/";
   //  TString outputpath = "./vd_check_data/";
+  TString outputpath = "./vd_check_data/for_raw_eve_ana/";
 
   TString inputFile = filepath + fileName + fileExt;
   TString scriptfile = "rcnp_map_size.xml";

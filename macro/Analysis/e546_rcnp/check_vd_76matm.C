@@ -179,6 +179,9 @@ void check_vd_76matm(){
    TH2F *h_kineE_thetalab_carbon = new TH2F("h_kineE_thetalab_carbon", "h_kineE_thetalab_carbon;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 600, 0, 60);
    TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 500, 0, 10);
    TH2F *h_kineE_thetalab_proton = new TH2F("h_kineE_thetalab_proton", "h_kineE_thetalab_proton;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 250, 0, 5);
+   TH2F *h_kineE_thetalab_peak1 = new TH2F("h_kineE_thetalab_peak1", "h_kineE_thetalab_peak1;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 60, 0, 60);
+   TH2F *h_kineE_thetalab_peak2 = new TH2F("h_kineE_thetalab_peak2", "h_kineE_thetalab_peak2;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 60, 0, 60);
+   TH2F *h_kineE_thetalab_peak3 = new TH2F("h_kineE_thetalab_peak3", "h_kineE_thetalab_peak3;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 60, 0, 60);
 
    // ... angle correlations
    TH2F *h_range_thetalab = new TH2F("h_range_thetalab", "h_range_thetalab", 180, 0, 180, 1030, 0, 1030);
@@ -187,6 +190,9 @@ void check_vd_76matm(){
    TH2F *h_range_thetalab_cut12c_ela = new TH2F("h_range_thetalab_cut12c_ela", "h_range_thetalab_cut12c_ela", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_range_thetalab_cutalpha = new TH2F("h_range_thetalab_cutalpha", "h_range_thetalab_cutalpha", 180, 0, 180, 1030, 0, 1030);
    TH2F *h_range_thetalab_cutproton = new TH2F("h_range_thetalab_cutproton", "h_range_thetalab_cutproton", 180, 0, 180, 1030, 0, 1030);
+   TH2F *h_range_thetalab_cutpeak1 = new TH2F("h_range_thetalab_cutpeak1", "h_range_thetalab_cutpeak1", 50, 0, 100, 300, 0, 600);
+   TH2F *h_range_thetalab_cutpeak2 = new TH2F("h_range_thetalab_cutpeak2", "h_range_thetalab_cutpeak1", 50, 0, 100, 300, 0, 600);
+   TH2F *h_range_thetalab_cutpeak3 = new TH2F("h_range_thetalab_cutpeak3", "h_range_thetalab_cutpeak1", 50, 0, 100, 300, 0, 600);
    // ... .. theta vs theta
    TH2F *h_thetalab_thetalab_cutphi = new TH2F("h_thetalab_thetalab_cutphi", "h_thetalab_thetalab_cutphi", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_cutphi_2tra = new TH2F("h_thetalab_thetalab_cutphi_2tra", "h_thetalab_thetalab_cutphi_2tra", 200, 0, 100, 200, 0, 100);
@@ -482,18 +488,36 @@ void check_vd_76matm(){
                   h_sum_theta_cut12c_ela -> Fill(sum_theta);
                   if (runNum == 52){
                      h_sum_theta_cut12c_run52 -> Fill(sum_theta);
-                     if (sum_theta > 76.0 && sum_theta < 84.0){
+                  }
+                  if (sum_theta > 76.0 && sum_theta < 84.0){
+                     if (runNum == 52){
                         peak1.push_back(i);
-                        h_sum_theta_cut12c_peak1 -> Fill(sum_theta);
-                     } 
-                     else if (sum_theta >= 84.0 && sum_theta < 88.0){
+                     }
+                     h_sum_theta_cut12c_peak1 -> Fill(sum_theta);
+                     h_range_thetalab_cutpeak1 -> Fill(track_theta[0], track_range[0]);
+                     h_range_thetalab_cutpeak1 -> Fill(track_theta[1], track_range[1]);
+                     h_kineE_thetalab_peak1 -> Fill(track_theta[0], track_KinE[0]);
+                     h_kineE_thetalab_peak1 -> Fill(track_theta[1], track_KinE[1]);            
+                  } 
+                  else if (sum_theta >= 84.0 && sum_theta < 88.0){
+                     if (runNum == 52){
                         peak2.push_back(i);
-                        h_sum_theta_cut12c_peak2 -> Fill(sum_theta);
                      }
-                     else if (sum_theta > 88.0 && sum_theta < 94.0){
+                     h_sum_theta_cut12c_peak2 -> Fill(sum_theta);
+                     h_range_thetalab_cutpeak2 -> Fill(track_theta[0], track_range[0]);
+                     h_range_thetalab_cutpeak2 -> Fill(track_theta[1], track_range[1]);
+                     h_kineE_thetalab_peak2 -> Fill(track_theta[0], track_KinE[0]);
+                     h_kineE_thetalab_peak2 -> Fill(track_theta[1], track_KinE[1]);            
+                  }
+                  else if (sum_theta > 88.0 && sum_theta < 94.0){
+                     if (runNum == 52){
                         peak3.push_back(i);
-                        h_sum_theta_cut12c_peak3 -> Fill(sum_theta);
                      }
+                     h_sum_theta_cut12c_peak3 -> Fill(sum_theta);
+                     h_range_thetalab_cutpeak3 -> Fill(track_theta[0], track_range[0]);
+                     h_range_thetalab_cutpeak3 -> Fill(track_theta[1], track_range[1]);
+                     h_kineE_thetalab_peak3 -> Fill(track_theta[0], track_KinE[0]);
+                     h_kineE_thetalab_peak3 -> Fill(track_theta[1], track_KinE[1]);            
                   }
                }
             }
@@ -750,9 +774,9 @@ void check_vd_76matm(){
 #endif
 
 #ifdef eve_check
-   TCanvas *c30 = new TCanvas("c30", "c30");
-   c30->Divide(3,2);
-   c30->cd(1);
+   TCanvas *c90 = new TCanvas("c90", "c90");
+   c90->Divide(3,1);
+   c90->cd(1);
    h_thetalab_thetalab_cut12c_ela->SetDirectory(0);
    h_thetalab_thetalab_cut12c_ela->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -761,26 +785,86 @@ void check_vd_76matm(){
    xy90->SetLineColor(kRed);
    xy90->SetLineWidth(1);
    xy90->Draw("same");
-   c30->cd(2);
+   c90->cd(2);
    h_sum_theta_cut12c_ela->SetDirectory(0);
    h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
    h_sum_theta_cut12c_ela->Draw();
-   c30->cd(3);
+   c90->cd(3);
    h_sum_theta_cut12c_run52->SetDirectory(0);
    h_sum_theta_cut12c_run52->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52");
    h_sum_theta_cut12c_run52->Draw();
-   c30->cd(4);
+
+   TCanvas *c91 = new TCanvas("c91", "c91", 1200, 800);
+   c91->Divide(4,3);
+   c91->cd(1);
+   h_sum_theta_cut12c_ela->SetDirectory(0);
+   h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
+   h_sum_theta_cut12c_ela->Draw();
+   c91->cd(2);
    h_sum_theta_cut12c_peak1->SetDirectory(0);
    h_sum_theta_cut12c_peak1->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52 peak1");
    h_sum_theta_cut12c_peak1->Draw();
-   c30->cd(5);
+   c91->cd(3);
    h_sum_theta_cut12c_peak2->SetDirectory(0);
    h_sum_theta_cut12c_peak2->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52 peak2");
    h_sum_theta_cut12c_peak2->Draw();
-   c30->cd(6);
+   c91->cd(4);
    h_sum_theta_cut12c_peak3->SetDirectory(0);
    h_sum_theta_cut12c_peak3->GetXaxis()->SetTitle("Sum of tracks [deg] cut run52 peak1");
    h_sum_theta_cut12c_peak3->Draw();
+   c91->cd(5);
+   h_range_thetalab_cut12c_ela->SetDirectory(0);
+   h_range_thetalab_cut12c_ela->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cut12c_ela->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cut12c_ela->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
+   h_range_thetalab_cut12c_ela->Draw("colz");
+   c91->cd(6);
+   h_range_thetalab_cutpeak1->SetDirectory(0);
+   h_range_thetalab_cutpeak1->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cutpeak1->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cutpeak1->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak1)", (int)del_phi));
+   h_range_thetalab_cutpeak1->Draw("colz");
+   c91->cd(7);
+   h_range_thetalab_cutpeak2->SetDirectory(0);
+   h_range_thetalab_cutpeak2->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cutpeak2->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cutpeak2->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak2)", (int)del_phi));
+   h_range_thetalab_cutpeak2->Draw("colz");
+   c91->cd(8);
+   h_range_thetalab_cutpeak3->SetDirectory(0);
+   h_range_thetalab_cutpeak3->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_range_thetalab_cutpeak3->GetYaxis()->SetTitle("roughRange [mm]");
+   h_range_thetalab_cutpeak3->SetTitle(Form("Range Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak3)", (int)del_phi));
+   h_range_thetalab_cutpeak3->Draw("colz");
+   c91->cd(9);
+   h_kineE_thetalab_carbon->SetDirectory(0);
+   h_kineE_thetalab_carbon->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
+   h_kineE_thetalab_carbon->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
+   h_kineE_thetalab_carbon->Draw("colz");
+   kine_12c12c_ela_60_7->Draw("same");
+   c91->cd(10);
+   h_kineE_thetalab_peak1->SetDirectory(0);
+   h_kineE_thetalab_peak1->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_kineE_thetalab_peak1->GetYaxis()->SetTitle("roughKineE [MeV]");
+   h_kineE_thetalab_peak1->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak1)", (int)del_phi));
+   h_kineE_thetalab_peak1->Draw("colz");
+   kine_12c12c_ela_60_7->Draw("same");
+   c91->cd(11);
+   h_kineE_thetalab_peak2->SetDirectory(0);
+   h_kineE_thetalab_peak2->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_kineE_thetalab_peak2->GetYaxis()->SetTitle("roughKineE [MeV]");
+   h_kineE_thetalab_peak2->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak2)", (int)del_phi));
+   h_kineE_thetalab_peak2->Draw("colz");
+   kine_12c12c_ela_60_7->Draw("same");
+   c91->cd(12);
+   h_kineE_thetalab_peak3->SetDirectory(0);
+   h_kineE_thetalab_peak3->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_kineE_thetalab_peak3->GetYaxis()->SetTitle("roughKineE [MeV]");
+   h_kineE_thetalab_peak3->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c, sum_theta_peak3)", (int)del_phi));
+   h_kineE_thetalab_peak3->Draw("colz");
+   kine_12c12c_ela_60_7->Draw("same");
+
 #endif
 
    /*
@@ -936,21 +1020,22 @@ void check_vd_76matm(){
    // cout of information
    std::cout << "                                                                " << std::endl;
    std::cout << "Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
+   std::cout << std::endl;
 #ifdef eve_check
    std::cout << "peak1 events: " << peak1.size() << std::endl;
-   std::cout << "  Event of peak1: " << std::flush;
+   std::cout << "  Event of peak1 " << std::endl;
    for (auto &eventIndex: peak1){
       std::cout << eventIndex << ", " << std::flush;
    }
-   std::cout << std::endl;
+   std::cout << std::endl << std::endl;
    std::cout << "peak2 events: " << peak2.size() << std::endl;
-   std::cout << "  Event of peak2: " << std::flush;
+   std::cout << "  Event of peak2: " << std::endl;
    for (auto &eventIndex: peak2){
       std::cout << eventIndex << ", " << std::flush;
    }
-   std::cout << std::endl;
+   std::cout << std::endl << std::endl;
    std::cout << "peak3 events: " << peak3.size() << std::endl;
-   std::cout << "  Event of peak3: " << std::flush;
+   std::cout << "  Event of peak3: " << std::endl;
    for (auto &eventIndex: peak3){
       std::cout << eventIndex << ", " << std::flush;
    }

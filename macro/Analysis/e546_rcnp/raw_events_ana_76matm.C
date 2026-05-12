@@ -39,6 +39,7 @@ void raw_events_ana_76matm(){
   TH1D *histADC = new TH1D("histADC", "histADC", 10000, -5000, 5000);
   TH1F *histRawADC = new TH1F("histRawADC", "histRawADC", 65536, 0, 65536);
   TH1F *histADCvTB = new TH1F("histADCvTB", "histADCvTB", 512, 0, 512);
+  TH1F *h_ADC_TB_dif = new TH1F("histADCvTB_dif", "histADCvTB_dif", 512, 0, 512);
 
   TH2F *histADCvTB2 = new TH2F("histADCvTB2", "histADCvTB2", 512, 0, 512, 10000, -5000, 5000);
   TH2F *histRawADCvTB2 = new TH2F("histRawADCvTB2", "histRawADCvTB2", 512, 0, 512, 65536, 0, 65536);
@@ -149,7 +150,8 @@ void raw_events_ana_76matm(){
 
     // Open the file with the AtRawEvents.
     //      TString unpackFileName = TString::Format("./decode_data/run_%04d_RawEvents.root", runNum);
-    TString unpackFileName = TString::Format("./decode_data/run_%04d.root", runNum);
+    //    TString unpackFileName = TString::Format("./decode_data/run_%04d.root", runNum);
+    TString unpackFileName = TString::Format("./vd_check_data/for_raw_eve_ana/run_%04d.root", runNum);
     TFile *unpackFile = new TFile(unpackFileName, "READ");
     TTree *unpackTree = (TTree *)unpackFile->Get("cbmsim");
     int nUnpackEvents = unpackTree->GetEntries();
@@ -203,19 +205,37 @@ void raw_events_ana_76matm(){
     // Close files.
     unpackFile->Close();
   }
+
+  // dif calculation
+  for(Int_t i = 1; i < histADCvTB -> GetNbinsX(); i++){
+    Double_t x1 = histADCvTB ->GetBinCenter(i);
+    Double_t x2 = histADCvTB ->GetBinCenter(i+1);
+    Double_t y1 = histADCvTB ->GetBinContent(i);
+    Double_t y2 = histADCvTB ->GetBinContent(i+1);
+    Double_t dlnydx = (log(y2) - log(y1))/(x2 - x1);
+    
+    h_ADC_TB_dif -> SetBinContent(i, dlnydx);
+    h_ADC_TB_dif -> SetBinError(i, 0.0);
+  }
+
   cout<<"Finished getting data of run "<<runstart<<"--"<<runstop<<".                              "<<endl;
 
-  TCanvas *c = new TCanvas();
+  TCanvas *c1 = new TCanvas("c1","c1");
   histADCvTB->Draw();
   histADCvTB->GetXaxis()->SetTitle("TB");
   histADCvTB->GetYaxis()->SetTitle("#Sigma ADC");
 
-  TCanvas *c2 = new TCanvas();
+  TCanvas *c2 = new TCanvas("c2","c2");
+  h_ADC_TB_dif->Draw();
+  h_ADC_TB_dif->GetXaxis()->SetTitle("TB");
+  h_ADC_TB_dif->GetYaxis()->SetTitle("d#Sigma ADC/dTB");
+
+  TCanvas *c3 = new TCanvas("c3","c3");
   histADCvTB2->Draw("zcol");
   histADCvTB2->GetXaxis()->SetTitle("TB");
   histADCvTB2->GetYaxis()->SetTitle("ADC");
 
-  TCanvas *c3 = new TCanvas();
+  TCanvas *c4 = new TCanvas("c4","c4");
   histADC->Draw();
   histADC->GetXaxis()->SetTitle("ADC");
 
