@@ -25,6 +25,7 @@ void unpack_rcnp_76matm(int run_num = 52){
   //  TString outputpath = "./vd_check_data/";
   //  TString outputpath = "./vd_check_data/for_raw_eve_ana/";
   TString outputpath = "./vd_check_data/vd4.05_files/";
+  //  TString outputpath = "./vd_check_data/vd4.07_files/";
 
   TString inputFile = filepath + fileName + fileExt;
   TString scriptfile = "rcnp_map_size.xml";
@@ -129,6 +130,7 @@ void unpack_rcnp_76matm(int run_num = 52){
   std::vector<std::unique_ptr<AtPatternModification>> patternModifications;
   auto braggCurveFinder = std::make_unique<AtBraggCurveFinder>();
   braggCurveFinder->SetBinSize(3.0);
+  braggCurveFinder->SetNumTracksPerVtx(2); //findvertex parameter, 1: find vertex single line, rather than 1: find vertex multiple lines
   braggCurveFinder->SetNumSmoothingSteps(200);
   patternModifications.push_back(std::move(braggCurveFinder));
   AtPatternModificationTask *patternModTask = new AtPatternModificationTask(std::move(patternModifications));
@@ -169,8 +171,8 @@ void unpack_rcnp_76matm(int run_num = 52){
   run->AddTask(psaTask);
   run->AddTask(SCTask);
   run->AddTask(ransacTask);
-  //  run->AddTask(patternModTask);
-  run->AddTask(fitterTask);
+  run->AddTask(patternModTask);
+  //  run->AddTask(fitterTask);
 
   std::cout << "***** Starting Init ******" << std::endl;
   run->Init();

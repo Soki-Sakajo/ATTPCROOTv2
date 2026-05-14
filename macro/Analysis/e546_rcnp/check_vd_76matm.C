@@ -34,8 +34,8 @@ void check_vd_76matm(){
    //   double vd_val = 3.50;
    //   double vd_val = 3.89;
    //   double vd_val = 4.00;
-   double vd_val = 4.05;
-   //   double vd_val = 4.07;
+   //   double vd_val = 4.05;
+   double vd_val = 4.07;
    //   double vd_val = 4.08;
    //   double vd_val = 4.10;
    //   double vd_val = 4.20;
@@ -44,14 +44,14 @@ void check_vd_76matm(){
    // files.
    //   std::vector runNums = {52};
    //   std::vector runNums = {50,51,52,53,54,55,56,57,58};
-
+   /*
    std::vector runNums = {
       28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47,50,
       51,52,53,54,55,56,57,58,62,63,64,66,67,68,69,70,71,75,76,77,
       78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,95,96,97,98,99,
       100,101,102,103,104,105,106,107,108,109,110,111,112
    };
-
+   */
    Int_t run_start = runNums.front();
    Int_t run_end = runNums.back();
    TFile * Results = new TFile(Form("data/check_vd_results_run%d-run%d.root", run_start, run_end),"recreate");
