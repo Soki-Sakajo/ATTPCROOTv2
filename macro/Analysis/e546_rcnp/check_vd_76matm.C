@@ -34,15 +34,15 @@ void check_vd_76matm(){
    //   double vd_val = 3.50;
    //   double vd_val = 3.89;
    //   double vd_val = 4.00;
-   //   double vd_val = 4.05;
-   double vd_val = 4.07;
+   double vd_val = 4.05;
+   //   double vd_val = 4.07;
    //   double vd_val = 4.08;
    //   double vd_val = 4.10;
    //   double vd_val = 4.20;
    //   double vd_val = 4.50;
 
    // files.
-   //   std::vector runNums = {52};
+   std::vector runNums = {52};
    //   std::vector runNums = {50,51,52,53,54,55,56,57,58};
    /*
    std::vector runNums = {
@@ -140,7 +140,6 @@ void check_vd_76matm(){
    */
 
    // Characteristic definitions
-   bool check_tracks = false;
    bool alpha_tracks = false;
    bool proton_tracks = false;
    Int_t narray = 10;
@@ -148,6 +147,11 @@ void check_vd_76matm(){
    Int_t itrack = 0;
    Int_t nalpha = 0;
    Int_t nproton = 0;
+   Int_t nbragg = 0;
+   Int_t nbrain = 0;
+   Int_t nbrano = 0;
+   Int_t n_bragg_true = 0;
+   Int_t n_bragg_false = 0;
    Double_t rad = -100;
    Double_t r_tem = 0;
    Double_t r_max = 0;
@@ -156,6 +160,9 @@ void check_vd_76matm(){
    Double_t track_lastx = 0;
    Double_t track_lasty = 0;
    Double_t track_lastz = 0;
+   Double_t vtx = 0;
+   Double_t vty = 0;
+   Double_t vtz = 0;
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
@@ -163,6 +170,9 @@ void check_vd_76matm(){
    Double_t track_r[narray];
    Double_t track_dedx[narray];
    Double_t track_KinE[narray];
+   Double_t vertx[narray];
+   Double_t verty[narray];
+   Double_t vertz[narray];
    std::vector<Int_t> track6(0);
    std::vector<Int_t> peak1(0);
    std::vector<Int_t> peak2(0);
@@ -268,7 +278,8 @@ void check_vd_76matm(){
       int nEventsWith2Tracks = 0;
       // Creare the TTreeReader to read the AtTrackingEvents and simulation.
       TTreeReader unpackReader("cbmsim", unpackFile);
-      TTreeReaderValue<TClonesArray> patternArray(unpackReader, "AtPatternEvent");
+      //      TTreeReaderValue<TClonesArray> patternArray(unpackReader, "AtPatternEvent");
+      TTreeReaderValue<TClonesArray> patternArray(unpackReader, "AtPatternEventModified");
 
       // Loop over events.
       for (int i = 0; i < nUnpackEvents; i++) {
@@ -281,18 +292,27 @@ void check_vd_76matm(){
          auto &tracks = patternEvent->GetTrackCand();
          ntrack = tracks.size();
          h_ntra->Fill(ntrack);
+         std::vector<bool> track_braggd(ntrack, false);
          std::vector<bool> track_12c(ntrack, false);
          std::vector<bool> track_alpha(ntrack, false);
          std::vector<bool> track_proton(ntrack, false);
-         check_tracks = false;
          alpha_tracks = false;
          proton_tracks = false;
          rad = 0;
          r_max = 0;
          r_tem = 0;
          itrack = 0;
+         nbragg = 0;
+         nbrain = 0;
+         nbrano = 0;
+         vtx = 0;
+         vty = 0;
+         vtz = 0;
+         n_bragg_true = 0;
+         n_bragg_false = 0;
          nalpha = 0;
          nproton = 0;
+
          if (ntrack == 6){
             track6.push_back(i);
          }
@@ -316,6 +336,11 @@ void check_vd_76matm(){
             auto pseudoVertex = pattern->ClosestPointOnPattern(firstPoint);
             auto braggCurvePairs = track.GetBraggCurveValues();
             auto &hits = track.GetHitArray();
+            auto braggCurve = track.GetBraggCurve();
+            if(braggCurve.RangeValues.size() > 0){
+               track_braggd[itrack] = true;
+               //               std::cout << "test! run:" << runNum << ", event:"<< i << ", track:" << itrack << ", check_bragg == true !!"<< std::endl;
+            }
 
             track_range[itrack] = pattern->DistanceAlongPattern(lastPoint, firstPoint);
             track_charge[itrack] = track.GetGeoQEnergy();
@@ -327,6 +352,40 @@ void check_vd_76matm(){
             track_lasty = lastPoint.Y();
             track_lastz = lastPoint.Z();
             rad = TMath::Sqrt(track_lastx * track_lastx + track_lasty * track_lasty);
+
+            if(track_braggd[itrack]){
+               vertx[itrack] = braggCurve.vertexX;
+               verty[itrack] = braggCurve.vertexY;
+               vertz[itrack] = braggCurve.vertexZ;
+               if(abs(vertx[itrack]) < 1e-6 && abs(verty[itrack]) < 1e-6 && abs(vertz[itrack] + 999 ) < 1e-6 ){
+                  nbrain ++;
+                  std::cout << "Something wrong with vertex! run:" << runNum << ", event;" << i << ", itracks:" << itrack 
+                        << ", vetex: (" << vertx[itrack] << ", " << verty[itrack] << ", " << vertz[itrack] << ")"  << std::endl;
+               }
+               if(abs(vtx) < 1e-6 && abs(vty) < 1e-6 && abs(vtz) < 1e-6){
+                  nbragg ++;
+                  vtx = vertx[itrack];
+                  vty = verty[itrack];
+                  vtz = vertz[itrack];
+               }
+               else if (abs(vertx[itrack] - vtx) < 1e-6 && abs(verty[itrack] - vty) < 1e-6 && abs(vertz[itrack] - vtz) < 1e-6){
+                  nbragg ++;
+               }
+               else {
+                  std::cout << std::endl;
+                  std::cout << "Multiple vertices in one run! run:" << runNum << ", event;" << i << ", track:" << itrack << std::endl;
+               }
+               /*
+               if(ntrack > 3){
+                  std::cout << "test! run:" << runNum << ", event:"<< i << ", track:" << itrack 
+                  << ", vertex: (" << vertx[itrack] <<",  " << verty[itrack] << ", " << vertz[itrack] << " )"<< std::endl;
+               }
+               */
+            }
+            else {
+               nbrano ++;
+               //               std::cout << "test! check_bragg == false !!"<< std::endl;
+            }
 
             for (auto &hit: hits) {
                auto pos = hit->GetPosition();
@@ -446,6 +505,34 @@ void check_vd_76matm(){
             */
             itrack ++;
          }
+
+         // check bragg curve
+         n_bragg_true = std::count(track_braggd.begin(), track_braggd.end(), true);
+         n_bragg_false = std::count(track_braggd.begin(), track_braggd.end(), false);
+
+         if(ntrack != nbragg + nbrain + nbrano){
+            std::cout << "Something wrong with vertex! run:" << runNum << ", event;" << i << ", ntracks:" << ntrack 
+                     << ", nbragg:" << nbragg << ", nbrain:" << nbrain << ", nbrano:" << nbrano << std::endl;
+         }
+         if(nbragg != n_bragg_true){
+            std::cout << "Something wrong with vertex! run:" << runNum << ", event;" << i << ", ntracks:" << ntrack 
+                     << ", nbragg:" << nbragg << ", nbrain:" << nbrain << ", nbrano:" << nbrano << std::endl;
+         }
+
+         if(ntrack == n_bragg_true){
+            // all true
+         }
+         else if(ntrack == n_bragg_false){
+            // all false
+         }
+         else{
+            // mixed
+            /*
+            std::cout << "bragg check run:" << runNum << ", event;" << i 
+               << ", ntracks:" << ntrack << ", nbragg:" << nbragg << ", nbrain:" << nbrain << ", nbrano:" << nbrano << std::endl;
+            */
+         }
+
          h_rmax->Fill(r_max);
          if(r_tri > r_max && r_max > 0){
             r_tri = r_max;
@@ -578,6 +665,10 @@ void check_vd_76matm(){
    }
 
    // Draw histograms in TCanvas.
+   //  Reset canvas c1
+   if (gROOT->FindObject("c1")){
+      delete gROOT->FindObject("c1");
+   }
    //  set color
    kine_12c12c_exex_60_7 -> SetLineColor(kRed);
    angle_12c12c_exex_60_7 -> SetLineColor(kRed);
