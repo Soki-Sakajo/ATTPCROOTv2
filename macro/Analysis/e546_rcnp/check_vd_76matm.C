@@ -155,6 +155,7 @@ void check_vd_76matm(){
    bool alpha_tracks = false;
    bool proton_tracks = false;
    const Int_t n_h_z = n_group +1;
+   Int_t nevents = 0;
    Int_t narray = 10;
    Int_t ntrack = 0;
    Int_t itrack = 0;
@@ -330,11 +331,11 @@ void check_vd_76matm(){
          h_verxy_exex_index[i] 
             = new TH2F("h_verxy_exex_index_other", "h_verxy_exex_z_others;Vertex X [mm];Vertex Y [mm]", 50, -50, 50, 50, -50, 50);
          h_kineE_thetalab_gsgs_index[i] 
-            = new TH2F("h_kineE_thetalab_gsgs_index_other","h_kineE_gsgs_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 600, 0, 60);
+            = new TH2F("h_kineE_thetalab_gsgs_index_other","h_kineE_gsgs_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 600, 0, 60);
          h_kineE_thetalab_gsex_index[i] 
-            = new TH2F("h_kineE_thetalab_gsex_index_other","h_kineE_gsex_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 600, 0, 60);
+            = new TH2F("h_kineE_thetalab_gsex_index_other","h_kineE_gsex_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 600, 0, 60);
          h_kineE_thetalab_exex_index[i] 
-            = new TH2F("h_kineE_thetalab_exex_index_other","h_kineE_exex_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 600, 0, 60);
+            = new TH2F("h_kineE_thetalab_exex_index_other","h_kineE_exex_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 600, 0, 60);
          h_thetalab_thetalab_gsgs_index[i]
             = new TH2F("h_thetalab_thetalab_gsgs_index_other","h_thetalab_thetalab_gsgs_z_others;#theta_{LAB} [deg];#theta_{LAB} [deg]", 200, 0, 100, 200, 0, 100);
          h_thetalab_thetalab_gsex_index[i]
@@ -363,13 +364,13 @@ void check_vd_76matm(){
                Form("h_verxy_exex_z_%d--%d;Vertex X [mm];Vertex Y [mm]", i*100, (i+1)*100), 50, -50, 50, 50, -50, 50);
          h_kineE_thetalab_gsgs_index[i] 
             = new TH2F(Form("h_kineE_thetalab_gsgs_index_%d", i),
-               Form("h_kineE_thetalab_gsgs_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 180, 0, 180, 600, 0, 60);
+               Form("h_kineE_thetalab_gsgs_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 100, 0, 100, 600, 0, 60);
          h_kineE_thetalab_gsex_index[i] 
             = new TH2F(Form("h_kineE_thetalab_gsex_index_%d", i),
-               Form("h_kineE_thetalab_gsex_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 180, 0, 180, 600, 0, 60);
+               Form("h_kineE_thetalab_gsex_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 100, 0, 100, 600, 0, 60);
          h_kineE_thetalab_exex_index[i] 
             = new TH2F(Form("h_kineE_thetalab_exex_index_%d", i),
-               Form("h_kineE_thetalab_exex_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 180, 0, 180, 600, 0, 60);
+               Form("h_kineE_thetalab_exex_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 100, 0, 100, 600, 0, 60);
          h_thetalab_thetalab_gsgs_index[i]
             = new TH2F(Form("h_thetalab_thetalab_gsgs_index_%d", i),
                Form("h_thetalab_thetalab_gsgs_z_%d--%d;#theta_{LAB} [deg];#theta_{LAB} [deg]", i*100, (i+1)*100), 200, 0, 100, 200, 0, 100);
@@ -843,6 +844,7 @@ void check_vd_76matm(){
          if(i%500==0){
             std::cout << "  Filling data: " << 100*i/nUnpackEvents << " %!    \r" << std::flush;
          }
+         nevents ++;
       }
       //      std::cout << "  Filled data: 100 %!, " << nUnpackEvents << " events" << std::endl;
       //      std::cout << "Number of 2 tracks events in run" << runNum << ":" << nEventsWith2Tracks << std::endl;
@@ -1098,7 +1100,7 @@ void check_vd_76matm(){
    h_ntra_verz->SetDirectory(0);
    h_ntra_verz->GetXaxis()->SetTitle("vertex z [mm]");
    h_ntra_verz->GetYaxis()->SetTitle("number of tracks");
-   h_ntra_verz->SetTitle(Form("vertex z"));
+   h_ntra_verz->SetTitle(Form("vertex z vs number of tracks"));
    gPad->SetLogz();
    h_ntra_verz->Draw("colz");
    c27->cd(3);
@@ -1139,6 +1141,7 @@ void check_vd_76matm(){
    h_verz_cut12c_ela->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_cut12c_ela->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
    h_verz_cut12c_ela->Draw();
+   c27->SaveAs("can_output/check_vd_76matm_c27_vertex.pdf");
 
 #endif
 
@@ -1299,6 +1302,7 @@ void check_vd_76matm(){
    h_verz_exex->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_exex->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c, exex)", (int)del_phi));
    h_verz_exex->Draw();
+   c81->SaveAs("can_output/check_vd_76matm_c81_vertex_states.pdf");
 
 #endif
 
@@ -1333,6 +1337,7 @@ void check_vd_76matm(){
    h_ntraver_ntra_cut12c_ela->SetTitle(Form("tracks with vertex (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
    gPad->SetLogz();
    h_ntraver_ntra_cut12c_ela->Draw("colz");
+   c90->SaveAs("can_output/check_vd_76matm_c90_vertex_tracks.pdf");
 
    draw_ind("c91", "gsgs", n_group, n_h_z, h_verz_gsgs, h_verxy_gsgs, h_kineE_thetalab_gsgs, h_thetalab_thetalab_cut12c_ela,
       h_verz_gsgs_index, h_verxy_gsgs_index, h_kineE_thetalab_gsgs_index, h_thetalab_thetalab_gsgs_index,
@@ -1552,6 +1557,7 @@ void check_vd_76matm(){
 
    // cout of information
    std::cout << "                                                                " << std::endl;
+   std::cout << "number of all events: " << nevents << std::endl;
    //   std::cout << "Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
 #ifdef peak_check
    std::cout << "peak1 events: " << peak1.size() << std::endl;
@@ -1581,13 +1587,13 @@ void check_vd_76matm(){
    }
    for (Int_t i = 0; i < track2_ver0.at(1).size(); i++){
       if (i == 0){
-         std::cout << "  runNum: " << track2_ver0[0].at(i)<< std::endl;
-         std::cout << "    events: " << track2_ver0.at(1).at(i) << std::flush;
+         std::cout << "  runNum: " << track2_ver0[0].at(i)<< std::flush;
+         std::cout << "; events: " << track2_ver0.at(1).at(i) << std::flush;
       }
       else if(track2_ver0.at(0).at(i) != track2_ver0.at(0).at(i - 1)){
          std::cout << std::endl;
-         std::cout << "  runNum: " << track2_ver0[0].at(i)<< std::endl;
-         std::cout << "    events: " << track2_ver0.at(1).at(i) << std::flush;
+         std::cout << "  runNum: " << track2_ver0[0].at(i)<< std::flush;
+         std::cout << "; events: " << track2_ver0.at(1).at(i) << std::flush;
       }
       else{
          std::cout << ", " << track2_ver0.at(1).at(i) << std::flush;
@@ -1762,4 +1768,6 @@ void draw_ind(TString cname, TString states, Int_t n_group, Int_t n_h_z,
       kine_exex->Draw("same");
 
    }
+   c->SaveAs(Form("can_output/check_vd_76matm_%s_vertex_%s.pdf", cname.Data(), states.Data()));
+
 }
