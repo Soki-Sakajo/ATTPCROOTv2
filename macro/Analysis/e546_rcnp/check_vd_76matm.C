@@ -192,6 +192,7 @@ void check_vd_76matm(){
    std::vector<Int_t> peak1(0);
    std::vector<Int_t> peak2(0);
    std::vector<Int_t> peak3(0);
+   std::vector<std::vector<Int_t>> track2_ver0(2, std::vector<Int_t>(0));
 
    // Histogram definitions.
    // ... TH1 hist for checking something.
@@ -259,13 +260,16 @@ void check_vd_76matm(){
    TH2F *h_philab_philab_cutphi_proton = new TH2F("h_philab_philab_cutphi_proton", "h_philab_philab_cutphi_proton", 360, -180, 180, 360, -180, 180);
 
    // ... vertex of tracks
-   TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 112, -10, 1010);
+   TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 1020, -10, 1010);
    TH1D *h_verz_cut12c_ela = new TH1D("h_verz_cut12c_ela", "h_verz_cut12c_ela;Vertex Z [mm]", 112, -10, 1010);
    TH1D *h_verz_gsgs = new TH1D("h_verz_gsgs", "h_verz_gsgs;Vertex Z [mm]", 112, -10, 1010);
    TH1D *h_verz_gsex = new TH1D("h_verz_gsex", "h_verz_gsex;Vertex Z [mm]", 112, -10, 1010);
    TH1D *h_verz_exex = new TH1D("h_verz_exex", "h_verz_exex;Vertex Z [mm]", 112, -10, 1010);
 
    TH2F *h_ntraver_ntra = new TH2F("h_ntraver_ntra", "h_ntraver_ntra", 11, -0.5, 10.5, 11, -0.5, 10.5);
+   TH2F *h_ntraver_ntra_cutphi = new TH2F("h_ntraver_ntra_cutphi", "h_ntraver_ntra_cutphi", 11, -0.5, 10.5, 11, -0.5, 10.5);
+   TH2F *h_ntraver_ntra_cutphi_2tra = new TH2F("h_ntraver_ntra_cutphi_2tra", "h_ntraver_ntra_cutphi_2tra", 11, -0.5, 10.5, 11, -0.5, 10.5);
+   TH2F *h_ntraver_ntra_cut12c_ela = new TH2F("h_ntraver_ntra_cut12c_ela", "h_ntraver_ntra_cut12c_ela", 11, -0.5, 10.5, 11, -0.5, 10.5);
    TH2F *h_ntra_verz = new TH2F("h_ntra_verz", "h_ntra_verz", 112, -10, 1010, 11, -0.5, 10.5);
    TH2F *h_verxy = new TH2F("h_verxy", "h_verxy", 50, -50, 50,  50, -50, 50);
    TH2F *h_verxz = new TH2F("h_verxz", "h_verxz", 112, -10, 1010, 50, -50, 50);
@@ -721,12 +725,14 @@ void check_vd_76matm(){
             h_range_thetalab_cutphi -> Fill(track_theta[1], track_range[1]);
             h_thetalab_thetalab_cutphi -> Fill(track_theta[0], track_theta[1]);
             h_philab_philab_cutphi -> Fill(track_phi[0], track_phi[1]);
+            h_ntraver_ntra_cutphi -> Fill(ntrack, n_bragg_true);
             if (ntrack == 2){
                h_charge_range_cutphi_2tra -> Fill(track_range[0], track_charge[0]);
                h_charge_range_cutphi_2tra -> Fill(track_range[1], track_charge[1]);
                h_range_thetalab_cutphi_2tra -> Fill(track_theta[0], track_range[0]);
                h_range_thetalab_cutphi_2tra -> Fill(track_theta[1], track_range[1]);
                h_thetalab_thetalab_cutphi_2tra -> Fill(track_theta[0], track_theta[1]);
+               h_ntraver_ntra_cutphi_2tra -> Fill(ntrack, n_bragg_true);
                if (track_12c[0] && track_12c[1]){
                   Double_t sum_theta = track_theta[0] + track_theta[1];
                   h_charge_range_cut12c_ela -> Fill(track_range[0], track_charge[0]);
@@ -737,12 +743,15 @@ void check_vd_76matm(){
                   h_kineE_thetalab_carbon -> Fill(track_theta[1], track_KinE[1]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
                   h_sum_theta_cut12c_ela -> Fill(sum_theta);
+                  h_ntraver_ntra_cut12c_ela -> Fill(ntrack, n_bragg_true);
                   if(tracks_vertex){
                      h_verxy_cut12c_ela -> Fill(vtx, vty);
                      h_verz_cut12c_ela -> Fill(vtz);
                   }
                   else {
                      std::cout << "  No vertex event:" << i << " (12c12c elastic)" << std::endl;
+                     track2_ver0[0].push_back(runNum);
+                     track2_ver0[1].push_back(i);
                      n_no_vertex ++;
                   }
                   if (runNum == 52){
@@ -1134,21 +1143,58 @@ void check_vd_76matm(){
 #endif
 
 #ifdef peak_check
-   TCanvas *c80 = new TCanvas("c80", "c80");
-   c80->Divide(2,1);
-   c80->cd(1);
+   TCanvas *c70 = new TCanvas("c70", "c70");
+   c70->Divide(2,1);
+   c70->cd(1);
    h_sum_theta->SetDirectory(0);
    h_sum_theta->GetXaxis()->SetTitle("Sum of tracks [deg]");
    h_sum_theta->SetTitle(Form("Sum Theta_LAB (track == 2, 12c12c, run 52)"));
    h_sum_theta->Draw();
-   c80->cd(2);
+   c70->cd(2);
    h_sum_theta_cut12c_run52->SetDirectory(0);
    h_sum_theta_cut12c_run52->GetXaxis()->SetTitle("Sum of tracks [deg]");
    h_sum_theta_cut12c_run52->SetTitle(Form("Sum Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c, run 52)", (int)del_phi));
    h_sum_theta_cut12c_run52->Draw();
 
-   TCanvas *c81 = new TCanvas("c81", "c81", 1200,600);
-   c81->Divide(3,1);
+   TCanvas *c71 = new TCanvas("c71", "c71", 1200,600);
+   c71->Divide(3,1);
+   c71->cd(1);
+   h_sum_theta_cut12c_ela->SetDirectory(0);
+   h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
+   h_sum_theta_cut12c_ela->Draw();
+   c71->cd(2);
+   h_sum_theta_gsgs->SetDirectory(0);
+   h_sum_theta_gsgs->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c gsgs");
+   h_sum_theta_gsgs->Draw();
+   c71->cd(3);
+   h_sum_theta_gsex->SetDirectory(0);
+   h_sum_theta_gsex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (gsex)");
+   h_sum_theta_gsex->Draw();
+   c71->cd(4);
+   h_sum_theta_exex->SetDirectory(0);
+   h_sum_theta_exex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (exex)");
+   h_sum_theta_exex->Draw();
+
+#endif
+
+#ifdef c12_check
+   TCanvas *c80 = new TCanvas("c80", "c80",1200,1000);
+   h_thetalab_thetalab_cut12c_ela->SetDirectory(0);
+   h_thetalab_thetalab_cut12c_ela->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_cut12c_ela->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
+   gPad->SetLogz();
+   h_thetalab_thetalab_cut12c_ela->SetMinimum(1);
+   h_thetalab_thetalab_cut12c_ela->Draw("colz");
+   xy90->Draw("same");
+   angle_12c12c_gsex_60_7->Draw("same");
+   angle_12c12c_exex_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   theta_gsex->Draw("same");
+   theta_exex->Draw("same");
+
+   TCanvas *c81 = new TCanvas("c81", "c81", 1200, 1000);
+   c81->Divide(4,4);
    c81->cd(1);
    h_sum_theta_cut12c_ela->SetDirectory(0);
    h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
@@ -1165,44 +1211,7 @@ void check_vd_76matm(){
    h_sum_theta_exex->SetDirectory(0);
    h_sum_theta_exex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (exex)");
    h_sum_theta_exex->Draw();
-
-#endif
-
-#ifdef c12_check
-   TCanvas *c90 = new TCanvas("c90", "c90",1200,1000);
-   h_thetalab_thetalab_cut12c_ela->SetDirectory(0);
-   h_thetalab_thetalab_cut12c_ela->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
-   h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-   h_thetalab_thetalab_cut12c_ela->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
-   gPad->SetLogz();
-   h_thetalab_thetalab_cut12c_ela->SetMinimum(1);
-   h_thetalab_thetalab_cut12c_ela->Draw("colz");
-   xy90->Draw("same");
-   angle_12c12c_gsex_60_7->Draw("same");
-   angle_12c12c_exex_60_7->Draw("same");
-   theta_gsgs->Draw("same");
-   theta_gsex->Draw("same");
-   theta_exex->Draw("same");
-
-   TCanvas *c91 = new TCanvas("c91", "c91", 1200, 1000);
-   c91->Divide(4,4);
-   c91->cd(1);
-   h_sum_theta_cut12c_ela->SetDirectory(0);
-   h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
-   h_sum_theta_cut12c_ela->Draw();
-   c91->cd(2);
-   h_sum_theta_gsgs->SetDirectory(0);
-   h_sum_theta_gsgs->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c gsgs");
-   h_sum_theta_gsgs->Draw();
-   c91->cd(3);
-   h_sum_theta_gsex->SetDirectory(0);
-   h_sum_theta_gsex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (gsex)");
-   h_sum_theta_gsex->Draw();
-   c91->cd(4);
-   h_sum_theta_exex->SetDirectory(0);
-   h_sum_theta_exex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (exex)");
-   h_sum_theta_exex->Draw();
-   c91->cd(5);
+   c81->cd(5);
    h_kineE_thetalab_carbon->SetDirectory(0);
    h_kineE_thetalab_carbon->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1213,7 +1222,7 @@ void check_vd_76matm(){
    kine_12c12c_gsgs_60_7->Draw("same");
    kine_12c12c_gsex_60_7->Draw("same");
    kine_12c12c_exex_60_7->Draw("same");
-   c91->cd(6);
+   c81->cd(6);
    h_kineE_thetalab_gsgs->SetDirectory(0);
    h_kineE_thetalab_gsgs->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_gsgs->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1224,7 +1233,7 @@ void check_vd_76matm(){
    kine_12c12c_gsgs_60_7->Draw("same");
    kine_12c12c_gsex_60_7->Draw("same");
    kine_12c12c_exex_60_7->Draw("same");
-   c91->cd(7);
+   c81->cd(7);
    h_kineE_thetalab_gsex->SetDirectory(0);
    h_kineE_thetalab_gsex->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_gsex->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1235,7 +1244,7 @@ void check_vd_76matm(){
    kine_12c12c_gsgs_60_7->Draw("same");
    kine_12c12c_gsex_60_7->Draw("same");
    kine_12c12c_exex_60_7->Draw("same");
-   c91->cd(8);
+   c81->cd(8);
    h_kineE_thetalab_exex->SetDirectory(0);
    h_kineE_thetalab_exex->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_exex->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1246,46 +1255,46 @@ void check_vd_76matm(){
    kine_12c12c_gsgs_60_7->Draw("same");
    kine_12c12c_gsex_60_7->Draw("same");
    kine_12c12c_exex_60_7->Draw("same");
-   c91->cd(9);
+   c81->cd(9);
    h_verxy_cut12c_ela->SetDirectory(0);
    h_verxy_cut12c_ela->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_cut12c_ela->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_cut12c_ela->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
    h_verxy_cut12c_ela->Draw("colz");
-   c91->cd(10);
+   c81->cd(10);
    h_verxy_gsgs->SetDirectory(0);
    h_verxy_gsgs->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_gsgs->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_gsgs->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c, gsgs)", (int)del_phi));
    h_verxy_gsgs->Draw("colz");
-   c91->cd(11);
+   c81->cd(11);
    h_verxy_gsex->SetDirectory(0);
    h_verxy_gsex->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_gsex->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_gsex->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c, gsex)", (int)del_phi));
    h_verxy_gsex->Draw("colz");
-   c91->cd(12);
+   c81->cd(12);
    h_verxy_exex->SetDirectory(0);
    h_verxy_exex->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_exex->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_exex->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c, exex)", (int)del_phi));
    h_verxy_exex->Draw("colz");
-   c91->cd(13);
+   c81->cd(13);
    h_verz_cut12c_ela->SetDirectory(0);
    h_verz_cut12c_ela->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_cut12c_ela->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
    h_verz_cut12c_ela->Draw();
-   c91->cd(14);
+   c81->cd(14);
    h_verz_gsgs->SetDirectory(0);
    h_verz_gsgs->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c, gsgs)", (int)del_phi));
    h_verz_gsgs->Draw();
-   c91->cd(15);
+   c81->cd(15);
    h_verz_gsex->SetDirectory(0);
    h_verz_gsex->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsex->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c, gsex)", (int)del_phi));
    h_verz_gsex->Draw();
-   c91->cd(16);
+   c81->cd(16);
    h_verz_exex->SetDirectory(0);
    h_verz_exex->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_exex->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c, exex)", (int)del_phi));
@@ -1294,17 +1303,48 @@ void check_vd_76matm(){
 #endif
 
 #ifdef states_vertex
-   draw_ind("c92", "gsgs", n_group, n_h_z, h_verz_gsgs, h_verxy_gsgs, h_kineE_thetalab_gsgs, h_thetalab_thetalab_cut12c_ela,
+   TCanvas *c90 = new TCanvas("c90", "c90", 600, 600);
+   c90->Divide(2,2);
+   c90->cd(1);
+   h_ntraver_ntra->SetDirectory(0);
+   h_ntraver_ntra->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra->SetTitle(Form("tracks with vertex"));
+   gPad->SetLogz();
+   h_ntraver_ntra->Draw("colz");
+   c90->cd(2);
+   h_ntraver_ntra_cutphi->SetDirectory(0);
+   h_ntraver_ntra_cutphi->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra_cutphi->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra_cutphi->SetTitle(Form("tracks with vertex (phi1-phi2-180 < %d)", (int)del_phi));
+   gPad->SetLogz();
+   h_ntraver_ntra_cutphi->Draw("colz");
+   c90->cd(3);
+   h_ntraver_ntra_cutphi_2tra->SetDirectory(0);
+   h_ntraver_ntra_cutphi_2tra->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra_cutphi_2tra->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra_cutphi_2tra->SetTitle(Form("tracks with vertex (phi1-phi2-180 < %d, track == 2)", (int)del_phi));
+   gPad->SetLogz();
+   h_ntraver_ntra_cutphi_2tra->Draw("colz");
+   c90->cd(4);
+   h_ntraver_ntra_cut12c_ela->SetDirectory(0);
+   h_ntraver_ntra_cut12c_ela->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra_cut12c_ela->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra_cut12c_ela->SetTitle(Form("tracks with vertex (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
+   gPad->SetLogz();
+   h_ntraver_ntra_cut12c_ela->Draw("colz");
+
+   draw_ind("c91", "gsgs", n_group, n_h_z, h_verz_gsgs, h_verxy_gsgs, h_kineE_thetalab_gsgs, h_thetalab_thetalab_cut12c_ela,
       h_verz_gsgs_index, h_verxy_gsgs_index, h_kineE_thetalab_gsgs_index, h_thetalab_thetalab_gsgs_index,
       kine_12c12c_gsgs_60_7, kine_12c12c_gsex_60_7, kine_12c12c_exex_60_7, xy90, angle_12c12c_gsex_60_7, angle_12c12c_exex_60_7
    );
 
-   draw_ind("c93", "gsex", n_group, n_h_z, h_verz_gsex, h_verxy_gsex, h_kineE_thetalab_gsex, h_thetalab_thetalab_cut12c_ela,
+   draw_ind("c92", "gsex", n_group, n_h_z, h_verz_gsex, h_verxy_gsex, h_kineE_thetalab_gsex, h_thetalab_thetalab_cut12c_ela,
       h_verz_gsex_index, h_verxy_gsex_index, h_kineE_thetalab_gsex_index, h_thetalab_thetalab_gsex_index,
       kine_12c12c_gsgs_60_7, kine_12c12c_gsex_60_7, kine_12c12c_exex_60_7, xy90, angle_12c12c_gsex_60_7, angle_12c12c_exex_60_7
    );
 
-   draw_ind("c94", "exex", n_group, n_h_z, h_verz_exex, h_verxy_exex, h_kineE_thetalab_exex, h_thetalab_thetalab_cut12c_ela,
+   draw_ind("c93", "exex", n_group, n_h_z, h_verz_exex, h_verxy_exex, h_kineE_thetalab_exex, h_thetalab_thetalab_cut12c_ela,
       h_verz_exex_index, h_verxy_exex_index, h_kineE_thetalab_exex_index, h_thetalab_thetalab_exex_index,
       kine_12c12c_gsgs_60_7, kine_12c12c_gsex_60_7, kine_12c12c_exex_60_7, xy90, angle_12c12c_gsex_60_7, angle_12c12c_exex_60_7
    );
@@ -1469,6 +1509,9 @@ void check_vd_76matm(){
    h_veryz->Write();
    h_ntra_verz->Write();
    h_ntraver_ntra->Write();
+   h_ntraver_ntra_cutphi->Write();
+   h_ntraver_ntra_cutphi_2tra->Write();
+   h_ntraver_ntra_cut12c_ela->Write();
 
    /*
    // Excitation energy spectra
@@ -1509,7 +1552,6 @@ void check_vd_76matm(){
 
    // cout of information
    std::cout << "                                                                " << std::endl;
-   std::cout << "12c12c elastic events with no vertex is " << n_no_vertex << " events." << std::endl;
    //   std::cout << "Maximum radius of hits: " << max_r_max << " mm, Trigger radius: " << r_tri << " mm" << std::endl;
 #ifdef peak_check
    std::cout << "peak1 events: " << peak1.size() << std::endl;
@@ -1528,6 +1570,28 @@ void check_vd_76matm(){
    std::cout << "  Event of peak3: " << std::endl;
    for (auto &eventIndex: peak3){
       std::cout << eventIndex << ", " << std::flush;
+   }
+
+#endif
+
+#ifdef states_vertex
+   std::cout << "12c12c elastic events with no vertex is " << n_no_vertex << " events." << std::endl;
+   if(n_no_vertex != track2_ver0.at(1).size()){
+      std::cout << " something is wrong with the vector. vector size: " << track2_ver0.at(1).size() << std::endl;
+   }
+   for (Int_t i = 0; i < track2_ver0.at(1).size(); i++){
+      if (i == 0){
+         std::cout << "  runNum: " << track2_ver0[0].at(i)<< std::endl;
+         std::cout << "    events: " << track2_ver0.at(1).at(i) << std::flush;
+      }
+      else if(track2_ver0.at(0).at(i) != track2_ver0.at(0).at(i - 1)){
+         std::cout << std::endl;
+         std::cout << "  runNum: " << track2_ver0[0].at(i)<< std::endl;
+         std::cout << "    events: " << track2_ver0.at(1).at(i) << std::flush;
+      }
+      else{
+         std::cout << ", " << track2_ver0.at(1).at(i) << std::flush;
+      }
    }
 
 #endif
