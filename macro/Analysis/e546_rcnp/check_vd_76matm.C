@@ -51,16 +51,16 @@ void check_vd_76matm(){
    //   double vd_val = 4.50;
 
    // files.
-   std::vector runNums = {52};
+   //   std::vector runNums = {52};
    //   std::vector runNums = {50,51,52,53,54,55,56,57,58};
-   /*
+
    std::vector runNums = {
       28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47,50,
       51,52,53,54,55,56,57,58,62,63,64,66,67,68,69,70,71,75,76,77,
       78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,95,96,97,98,99,
       100,101,102,103,104,105,106,107,108,109,110,111,112
    };
-   */
+
    const Int_t n_group = 7;
    const Int_t verz_h = 600;
 
@@ -188,6 +188,7 @@ void check_vd_76matm(){
    Double_t vty = 0;
    Double_t vtz = 0;
    Double_t Ebeam = 0;
+   Double_t Ebeam_cm = 0;
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
@@ -302,13 +303,21 @@ void check_vd_76matm(){
    TH2F *h_verxy_exex = new TH2F("h_verxy_exex", "h_verxy_exex", 50, -50, 50, 50, -50, 50);
 
    // ... Beam energy estimation
-   TH1D *h_Ebeam = new TH1D("h_Ebeam", "h_Ebeam;E_{beam} [MeV]", 700, 0, 70);
-   TH1D *h_Ebeam_gsgs = new TH1D("h_Ebeam_gsgs", "h_Ebeam_gsgs;E_{beam} [MeV]", 700, 0, 70);
-   TH1D *h_Ebeam_gsgs_cm50 = new TH1D("h_Ebeam_gsgs_cm50", "h_Ebeam_gsgs_cm50;E_{beam} [MeV]", 700, 0, 70);
-   TH1D *h_Ebeam_gsgs_cm60 = new TH1D("h_Ebeam_gsgs_cm60", "h_Ebeam_gsgs_cm60;E_{beam} [MeV]", 700, 0, 70);
-   TH1D *h_Ebeam_gsgs_cm70 = new TH1D("h_Ebeam_gsgs_cm70", "h_Ebeam_gsgs_cm70;E_{beam} [MeV]", 700, 0, 70);
-   TH1D *h_Ebeam_gsgs_cm80 = new TH1D("h_Ebeam_gsgs_cm80", "h_Ebeam_gsgs_cm80;E_{beam} [MeV]", 700, 0, 70);
-   TH1D *h_Ebeam_gsgs_cm90 = new TH1D("h_Ebeam_gsgs_cm90", "h_Ebeam_gsgs_cm90;E_{beam} [MeV]", 700, 0, 70);
+   TH1D *h_Ebeam = new TH1D("h_Ebeam", "h_Ebeam;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs = new TH1D("h_Ebeam_gsgs", "h_Ebeam_gsgs;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm50 = new TH1D("h_Ebeam_gsgs_cm50", "h_Ebeam_gsgs_cm50;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm60 = new TH1D("h_Ebeam_gsgs_cm60", "h_Ebeam_gsgs_cm60;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm70 = new TH1D("h_Ebeam_gsgs_cm70", "h_Ebeam_gsgs_cm70;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm80 = new TH1D("h_Ebeam_gsgs_cm80", "h_Ebeam_gsgs_cm80;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm90 = new TH1D("h_Ebeam_gsgs_cm90", "h_Ebeam_gsgs_cm90;E_{beam} [MeV]", 70, 0, 70);
+
+   TH1D *h_Ebcm = new TH1D("h_Ebcm", "h_Ebcm;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs = new TH1D("h_Ebcm_gsgs", "h_Ebcm_gsgs;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm50 = new TH1D("h_Ebcm_gsgs_cm50", "h_Ebcm_gsgs_cm50;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm60 = new TH1D("h_Ebcm_gsgs_cm60", "h_Ebcm_gsgs_cm60;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm70 = new TH1D("h_Ebcm_gsgs_cm70", "h_Ebcm_gsgs_cm70;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm80 = new TH1D("h_Ebcm_gsgs_cm80", "h_Ebcm_gsgs_cm80;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm90 = new TH1D("h_Ebcm_gsgs_cm90", "h_Ebcm_gsgs_cm90;E_{bc} [MeV]", 62, 0, 31);
 
    /*
    // ... Excitation energy 
@@ -777,7 +786,9 @@ void check_vd_76matm(){
                      h_verxy_cut12c_ela -> Fill(vtx, vty);
                      h_verz_cut12c_ela -> Fill(vtz);
                      Ebeam = est_Ebeam(Ebeam_para, vtz);
+                     Ebeam_cm = Ebeam/2.0;
                      h_Ebeam->Fill(Ebeam);
+                     h_Ebcm->Fill(Ebeam_cm);
                   }
                   else {
                      std::cout << "  No vertex event:" << i << " (12c12c elastic)" << std::endl;
@@ -801,32 +812,38 @@ void check_vd_76matm(){
                      h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
                      if(tracks_vertex){
                         h_Ebeam_gsgs->Fill(Ebeam);
+                        h_Ebcm_gsgs->Fill(Ebeam_cm);
                         h_verxy_gsgs -> Fill(vtx, vty);
                         h_verz_gsgs -> Fill(vtz);
                         if ((track_theta[0] > 23 && track_theta[0] < 27) || (track_theta[1] > 23 && track_theta[1] < 27)){
                            h_thetalab_thetalab_gsgs_cm50 -> Fill(track_theta[0], track_theta[1]);
                            h_verz_gsgs_cm50 -> Fill(vtz);
                            h_Ebeam_gsgs_cm50->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm50->Fill(Ebeam_cm);
                         }
                         if ((track_theta[0] > 28 && track_theta[0] < 32) || (track_theta[1] > 28 && track_theta[1] < 32)){
                            h_thetalab_thetalab_gsgs_cm60 -> Fill(track_theta[0], track_theta[1]);
                            h_verz_gsgs_cm60 -> Fill(vtz);
                            h_Ebeam_gsgs_cm60->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm60->Fill(Ebeam_cm);
                         }
                         if ((track_theta[0] > 33 && track_theta[0] < 37) || (track_theta[1] > 33 && track_theta[1] < 37)){
                            h_thetalab_thetalab_gsgs_cm70 -> Fill(track_theta[0], track_theta[1]);
                            h_verz_gsgs_cm70 -> Fill(vtz);
                            h_Ebeam_gsgs_cm70->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm70->Fill(Ebeam_cm);
                         }
                         if ((track_theta[0] > 38 && track_theta[0] < 42) || (track_theta[1] > 38 && track_theta[1] < 42)){
                            h_thetalab_thetalab_gsgs_cm80 -> Fill(track_theta[0], track_theta[1]);
                            h_verz_gsgs_cm80 -> Fill(vtz);
                            h_Ebeam_gsgs_cm80->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm80->Fill(Ebeam_cm);
                         }
-                        if (track_theta[0] > 43 && track_theta[0] < 47 && track_theta[1] > 43 && track_theta[1] < 47){
+                        if ((track_theta[0] > 43 && track_theta[0] < 47) || (track_theta[1] > 43 && track_theta[1] < 47)){
                            h_thetalab_thetalab_gsgs_cm90 -> Fill(track_theta[0], track_theta[1]);
                            h_verz_gsgs_cm90 -> Fill(vtz);
                            h_Ebeam_gsgs_cm90->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm90->Fill(Ebeam_cm);
                         }
 #ifdef vertex_index
                         h_verz_gsgs_index[vindex] -> Fill(vtz);
@@ -1465,7 +1482,7 @@ void check_vd_76matm(){
    h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm90->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm90->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
-   h_thetalab_thetalab_gsgs_cm90->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 43<#theta_1<47 and 43<#theta_2<47)"));
+   h_thetalab_thetalab_gsgs_cm90->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm90->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm90->Draw("colz");
@@ -1505,7 +1522,7 @@ void check_vd_76matm(){
    c91->cd(12);
    h_verz_gsgs_cm90->SetDirectory(0);
    h_verz_gsgs_cm90->GetXaxis()->SetTitle("vertex z [mm]");
-   h_verz_gsgs_cm90->SetTitle(Form("vertex z (12c12c, gsgs, 43<#theta_1<47 and 43<#theta_2<47)"));
+   h_verz_gsgs_cm90->SetTitle(Form("vertex z (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
    gPad->SetLogy();
    h_verz_gsgs_cm90->Draw();
 
@@ -1542,9 +1559,109 @@ void check_vd_76matm(){
    c91->cd(18);
    h_Ebeam_gsgs_cm90->SetDirectory(0);
    h_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
-   h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 and 43<#theta_2<47)"));
+   h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
    gPad->SetLogy();
    h_Ebeam_gsgs_cm90->Draw();
+
+   TCanvas *c92 = new TCanvas("c92", "c92", 1600, 600);
+   c92->Divide(6, 2);
+   c92->cd(1);
+   h_thetalab_thetalab_gsgs->SetDirectory(0);
+   h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c, gsgs)", (int)del_phi));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs->SetMinimum(1);
+   h_thetalab_thetalab_gsgs->Draw("colz");
+   xy90->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(2);
+   h_thetalab_thetalab_gsgs_cm50->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm50->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm50->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm50->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm50->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm50->Draw("colz");
+   xy90->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(3);
+   h_thetalab_thetalab_gsgs_cm60->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm60->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm60->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm60->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm60->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm60->Draw("colz");
+   xy90->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(4);
+   h_thetalab_thetalab_gsgs_cm70->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm70->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm70->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm70->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm70->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm70->Draw("colz");
+   xy90->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(5);
+   h_thetalab_thetalab_gsgs_cm80->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm80->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm80->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm80->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm80->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm80->Draw("colz");
+   xy90->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(6);
+   h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm90->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm90->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm90->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm90->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm90->Draw("colz");
+   xy90->Draw("same");
+   theta_gsgs->Draw("same");
+
+   c92->cd(7);
+   h_Ebcm_gsgs->SetDirectory(0);
+   h_Ebcm_gsgs->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs->Draw();
+   c92->cd(8);
+   h_Ebcm_gsgs_cm50->SetDirectory(0);
+   h_Ebcm_gsgs_cm50->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm50->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm50->Draw();
+   c92->cd(9);
+   h_Ebcm_gsgs_cm60->SetDirectory(0);
+   h_Ebcm_gsgs_cm60->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm60->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm60->Draw();
+   c92->cd(10);
+   h_Ebcm_gsgs_cm70->SetDirectory(0);
+   h_Ebcm_gsgs_cm70->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm70->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm70->Draw();
+   c92->cd(11);
+   h_Ebcm_gsgs_cm80->SetDirectory(0);
+   h_Ebcm_gsgs_cm80->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm80->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm80->Draw();
+   c92->cd(12);
+   h_Ebcm_gsgs_cm90->SetDirectory(0);
+   h_Ebcm_gsgs_cm90->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm90->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm90->Draw();
 
 #endif
 
@@ -2031,7 +2148,7 @@ std::vector<Double_t> cal_Ebeam_para(){
 
    std::cout << std::setprecision(4) << std::endl;
    std::cout << "Set estimation of beam energy." << std::endl;
-   std::cout << "  function: a + b * x + c * x^3 + d * x^2 + e * x^4" << std::endl;
+   std::cout << "  function: a + b * x + c * x^2 + d * x^3 + e * x^4" << std::endl;
    std::cout << "  a:" << a << ", b:" << b << ", c:" << c << ", d:" << d << ", e:" << e << std::endl;
 
    return Ebeam_para;
