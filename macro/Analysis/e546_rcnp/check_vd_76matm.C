@@ -1229,10 +1229,10 @@ void check_vd_76matm(){
    TCanvas *c70 = new TCanvas("c70", "c70");
    c70->Divide(2,1);
    c70->cd(1);
-   h_sum_theta->SetDirectory(0);
-   h_sum_theta->GetXaxis()->SetTitle("Sum of tracks [deg]");
-   h_sum_theta->SetTitle(Form("Sum Theta_LAB (track == 2, 12c12c, run 52)"));
-   h_sum_theta->Draw();
+   h_sum_theta_cut12c_ela->SetDirectory(0);
+   h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
+   h_sum_theta_cut12c_ela->SetTitle(Form("Sum Theta_LAB (track == 2, 12c12c)"));
+   h_sum_theta_cut12c_ela->Draw();
    c70->cd(2);
    h_sum_theta_cut12c_run52->SetDirectory(0);
    h_sum_theta_cut12c_run52->GetXaxis()->SetTitle("Sum of tracks [deg]");
@@ -1240,7 +1240,7 @@ void check_vd_76matm(){
    h_sum_theta_cut12c_run52->Draw();
 
    TCanvas *c71 = new TCanvas("c71", "c71", 1200,600);
-   c71->Divide(3,1);
+   c71->Divide(4,1);
    c71->cd(1);
    h_sum_theta_cut12c_ela->SetDirectory(0);
    h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
@@ -1262,7 +1262,7 @@ void check_vd_76matm(){
    c72->cd();
    h_sum_theta_gsgs->SetDirectory(0);
    h_sum_theta_gsgs->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c gsgs");
-   h_sum_theta_gsgs->SetUserRange(85, 100);
+   h_sum_theta_gsgs->GetXaxis()->SetRangeUser(85, 100);
    h_sum_theta_gsgs->Draw();
 
 #endif

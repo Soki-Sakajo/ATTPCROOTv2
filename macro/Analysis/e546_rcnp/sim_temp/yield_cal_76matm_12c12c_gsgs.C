@@ -160,6 +160,7 @@ void yield_cal_76matm_12c12c_gsgs(){
   Y1.resize(n);
   //  Ye.resize(n);
   Yda.resize(n);
+  Yrun.resize(n);
   Ya.resize(n);
   //  Yrunerr.resize(n);
   
