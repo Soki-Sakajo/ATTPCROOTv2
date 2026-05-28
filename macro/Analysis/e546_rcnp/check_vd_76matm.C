@@ -1904,6 +1904,7 @@ void check_vd_76matm(){
    for (auto &eventIndex: peak3){
       std::cout << eventIndex << ", " << std::flush;
    }
+   std::cout << std::endl;
 
 #endif
 
