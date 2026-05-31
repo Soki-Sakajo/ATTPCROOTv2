@@ -1,6 +1,6 @@
-//#define nom_check
-//#define peak_check
-//#define c12_check
+#define nom_check
+#define peak_check
+#define c12_check
 #define states_vertex
 //#define vertex_index
 #include <fstream>
@@ -44,6 +44,7 @@ void check_vd_76matm(){
    //   double vd_val = 3.89;
    //   double vd_val = 4.00;
    double vd_val = 4.05;
+   //   double vd_val = 4.06;
    //   double vd_val = 4.07;
    //   double vd_val = 4.08;
    //   double vd_val = 4.10;
@@ -67,7 +68,8 @@ void check_vd_76matm(){
    Int_t run_start = runNums.front();
    Int_t run_end = runNums.back();
    std::vector<Double_t> Ebeam_para(0);
-   TFile * Results = new TFile(Form("data/check_vd_results_run%d-run%d.root", run_start, run_end),"recreate");
+   //   TFile * Results = new TFile(Form("data/check_vd_results_run%d-run%d.root", run_start, run_end),"recreate");
+   TFile * Results = new TFile(Form("data/check_vd_results_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
       
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
@@ -1818,6 +1820,8 @@ void check_vd_76matm(){
    h_thetalab_thetalab_cutphi->Write();
    h_thetalab_thetalab_cutphi_2tra->Write();
    h_thetalab_thetalab_cut12c_ela->Write();
+
+
    //  phi vs phi
    h_philab_philab->Write();
    h_philab_philab_cutphi->Write();
