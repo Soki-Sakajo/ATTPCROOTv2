@@ -17,7 +17,7 @@ void draw_ind(TString cname, TString states, Int_t n_group, Int_t n_h_z, TH1D* h
 std::vector<Double_t> cal_Ebeam_para();
 Double_t est_Ebeam(std::vector<Double_t> &Ebeam_para, Double_t vertz);
 
-void check_vd_76matm(){
+void check_vd_76matm(Double_t vd_val = 4.05){
    //copy from kine.C 2026/05/06 12:20
 
    //set timer
@@ -43,7 +43,7 @@ void check_vd_76matm(){
    //   double vd_val = 3.50;
    //   double vd_val = 3.89;
    //   double vd_val = 4.00;
-   double vd_val = 4.05;
+   //   double vd_val = 4.05;
    //   double vd_val = 4.06;
    //   double vd_val = 4.07;
    //   double vd_val = 4.08;
@@ -1820,6 +1820,7 @@ void check_vd_76matm(){
    h_thetalab_thetalab_cutphi->Write();
    h_thetalab_thetalab_cutphi_2tra->Write();
    h_thetalab_thetalab_cut12c_ela->Write();
+   h_thetalab_thetalab_gsgs->Write();
 
 
    //  phi vs phi
