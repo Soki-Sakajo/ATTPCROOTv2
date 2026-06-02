@@ -359,8 +359,8 @@ std::vector<std::vector<Double_t>> cal_Ebeam_depth(){
   TF1 *f1 = new TF1("f1", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4", 0, 1000);
   TF1 *f2 = new TF1("f2", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4", 0, 65);
 
-  h_Ebeam->Fit(f1, "QR", "", 0, 700);
-  h_vertz->Fit(f2, "QR", "", 0, 60.8);
+  h_Ebeam->Fit(f1, "QRN", "", 0, 700);
+  h_vertz->Fit(f2, "QRN", "", 0, 60.8);
 
   TCanvas *c90 = new TCanvas("c90", "c90");
   h_Ebeam->SetMarkerStyle(20);
@@ -439,7 +439,7 @@ Double_t est_depth(std::vector<std::vector<Double_t>> &Ebeam_depth, Double_t Ecm
     Double_t d = Ebeam_depth[1][3];
     Double_t e = Ebeam_depth[1][4];
     Depth = a + b * E + c * pow(E, 2) + d * pow(E, 3) + e * pow(E, 4);
-   }
+  }
 
-   return Depth;
+  return Depth;
 }

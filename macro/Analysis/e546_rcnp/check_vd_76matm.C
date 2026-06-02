@@ -52,16 +52,16 @@ void check_vd_76matm(Double_t vd_val = 4.05){
    //   double vd_val = 4.50;
 
    // files.
-   //   std::vector runNums = {52};
+   std::vector runNums = {52};
    //   std::vector runNums = {50,51,52,53,54,55,56,57,58};
-
+   /*
    std::vector runNums = {
       28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47,50,
       51,52,53,54,55,56,57,58,62,63,64,66,67,68,69,70,71,75,76,77,
       78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,95,96,97,98,99,
       100,101,102,103,104,105,106,107,108,109,110,111,112
    };
-
+   */
    const Int_t n_group = 7;
    const Int_t verz_h = 600;
 
@@ -1850,6 +1850,11 @@ void check_vd_76matm(Double_t vd_val = 4.05){
    h_ntraver_ntra_cutphi_2tra->Write();
    h_ntraver_ntra_cut12c_ela->Write();
 
+   // Beam energy estimation
+   h_Ebeam->Write();
+   h_Ebeam_gsgs->Write();
+   h_Ebcm_gsgs->Write();
+
    /*
    // Excitation energy spectra
    histExdp->Write();
@@ -1871,20 +1876,6 @@ void check_vd_76matm(Double_t vd_val = 4.05){
    histEstimatedKinEVThetaLAB2H->Write();
    histEstimatedKinEVThetaLAB1H->Write();
    */
-   // save cuts
-   cut12c->Write("charge_range_12c");
-   cutalpha->Write("charge_range_alpha");
-   cutproton->Write("charge_range_proton");
-   theta_gsgs->Write("theta_theta_gsgs");
-   theta_gsex->Write("theta_theta_gsex");
-   theta_exex->Write("theta_theta_exex");
-   // save lines
-   kine_12c12c_gsgs_60_7->Write("kine_12c_gsgs");
-   kine_12c12c_gsex_60_7->Write("kine_12c_gsex");
-   kine_12c12c_exex_60_7->Write("kine_12c_exex");
-   xy90->Write("angle_12c_gsgs");
-   angle_12c12c_gsex_60_7->Write("angle_12c_gsex");
-   angle_12c12c_exex_60_7->Write("angle_12c_exex");
 
 #ifdef vertex_index
    for(Int_t i = 0; i < n_group; i++){
@@ -1903,6 +1894,21 @@ void check_vd_76matm(Double_t vd_val = 4.05){
    }
 
 #endif
+
+// save cuts
+   cut12c->Write("charge_range_12c");
+   cutalpha->Write("charge_range_alpha");
+   cutproton->Write("charge_range_proton");
+   theta_gsgs->Write("theta_theta_gsgs");
+   theta_gsex->Write("theta_theta_gsex");
+   theta_exex->Write("theta_theta_exex");
+   // save lines
+   kine_12c12c_gsgs_60_7->Write("kine_12c_gsgs");
+   kine_12c12c_gsex_60_7->Write("kine_12c_gsex");
+   kine_12c12c_exex_60_7->Write("kine_12c_exex");
+   xy90->Write("angle_12c_gsgs");
+   angle_12c12c_gsex_60_7->Write("angle_12c_gsex");
+   angle_12c12c_exex_60_7->Write("angle_12c_exex");
    Results->Close();
 
    // cout of information
@@ -2128,9 +2134,9 @@ std::vector<Double_t> cal_Ebeam_para(){
 
    // set data
    vector<pair<Double_t, Double_t>> lise_data={
-        {0, 60.724}, {50, 57.862}, {100, 54.873}, {150, 51.775}, {200, 48.529}, {250, 45.143}, {300, 41.562},
-        {350, 37.779},{400, 33.736},{450, 29.363}, {500, 24.589}, {550, 19.089},{600, 13.089}, {650, 5.513},
-        {680, 0.360}
+         {0, 60.724}, {50, 57.862}, {100, 54.873}, {150, 51.775}, {200, 48.529}, {250, 45.143}, {300, 41.562},
+         {350, 37.779},{400, 33.736},{450, 29.363}, {500, 24.589}, {550, 19.089},{600, 13.089}, {650, 5.513},
+         {680, 0.360}
    };
 
    Int_t n_data = lise_data.size();
@@ -2139,21 +2145,21 @@ std::vector<Double_t> cal_Ebeam_para(){
       Ebeam.at(0).at(i) = lise_data[i].first;
       Ebeam.at(1).at(i) = lise_data[i].second;
    }
-   TGraph *h_Ebeam = new TGraph(n_data, Ebeam.at(0).data(), Ebeam.at(1).data());
+   TGraph *h_Ebeam_est = new TGraph(n_data, Ebeam.at(0).data(), Ebeam.at(1).data());
    TF1 *f1 = new TF1("f1", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4", 0, 1000);
 
-   h_Ebeam->Fit(f1, "QR", "", 0, 700);
+   h_Ebeam_est->Fit(f1, "QRN", "", 0, 700);
 
    TCanvas *c0 = new TCanvas("c0", "c0");
-   h_Ebeam->SetMarkerStyle(20);
-   h_Ebeam->SetMarkerSize(1.2);
-   h_Ebeam->SetMarkerColor(kBlue);
-   h_Ebeam->SetLineColor(kRed);
-   h_Ebeam->GetXaxis()->SetTitle("Depth [mm]");
-   h_Ebeam->GetYaxis()->SetTitle("beam energy [MeV]");
-   h_Ebeam->SetTitle("Beam energy vs Depth");
-   h_Ebeam->GetXaxis()->SetLimits(0, 700);
-   h_Ebeam->Draw("AP");
+   h_Ebeam_est->SetMarkerStyle(20);
+   h_Ebeam_est->SetMarkerSize(1.2);
+   h_Ebeam_est->SetMarkerColor(kBlue);
+   h_Ebeam_est->SetLineColor(kRed);
+   h_Ebeam_est->GetXaxis()->SetTitle("Depth [mm]");
+   h_Ebeam_est->GetYaxis()->SetTitle("beam energy [MeV]");
+   h_Ebeam_est->SetTitle("Beam energy vs Depth");
+   h_Ebeam_est->GetXaxis()->SetLimits(0, 700);
+   h_Ebeam_est->Draw("AP");
    f1->SetNpx(1000);
    f1->SetLineColor(kBlack);
    f1->Draw("P same");
