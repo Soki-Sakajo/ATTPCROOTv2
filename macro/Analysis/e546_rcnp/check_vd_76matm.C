@@ -1,6 +1,6 @@
-#define nom_check
-#define peak_check
-#define c12_check
+//#define nom_check
+//#define peak_check
+//#define c12_check
 #define states_vertex
 //#define vertex_index
 #include <fstream>
@@ -1885,6 +1885,24 @@ void check_vd_76matm(Double_t vd_val = 4.05){
    xy90->Write("angle_12c_gsgs");
    angle_12c12c_gsex_60_7->Write("angle_12c_gsex");
    angle_12c12c_exex_60_7->Write("angle_12c_exex");
+
+#ifdef vertex_index
+   for(Int_t i = 0; i < n_group; i++){
+      h_verz_gsgs_index[i]->Write();
+      h_verz_gsex_index[i]->Write();
+      h_verz_exex_index[i]->Write();
+      h_verxy_gsgs_index[i]->Write();
+      h_verxy_gsex_index[i]->Write();
+      h_verxy_exex_index[i]->Write();
+      h_kineE_thetalab_gsgs_index[i]->Write();
+      h_kineE_thetalab_gsex_index[i]->Write();
+      h_kineE_thetalab_exex_index[i]->Write();
+      h_thetalab_thetalab_gsgs_index[i]->Write();
+      h_thetalab_thetalab_gsex_index[i]->Write();
+      h_thetalab_thetalab_exex_index[i]->Write();
+   }
+
+#endif
    Results->Close();
 
    // cout of information
@@ -1909,7 +1927,7 @@ void check_vd_76matm(Double_t vd_val = 4.05){
    for (auto &eventIndex: peak3){
       std::cout << eventIndex << ", " << std::flush;
    }
-   std::cout << std::endl;
+   std::cout << std::endl << std::endl;
 
 #endif
 
