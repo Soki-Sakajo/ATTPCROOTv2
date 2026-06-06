@@ -98,15 +98,18 @@ void yield_cal_76matm_12c12c_gsgs(){
 
   //input
   ifstream infi(Form("c12c12_gsgs_theta_%d_Ecm_mb_sr.txt", ang));
+  //  ifstream infi(Form("c12c12_gsgs_integrated_Ecm_mb_sr.txt"));
   if(!infi.is_open()){
     cerr<<"failed to open the file"<<endl;
-    return 1;
+    //    return 1;
   }
-  /*
+
   //set output for making rutdata by each subnum
   // if you want to set the branch, you need to change tree name.
-  TString outdata = "yeild_calculation_76matm.root";
+  TString outdata = Form("yield_calculation_76matm_12c12c_gsgs_theta_%d.root", ang);
+  //  TString outdata = "yield_calculation_76matm_12c12c_gsgs.root";
   TFile *file=new TFile(outdata, "recreate");
+  /*
   TTree *data = new TTree("data","data");
   data->Branch("number_of_data",&n,"n/I");
   data->Branch("reaction_energy",&Ecm);
@@ -127,24 +130,34 @@ void yield_cal_76matm_12c12c_gsgs(){
       continue;
     }
     istringstream iss(line);
-    //    if(iss >> E >> z_min >> z_max >> sigma >> stat >> syst ){
-    //    if(iss >> E >> z_min >> sigma >> stat >> syst ){
-    if(iss >> E >> comma >> sigma){
-      //      cout<<E<<" "<<z_min<<" "<<z_max<<" "<<sigma<<" "<<stat<<" "<<syst<<endl;
-      /*
-      Ecm.push_back(E);
-      range_attpc[0].push_back(z_min);
-      range_attpc[1].push_back(z_max);
-      dz.push_back(z_min);
-      sig.push_back(sigma);
-      sier.push_back((stat+syst));
-      data[0].push_back(E);
-      data[1].push_back(sigma);
-      */
-      data.emplace_back(E, sigma);
+    if(line.find(',') != std::string::npos){
+      //    if(iss >> E >> z_min >> z_max >> sigma >> stat >> syst ){
+      //    if(iss >> E >> z_min >> sigma >> stat >> syst ){
+      if(iss >> E >> comma >> sigma){
+        //      cout<<E<<" "<<z_min<<" "<<z_max<<" "<<sigma<<" "<<stat<<" "<<syst<<endl;
+        /*
+        Ecm.push_back(E);
+        range_attpc[0].push_back(z_min);
+        range_attpc[1].push_back(z_max);
+        dz.push_back(z_min);
+        sig.push_back(sigma);
+        sier.push_back((stat+syst));
+        data[0].push_back(E);
+        data[1].push_back(sigma);
+        */
+        data.emplace_back(E, sigma);
+      }
+      else{
+        cerr<<"faild to parse line: "<<line<<endl;
+      }
     }
     else{
-      cerr<<"faild to parse line: "<<line<<endl;
+      if(iss >> E >> sigma){
+        data.emplace_back(E, sigma);
+      }
+      else{
+        cerr<<"faild to parse line: "<<line<<endl;
+      }
     }
   }
 
@@ -196,8 +209,8 @@ void yield_cal_76matm_12c12c_gsgs(){
     /*
     if(Ecm.at(i)==22.2){
       cout<<i<<" energy "<<Ecm.at(i)<<" sig "<<sig.at(i)<<" n_b "<<n_b<<"  rho "<<rho*N_rate1
-	  <<" range_attpc "<<range_attpc.at(0).at(i)<<" "<<range_attpc.at(1).at(i)<<" dz "<<dz.at(i)
-	  <<" yeild "<<Y1.at(i)<<endl;
+      <<" range_attpc "<<range_attpc.at(0).at(i)<<" "<<range_attpc.at(1).at(i)<<" dz "<<dz.at(i)
+      <<" yeild "<<Y1.at(i)<<endl;
       cout<<endl<<endl<<endl;
       cout<<"rho dz: "<<rho*N_rate1*dz.at(i)*1e-3*1e-4<<endl;
     }
@@ -240,7 +253,7 @@ void yield_cal_76matm_12c12c_gsgs(){
   for(Int_t i=0; i<plot.at(0).size(); i++){
     if(plot.at(2).at(i)-plot.at(3).at(i)<0){
       cout<<"error bar is under 0 ! energy: "<<plot.at(0).at(i)<<", Yeild: "<<plot.at(2).at(i)
-	  <<", Error: "<<plot.at(3).at(i)<<endl;
+        <<", Error: "<<plot.at(3).at(i)<<endl;
       plot.at(3).at(i)=plot.at(2).at(i);
     }
   }
@@ -248,7 +261,7 @@ void yield_cal_76matm_12c12c_gsgs(){
   /*
   TGraphAsymmErrors *h_yp=
     new TGraphAsymmErrors(n_p,plot.at(0).data(),plot.at(2).data(),
-			  plot.at(1).data(),plot.at(1).data(),plot.at(3).data(),plot.at(4).data());
+        plot.at(1).data(),plot.at(1).data(),plot.at(3).data(),plot.at(4).data());
   */
 
   TGraph *h_sig = new TGraph(n_p, plot.at(0).data(), plot.at(1).data());
@@ -265,7 +278,8 @@ void yield_cal_76matm_12c12c_gsgs(){
   h_sig->SetMarkerColor(kBlue);
   h_sig->GetXaxis()->SetTitle("E_{c.m.} [MeV]");
   h_sig->GetYaxis()->SetTitle("d#sigma/d#Omega");
-  h_sig->SetTitle(Form("E_{c.m.} d#sigma/d#Omega in %d", ang));
+  //  h_sig->SetTitle(Form("E_{c.m.} d#sigma/d#Omega in %d", ang));
+  h_sig->SetTitle(Form("E_{c.m.} d#sigma/d#Omega (integrated cross sections)"));
   h_sig->GetXaxis()->SetLimits(0, Ecmm);
   gPad->SetLogy();
   h_sig->Draw("AP");
@@ -322,8 +336,9 @@ void yield_cal_76matm_12c12c_gsgs(){
 
   //save branch
   data->AutoSave();
-  file->Close();
   */
+  h_sig->Write("h_sig");
+  file->Close();
   
   // stop timer
   timer.Stop();

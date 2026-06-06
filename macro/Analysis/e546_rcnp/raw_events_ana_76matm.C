@@ -150,8 +150,8 @@ void raw_events_ana_76matm(){
 
     // Open the file with the AtRawEvents.
     //      TString unpackFileName = TString::Format("./decode_data/run_%04d_RawEvents.root", runNum);
-    //    TString unpackFileName = TString::Format("./decode_data/run_%04d.root", runNum);
-    TString unpackFileName = TString::Format("./vd_check_data/for_raw_eve_ana/run_%04d.root", runNum);
+    TString unpackFileName = TString::Format("./decode_data/run_%04d.root", runNum);
+    //    TString unpackFileName = TString::Format("./vd_check_data/for_raw_eve_ana/run_%04d.root", runNum);
     TFile *unpackFile = new TFile(unpackFileName, "READ");
     TTree *unpackTree = (TTree *)unpackFile->Get("cbmsim");
     int nUnpackEvents = unpackTree->GetEntries();

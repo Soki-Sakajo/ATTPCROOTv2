@@ -1,9 +1,13 @@
+//#define cal_Ebeam
 #include <fstream>
 #include "TFile.h"
 #include "TObject.h"
 #include "TCanvas.h"
 
 void cal_Ebeam_para(){
+
+   // set para
+   Double_t verz = 100;
 
    // set data
    vector<pair<Double_t, Double_t>> lise_data={
@@ -60,5 +64,11 @@ void cal_Ebeam_para(){
    std::cout << "Set estimation of beam energy." << std::endl;
    std::cout << "  function: a + b * x + c * x^2 + d * x^3 + e * x^4" << std::endl;
    std::cout << "  a:" << a << ", b:" << b << ", c:" << c << ", d:" << d << ", e:" << e << std::endl << std::endl;
+
+#ifdef cal_Ebeam
+   std::cout << "E_beam estimation at z = " << verz << " mm; E_beam = " 
+   << a + b * verz + c * pow(verz, 2) + d * pow(verz, 3) + e * pow(verz, 4) << " MeV" << std::endl << std::endl;
+
+#endif
 
 }
