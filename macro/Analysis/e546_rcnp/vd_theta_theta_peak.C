@@ -57,30 +57,32 @@ void vd_theta_theta_peak(){
     h_peak3->Fit(f3, "R");
 
     //set style
-    h_peak1->SetMarkerStyle(20);
+    h_peak1->SetMarkerStyle(22);
     h_peak1->SetMarkerSize(1.2);
-    h_peak1->SetMarkerColor(kRed);
-    h_peak1->SetLineColor(kRed);
+    h_peak1->SetMarkerColor(kGreen+2);
+    h_peak1->SetLineColor(kGreen+2);
     f1->SetNpx(1000);
-    f1->SetLineColor(kRed);
+    f1->SetLineColor(kGreen+2);
     h_peak2->SetMarkerStyle(21);
     h_peak2->SetMarkerSize(1.2);
     h_peak2->SetMarkerColor(kBlue);
     h_peak2->SetLineColor(kBlue);
     f2->SetNpx(1000);
     f2->SetLineColor(kBlue);
-    h_peak3->SetMarkerStyle(22);
+    h_peak3->SetMarkerStyle(20);
     h_peak3->SetMarkerSize(1.2);
-    h_peak3->SetMarkerColor(kGreen+2);
-    h_peak3->SetLineColor(kGreen+2);
+    h_peak3->SetMarkerColor(kRed);
+    h_peak3->SetLineColor(kRed);
     f3->SetNpx(1000);
-    f3->SetLineColor(kGreen+2);
-    y90->SetLineColor(kMagenta);
-    y90->SetLineWidth(1);
+    f3->SetLineColor(kRed);
+    y90->SetLineColor(kBlack);
+    y90->SetLineWidth(3);
 
     //draw
     TCanvas *c = new TCanvas("c","c");
     //graph
+    h_peak1->GetXaxis()->SetNdivisions(510);
+    h_peak1->GetYaxis()->SetNdivisions(510);
     h_peak1->Draw("AP");
     h_peak2->Draw("P SAME");
     h_peak3->Draw("P SAME");
@@ -91,9 +93,14 @@ void vd_theta_theta_peak(){
     y90->Draw("same");
     //legend
     TLegend *le1 = new TLegend(0.7,0.7,0.9,0.9);
+    /*
     le1 -> AddEntry(h_peak1, "peak1", "p");
     le1 -> AddEntry(h_peak2, "peak2", "p");
     le1 -> AddEntry(h_peak3, "peak3", "p");
+    */
+    le1 -> AddEntry(h_peak3, "gs-gs", "p");
+    le1 -> AddEntry(h_peak2, "gs-ex", "p");
+    le1 -> AddEntry(h_peak1, "ex-ex", "p");
     le1 -> Draw();
     //axis range
     h_peak1->GetXaxis()->SetLimits(3.0,5.0);

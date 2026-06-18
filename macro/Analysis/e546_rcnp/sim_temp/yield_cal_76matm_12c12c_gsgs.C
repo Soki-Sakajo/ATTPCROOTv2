@@ -97,7 +97,7 @@ void yield_cal_76matm_12c12c_gsgs(){
   Ebeam_depth = cal_Ebeam_depth();
 
   //input
-  ifstream infi(Form("c12c12_gsgs_theta_%d_Ecm_mb_sr.txt", ang));
+  ifstream infi(Form("c12c12_gsgs_theta_%d_Ecm_mb_sr_10-38MeV.txt", ang));
   //  ifstream infi(Form("c12c12_gsgs_integrated_Ecm_mb_sr.txt"));
   if(!infi.is_open()){
     cerr<<"failed to open the file"<<endl;
@@ -280,7 +280,7 @@ void yield_cal_76matm_12c12c_gsgs(){
   h_sig->GetYaxis()->SetTitle("d#sigma/d#Omega");
   //  h_sig->SetTitle(Form("E_{c.m.} d#sigma/d#Omega in %d", ang));
   h_sig->SetTitle(Form("E_{c.m.} d#sigma/d#Omega (integrated cross sections)"));
-  h_sig->GetXaxis()->SetLimits(0, Ecmm);
+  //  h_sig->GetXaxis()->SetLimits(0, Ecmm);
   gPad->SetLogy();
   h_sig->Draw("AP");
   c1->cd(2);

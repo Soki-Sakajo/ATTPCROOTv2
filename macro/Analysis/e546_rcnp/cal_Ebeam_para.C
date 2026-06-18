@@ -1,4 +1,4 @@
-//#define cal_Ebeam
+#define cal_Ebeam
 #include <fstream>
 #include "TFile.h"
 #include "TObject.h"
@@ -7,7 +7,7 @@
 void cal_Ebeam_para(){
 
    // set para
-   Double_t verz = 100;
+   Double_t verz = 500;
 
    // set data
    vector<pair<Double_t, Double_t>> lise_data={
