@@ -114,14 +114,14 @@ void AtFindVertex::FindVertexMultipleLines(std::vector<AtTrack> tracks, Int_t nb
 
    for (Int_t i = 0; i < vtxCand.size(); i++) {
       if (cogVtx.at(i).X() != cogVtx.at(i).X() || cogVtx.at(i).Y() != cogVtx.at(i).Y() ||
-         cogVtx.at(i).Z() != cogVtx.at(i).Z())
+          cogVtx.at(i).Z() != cogVtx.at(i).Z())
          continue;
       //      if (cogVtx.at(i).Z() <= 0 || cogVtx.at(i).Z() >= 1000 || sqrt(cogVtx.at(i).Perp2()) > 30)
       if (cogVtx.at(i).Z() <= 0 || cogVtx.at(i).Z() >= 1000)
          continue;
       if (vtxCand.at(i).size() > nbTracksPerVtx)
          std::cout << cYELLOW << " vtx with more than " << nbTracksPerVtx << " tracks(" << vtxCand.at(i).size() << ")"
-                  << cNORMAL << std::endl;
+                   << cNORMAL << std::endl;
       std::vector<AtTrack> tracksVtx;
       for (auto vtxInd : vtxCand.at(i)) {
          tracksVtx.push_back(tracks.at(vtxInd));
@@ -222,7 +222,7 @@ AtFindVertex::CoGVtxSingleTrack(std::vector<std::vector<Double_t>> lines, std::v
 }
 
 std::vector<XYZVector> AtFindVertex::CoGVtx(std::vector<std::vector<Int_t>> vtxCand,
-                                             std::vector<std::vector<Double_t>> lines, std::vector<Double_t> wlines)
+                                            std::vector<std::vector<Double_t>> lines, std::vector<Double_t> wlines)
 {
    std::vector<XYZVector> result;
 
