@@ -17,8 +17,7 @@ void draw_ind(TString cname, TString states, Int_t n_group, Int_t n_h_z, TH1D* h
 std::vector<Double_t> cal_Ebeam_para();
 Double_t est_Ebeam(std::vector<Double_t> &Ebeam_para, Double_t vertz);
 
-//void check_vd_76matm(Double_t vd_val = 4.05){
-void check_vd_76matm(){
+void check_vd_76matm(Double_t vd_val = 4.05){
    //copy from kine.C 2026/05/06 12:20
 
    //set timer
@@ -40,17 +39,17 @@ void check_vd_76matm(){
    */
 
    // directory
-   //   Double_t vd_val = 3.06;
-   //   Double_t vd_val = 3.50;
-   //   Double_t vd_val = 3.89;
-   //   Double_t vd_val = 4.00;
-   Double_t vd_val = 4.05;
-   //   Double_t vd_val = 4.06;
-   //   Double_t vd_val = 4.07;
-   //   Double_t vd_val = 4.08;
-   //   Double_t vd_val = 4.10;
-   //   Double_t vd_val = 4.20;
-   //   Double_t vd_val = 4.50;
+   //   double vd_val = 3.06;
+   //   double vd_val = 3.50;
+   //   double vd_val = 3.89;
+   //   double vd_val = 4.00;
+   //   double vd_val = 4.05;
+   //   double vd_val = 4.06;
+   //   double vd_val = 4.07;
+   //   double vd_val = 4.08;
+   //   double vd_val = 4.10;
+   //   double vd_val = 4.20;
+   //   double vd_val = 4.50;
 
    // files.
    std::vector runNums = {52};
@@ -70,9 +69,8 @@ void check_vd_76matm(){
    Int_t run_end = runNums.back();
    std::vector<Double_t> Ebeam_para(0);
    //   TFile * Results = new TFile(Form("data/check_vd_results_run%d-run%d.root", run_start, run_end),"recreate");
-   //   TFile * Results = new TFile(Form("vd_data/vd_results_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
-   TFile * Results = new TFile(Form("vd_data/vd_results_all_hists_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
-
+   TFile * Results = new TFile(Form("data/check_vd_results_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
+      
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
    //   TString outfname="./canvas_kine.root";
    //   TFile *outfile=new TFile(outfname,"recreate");
@@ -145,25 +143,12 @@ void check_vd_76matm(){
    TCutG *theta_exex = (TCutG*) gROOT->FindObject("theta_theta_ex-ex");
 
    // Kinematic lines.
-   TGraph *kine_gsex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsex_4.44_60.7.txt");
-   TGraph *kine_exex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_exex_4.44_60.7.txt");
-
-   TGraph *kine_gsgs_0   = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_60.7_verz_0.txt");
-   TGraph *kine_gsgs_50  = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_57.9_verz_50.txt");
-   TGraph *kine_gsgs_100 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_55.0_verz_100.txt");
-   TGraph *kine_gsgs_150 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_51.8_verz_150.txt");
-   TGraph *kine_gsgs_200 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_48.5_verz_200.txt");
-
-   TGraph *kine_gsgs_300 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_41.5_verz_300.txt");
-   TGraph *kine_gsgs_350 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_37.8_verz_350.txt");
-   TGraph *kine_gsgs_400 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_33.8_verz_400.txt");
-   TGraph *kine_gsgs_450 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_29.5_verz_450.txt");
-   TGraph *kine_gsgs_500 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_24.6_verz_500.txt");
-
-   TF1 *angle_gsgs_60_7    = new TF1("angle_gsgs_60_7", "-x + 90", 0, 90);
-   TGraph *angle_gsex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_gsex_4.44_60.7.txt")
-   TGraph *angle_exex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_exex_4.44_60.7.txt");
-
+   TGraph *kine_12c12c_gsgs_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_60.7.txt");
+   TGraph *kine_12c12c_gsex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsex_4.44_60.7.txt");
+   TGraph *kine_12c12c_exex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_exex_4.44_60.7.txt");
+   TF1 *xy90 = new TF1("xy90", "-x + 90", 0, 90);
+   TGraph *angle_12c12c_gsex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_gsex_4.44_60.7.txt");
+   TGraph *angle_12c12c_exex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_exex_4.44_60.7.txt");
    /*
    TGraph *kine_dp_gs = ReadKinematics("./kineFiles/kine17C_dp_gs.txt");
    TGraph *kine_dd_gs_25MeVu = ReadKinematics("./kineFiles/kine17C_dd_gs_25MeVu.txt");
@@ -955,10 +940,10 @@ void check_vd_76matm(){
       delete gROOT->FindObject("c1");
    }
    //  set color
-   kine_exex_60_7 -> SetLineColor(kRed);
-   angle_gsgs_60_7->SetLineColor(kRed);
-   angle_gsgs_60_7->SetLineWidth(1);
-   angle_exex_60_7 -> SetLineColor(kRed);
+   kine_12c12c_exex_60_7 -> SetLineColor(kRed);
+   xy90->SetLineColor(kRed);
+   xy90->SetLineWidth(1);
+   angle_12c12c_exex_60_7 -> SetLineColor(kRed);
 
 #ifdef nom_check
    TCanvas *c1 = new TCanvas("c1", "c1");
@@ -1004,7 +989,7 @@ void check_vd_76matm(){
    h_kineE_thetalab->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab->GetYaxis()->SetTitle("roughKinE [MeV]");
    h_kineE_thetalab->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
 
    TCanvas *c7 = new TCanvas("c7", "c7");
    c7->cd();
@@ -1051,7 +1036,7 @@ void check_vd_76matm(){
    h_thetalab_thetalab_cutphi->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d )", (int)del_phi));
    h_thetalab_thetalab_cutphi->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
 
    TCanvas *c12 = new TCanvas("c12", "c12");
    c12->cd();
@@ -1086,7 +1071,7 @@ void check_vd_76matm(){
    h_thetalab_thetalab_cutphi_2tra->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cutphi_2tra->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2 )", (int)del_phi));
    h_thetalab_thetalab_cutphi_2tra->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
 
    TCanvas *c16 = new TCanvas("c16", "c16");
    c16->cd();
@@ -1112,7 +1097,7 @@ void check_vd_76matm(){
    h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_carbon->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
    h_kineE_thetalab_carbon->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
 
    TCanvas *c19 = new TCanvas("c19", "c19");
    c19->cd();
@@ -1121,9 +1106,9 @@ void check_vd_76matm(){
    h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cut12c_ela->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c )", (int)del_phi));
    h_thetalab_thetalab_cut12c_ela->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
-   angle_gsex_60_7->Draw("same");
-   angle_exex_60_7->Draw("same");
+   xy90->Draw("same");
+   angle_12c12c_gsex_60_7->Draw("same");
+   angle_12c12c_exex_60_7->Draw("same");
    theta_gsgs->Draw("same");
    theta_gsex->Draw("same");
    theta_exex->Draw("same");
@@ -1293,9 +1278,9 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_cut12c_ela->SetMinimum(1);
    h_thetalab_thetalab_cut12c_ela->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
-   angle_gsex_60_7->Draw("same");
-   angle_exex_60_7->Draw("same");
+   xy90->Draw("same");
+   angle_12c12c_gsex_60_7->Draw("same");
+   angle_12c12c_exex_60_7->Draw("same");
    theta_gsgs->Draw("same");
    theta_gsex->Draw("same");
    theta_exex->Draw("same");
@@ -1326,9 +1311,9 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_carbon->SetMinimum(1);
    h_kineE_thetalab_carbon->Draw("colz");
-   kine_gsgs_0->Draw("same");
-   kine_gsex_60_7->Draw("same");
-   kine_exex_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
    c81->cd(6);
    h_kineE_thetalab_gsgs->SetDirectory(0);
    h_kineE_thetalab_gsgs->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
@@ -1337,9 +1322,9 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_gsgs->SetMinimum(1);
    h_kineE_thetalab_gsgs->Draw("colz");
-   kine_gsgs_0->Draw("same");
-   kine_gsex_60_7->Draw("same");
-   kine_exex_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
    c81->cd(7);
    h_kineE_thetalab_gsex->SetDirectory(0);
    h_kineE_thetalab_gsex->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
@@ -1348,9 +1333,9 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_gsex->SetMinimum(1);
    h_kineE_thetalab_gsex->Draw("colz");
-   kine_gsgs_0->Draw("same");
-   kine_gsex_60_7->Draw("same");
-   kine_exex_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
    c81->cd(8);
    h_kineE_thetalab_exex->SetDirectory(0);
    h_kineE_thetalab_exex->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
@@ -1359,9 +1344,9 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_exex->SetMinimum(1);
    h_kineE_thetalab_exex->Draw("colz");
-   kine_gsgs_0->Draw("same");
-   kine_gsex_60_7->Draw("same");
-   kine_exex_60_7->Draw("same");
+   kine_12c12c_gsgs_60_7->Draw("same");
+   kine_12c12c_gsex_60_7->Draw("same");
+   kine_12c12c_exex_60_7->Draw("same");
    c81->cd(9);
    h_verxy_cut12c_ela->SetDirectory(0);
    h_verxy_cut12c_ela->GetXaxis()->SetTitle("vertex x [mm]");
@@ -1453,7 +1438,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs->SetMinimum(1);
    h_thetalab_thetalab_gsgs->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c91->cd(2);
    h_thetalab_thetalab_gsgs_cm50->SetDirectory(0);
@@ -1463,7 +1448,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm50->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm50->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c91->cd(3);
    h_thetalab_thetalab_gsgs_cm60->SetDirectory(0);
@@ -1473,7 +1458,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm60->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm60->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c91->cd(4);
    h_thetalab_thetalab_gsgs_cm70->SetDirectory(0);
@@ -1483,7 +1468,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm70->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm70->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c91->cd(5);
    h_thetalab_thetalab_gsgs_cm80->SetDirectory(0);
@@ -1493,7 +1478,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm80->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm80->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c91->cd(6);
    h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
@@ -1503,7 +1488,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm90->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm90->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
 
    c91->cd(7);
@@ -1590,7 +1575,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs->SetMinimum(1);
    h_thetalab_thetalab_gsgs->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c92->cd(2);
    h_thetalab_thetalab_gsgs_cm50->SetDirectory(0);
@@ -1600,7 +1585,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm50->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm50->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c92->cd(3);
    h_thetalab_thetalab_gsgs_cm60->SetDirectory(0);
@@ -1610,7 +1595,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm60->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm60->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c92->cd(4);
    h_thetalab_thetalab_gsgs_cm70->SetDirectory(0);
@@ -1620,7 +1605,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm70->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm70->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c92->cd(5);
    h_thetalab_thetalab_gsgs_cm80->SetDirectory(0);
@@ -1630,7 +1615,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm80->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm80->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
    c92->cd(6);
    h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
@@ -1640,7 +1625,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_thetalab_thetalab_gsgs_cm90->SetMinimum(1);
    h_thetalab_thetalab_gsgs_cm90->Draw("colz");
-   angle_gsgs_60_7->Draw("same");
+   xy90->Draw("same");
    theta_gsgs->Draw("same");
 
    c92->cd(7);
@@ -1685,56 +1670,86 @@ void check_vd_76matm(){
 #ifdef vertex_index
    draw_ind("c97", "gsgs", n_group, n_h_z, h_verz_gsgs, h_verxy_gsgs, h_kineE_thetalab_gsgs, h_thetalab_thetalab_cut12c_ela,
       h_verz_gsgs_index, h_verxy_gsgs_index, h_kineE_thetalab_gsgs_index, h_thetalab_thetalab_gsgs_index,
-      kine_gsgs_0, kine_gsex_60_7, kine_exex_60_7, angle_gsgs_60_7, angle_gsex_60_7, angle_exex_60_7
+      kine_12c12c_gsgs_60_7, kine_12c12c_gsex_60_7, kine_12c12c_exex_60_7, xy90, angle_12c12c_gsex_60_7, angle_12c12c_exex_60_7
    );
 
    draw_ind("c98", "gsex", n_group, n_h_z, h_verz_gsex, h_verxy_gsex, h_kineE_thetalab_gsex, h_thetalab_thetalab_cut12c_ela,
       h_verz_gsex_index, h_verxy_gsex_index, h_kineE_thetalab_gsex_index, h_thetalab_thetalab_gsex_index,
-      kine_gsgs_0, kine_gsex_60_7, kine_exex_60_7, angle_gsgs_60_7, angle_gsex_60_7, angle_exex_60_7
+      kine_12c12c_gsgs_60_7, kine_12c12c_gsex_60_7, kine_12c12c_exex_60_7, xy90, angle_12c12c_gsex_60_7, angle_12c12c_exex_60_7
    );
 
    draw_ind("c99", "exex", n_group, n_h_z, h_verz_exex, h_verxy_exex, h_kineE_thetalab_exex, h_thetalab_thetalab_cut12c_ela,
       h_verz_exex_index, h_verxy_exex_index, h_kineE_thetalab_exex_index, h_thetalab_thetalab_exex_index,
-      kine_gsgs_0, kine_gsex_60_7, kine_exex_60_7, angle_gsgs_60_7, angle_gsex_60_7, angle_exex_60_7
+      kine_12c12c_gsgs_60_7, kine_12c12c_gsex_60_7, kine_12c12c_exex_60_7, xy90, angle_12c12c_gsex_60_7, angle_12c12c_exex_60_7
    );
-
-   TCanvas *c100 = new TCanvas("c100","c100");
-   c100->Divide(2,2);
-   c100->cd(1);
-   h_kineE_thetalab_gsgs_index_0->SetStats(0);
-   gPad->SetLogz();
-   h_kineE_thetalab_gsgs_index_0->Draw("colz");
-   kine_gsgs_0->Draw("same");
-   //  kine_gsgs_50->Draw("same");
-   kine_gsgs_100->Draw("same");
-
-   c100->cd(2);
-   h_kineE_thetalab_gsgs_index_1->SetStats(0);
-   gPad->SetLogz();
-   h_kineE_thetalab_gsgs_index_1->Draw("colz");
-   kine_gsgs_100->Draw("same");
-   //  kine_gsgs_150->Draw("same");
-   kine_gsgs_200->Draw("same");
-
-   c100->cd(3);
-   h_kineE_thetalab_gsgs_index_3->SetStats(0);
-   gPad->SetLogz();
-   h_kineE_thetalab_gsgs_index_3->Draw("colz");
-   kine_gsgs_300->Draw("same");
-   //  kine_gsgs_350->Draw("same");
-   kine_gsgs_400->Draw("same");
-
-   c100->cd(4);
-   h_kineE_thetalab_gsgs_index_4->SetStats(0);
-   gPad->SetLogz();
-   h_kineE_thetalab_gsgs_index_4->Draw("colz");
-   kine_gsgs_400->Draw("same");
-   //  kine_gsgs_450->Draw("same");
-   kine_gsgs_500->Draw("same");
 
 #endif
 
    /*
+   TCanvas *c29 = new TCanvas("c29", "c29");
+   c29->cd();
+   h_philab_philab_cutphi_12c->SetDirectory(0);
+   h_philab_philab_cutphi_12c->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_12c->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_12c->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, 12c)", (int)del_phi));
+   h_philab_philab_cutphi_12c->Draw("colz");
+
+   TCanvas *c30 = new TCanvas("c30", "c30");
+   c30->cd();
+   h_philab_philab_cutphi_alpha->SetDirectory(0);
+   h_philab_philab_cutphi_alpha->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_alpha->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_alpha->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, alpha)", (int)del_phi));
+   h_philab_philab_cutphi_alpha->Draw("colz");
+
+   TCanvas *c31 = new TCanvas("c31", "c31");
+   c31->cd();
+   h_philab_philab_cutphi_proton->SetDirectory(0);
+   h_philab_philab_cutphi_proton->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_proton->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi_proton->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d, proton)", (int)del_phi));
+   h_philab_philab_cutphi_proton->Draw("colz");
+
+   TCanvas *c30 = new TCanvas("c30", "c30");
+   c30->Divide(2,1);
+   c30->cd(1);
+   h_dEdx_range_cutmul1->SetDirectory(0);
+   h_dEdx_range_cutmul1->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_dEdx_range_cutmul1->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_dEdx_range_cutmul1->Draw("colz");
+   c30->cd(2);
+   h_dEdx_range_cutmul2->SetDirectory(0);
+   h_dEdx_range_cutmul2->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_dEdx_range_cutmul2->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_dEdx_range_cutmul2->Draw("colz");
+
+   */
+
+   /*
+   TCanvas *c26 = new TCanvas("c26", "c26");
+   c26->cd();
+   h_dEdx_range_cutphi_12c->SetDirectory(0);
+   h_dEdx_range_cutphi_12c->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range_cutphi_12c->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range_cutphi_12c->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, 12c)", (int)del_phi));
+   h_dEdx_range_cutphi_12c->Draw("colz");
+
+   TCanvas *c27 = new TCanvas("c27", "c27");
+   c27->cd();
+   h_dEdx_range_cutphi_alpha->SetDirectory(0);
+   h_dEdx_range_cutphi_alpha->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range_cutphi_alpha->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range_cutphi_alpha->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
+   h_dEdx_range_cutphi_alpha->Draw("colz");
+
+   TCanvas *c28 = new TCanvas("c28", "c28");
+   c28->cd();
+   h_dEdx_range_cutphi_proton->SetDirectory(0);
+   h_dEdx_range_cutphi_proton->GetXaxis()->SetTitle("roughRange [mm]");
+   h_dEdx_range_cutphi_proton->GetYaxis()->SetTitle("dE/dx [ADC/mm]");
+   h_dEdx_range_cutphi_proton->SetTitle(Form("dE/dx Range (phi1-phi2-180 < %d, alpha)", (int)del_phi));
+   h_dEdx_range_cutphi_proton->Draw("colz");
+
    TCanvas *c8 = new TCanvas();
    histExdp->SetDirectory(0);
    histExdp->Draw();
@@ -1888,23 +1903,12 @@ void check_vd_76matm(){
    theta_gsex->Write("theta_theta_gsex");
    theta_exex->Write("theta_theta_exex");
    // save lines
-   kine_gsgs_0  ->Write("kine_12c_gsgs_E60_7_z0");
-   kine_gsgs_50 ->Write("kine_12c_gsgs_E57_9_z50");
-   kine_gsgs_100->Write("kine_12c_gsgs_E55_0_z100");
-   kine_gsgs_150->Write("kine_12c_gsgs_E51_8_z150");
-   kine_gsgs_200->Write("kine_12c_gsgs_E48_5_z200");
-
-   kine_gsgs_300->Write("kine_12c_gsgs_E41_5_z300");
-   kine_gsgs_350->Write("kine_12c_gsgs_E37_8_z350");
-   kine_gsgs_400->Write("kine_12c_gsgs_E33_8_z400");
-   kine_gsgs_450->Write("kine_12c_gsgs_E29_5_z450");
-   kine_gsgs_500->Write("kine_12c_gsgs_E24_6_z500");
-
-   kine_gsex_60_7->Write("kine_12c_gsex");
-   kine_exex_60_7->Write("kine_12c_exex");
-   angle_gsgs_60_7->Write("angle_12c_gsgs");
-   angle_gsex_60_7->Write("angle_12c_gsex");
-   angle_exex_60_7->Write("angle_12c_exex");
+   kine_12c12c_gsgs_60_7->Write("kine_12c_gsgs");
+   kine_12c12c_gsex_60_7->Write("kine_12c_gsex");
+   kine_12c12c_exex_60_7->Write("kine_12c_exex");
+   xy90->Write("angle_12c_gsgs");
+   angle_12c12c_gsex_60_7->Write("angle_12c_gsex");
+   angle_12c12c_exex_60_7->Write("angle_12c_exex");
    Results->Close();
 
    // cout of information

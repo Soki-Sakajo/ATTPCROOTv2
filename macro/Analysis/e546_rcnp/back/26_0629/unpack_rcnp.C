@@ -7,10 +7,10 @@ bool reduceFunc(AtRawEvent *evt){
   return (evt->GetNumPads() > 0) && evt->IsGood();
 }
 
-void unpack_rcnp_129matm(int run_num = 116){
-
+void unpack_rcnp(int run_num = 52){
+//void unpack_rcnp(int run_num = 116){
   // Load the library for unpacking and reconstruction
-  //  gSystem->Load("libAtRecoMediumnstruction.so");
+  gSystem->Load("libAtRecoMediumnstruction.so");
 
   TStopwatch timer;
   timer.Start();
@@ -36,13 +36,13 @@ void unpack_rcnp_129matm(int run_num = 116){
   TString loggerFile = dataDir + "ATTPCLog.log";
   TString digiParFile = dir + "/parameters/RCNP/" + parameterFile;
   //  TString geoManFile = dir + "/geometry/ATTPC_C4H10_57_7torr.root";
-  //  TString geoManFile = dir + "/geometry/rcnp_76matm_e546.root";
-  TString geoManFile = dir + "/geometry/rcnp_129matm_e546.root";
+  TString geoManFile = dir + "/geometry/rcnp_76matm_e546.root";
+  //  TString geoManFile = dir + "/geometry/rcnp_129matm_e546.root";
 
   // set the value for AtFitterTask task.
   //  double density = 1.835e-4; //density of IsoButane at 57.7torr; the same value as media.geo
-  //  double density = 1.7884e-4; //density of IsoButane at 76matm; the same value as media.geo
-  double density = 3.0406e-4; //density of IsoButane at 129matm; the same value as media.geo
+  double density = 1.7884e-4; //density of IsoButane at 76matm; the same value as media.geo
+  //  double density = 3.0406e-4; //density of IsoButane at 129matm; the same value as media.geo
 
   // Specific paths for three LUT for electric field correction
   TString zlutFile = dir + "/resources/corrections/a1954/zLUT.txt";

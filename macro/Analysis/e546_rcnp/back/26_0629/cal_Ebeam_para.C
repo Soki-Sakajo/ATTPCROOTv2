@@ -7,7 +7,7 @@
 void cal_Ebeam_para(){
 
    // set para
-   Double_t verz = -50;
+   Double_t verz = 500;
 
    // set data
    vector<pair<Double_t, Double_t>> lise_data={

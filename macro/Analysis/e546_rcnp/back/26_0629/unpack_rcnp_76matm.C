@@ -7,21 +7,27 @@ bool reduceFunc(AtRawEvent *evt){
   return (evt->GetNumPads() > 0) && evt->IsGood();
 }
 
-void unpack_rcnp_129matm(int run_num = 116){
+void unpack_rcnp_76matm(int run_num = 52){
 
   // Load the library for unpacking and reconstruction
-  //  gSystem->Load("libAtRecoMediumnstruction.so");
+  gSystem->Load("libAtRecoMediumnstruction.so");
 
   TStopwatch timer;
   timer.Start();
 
   TString fileName = TString::Format("run_%04d", run_num);
   TString mappath = "";
-  TString parameterFile = "ATTPC.E546.par"; // need to check
+  TString parameterFile = "ATTPC.E546_76matm.par"; // need to check
   TString beampadsfile = "BeamPads_RCNP.csv";
   TString filepath = "./h5_file/";
   TString fileExt = ".h5";
-  TString outputpath = "./decode_data/";
+  //  TString outputpath = "./decode_data/";
+  //  TString outputpath = "./vd_check_data/";
+  //  TString outputpath = "./vd_check_data/for_raw_eve_ana/";
+  TString outputpath = "./vd_check_data/vd4.05_files/";
+  //  TString outputpath = "./vd_check_data/vd4.06_files/";
+  //  TString outputpath = "./vd_check_data/vd4.07_files/";
+  //  TString outputpath = "./vd_check_data/vd4.08_files/";
 
   TString inputFile = filepath + fileName + fileExt;
   TString scriptfile = "rcnp_map_size.xml";
@@ -36,13 +42,13 @@ void unpack_rcnp_129matm(int run_num = 116){
   TString loggerFile = dataDir + "ATTPCLog.log";
   TString digiParFile = dir + "/parameters/RCNP/" + parameterFile;
   //  TString geoManFile = dir + "/geometry/ATTPC_C4H10_57_7torr.root";
-  //  TString geoManFile = dir + "/geometry/rcnp_76matm_e546.root";
-  TString geoManFile = dir + "/geometry/rcnp_129matm_e546.root";
+  TString geoManFile = dir + "/geometry/rcnp_76matm_e546.root";
+  //  TString geoManFile = dir + "/geometry/rcnp_129matm_e546.root";
 
   // set the value for AtFitterTask task.
   //  double density = 1.835e-4; //density of IsoButane at 57.7torr; the same value as media.geo
-  //  double density = 1.7884e-4; //density of IsoButane at 76matm; the same value as media.geo
-  double density = 3.0406e-4; //density of IsoButane at 129matm; the same value as media.geo
+  double density = 1.7884e-4; //density of IsoButane at 76matm; the same value as media.geo
+  //  double density = 3.0406e-4; //density of IsoButane at 129matm; the same value as media.geo
 
   // Specific paths for three LUT for electric field correction
   TString zlutFile = dir + "/resources/corrections/a1954/zLUT.txt";
@@ -126,6 +132,7 @@ void unpack_rcnp_129matm(int run_num = 116){
   std::vector<std::unique_ptr<AtPatternModification>> patternModifications;
   auto braggCurveFinder = std::make_unique<AtBraggCurveFinder>();
   braggCurveFinder->SetBinSize(3.0);
+  braggCurveFinder->SetNumTracksPerVtx(2); //findvertex parameter, 1: find vertex single line, rather than 1: find vertex multiple lines
   braggCurveFinder->SetNumSmoothingSteps(200);
   patternModifications.push_back(std::move(braggCurveFinder));
   AtPatternModificationTask *patternModTask = new AtPatternModificationTask(std::move(patternModifications));
@@ -167,7 +174,7 @@ void unpack_rcnp_129matm(int run_num = 116){
   run->AddTask(SCTask);
   run->AddTask(ransacTask);
   run->AddTask(patternModTask);
-  run->AddTask(fitterTask);
+  //  run->AddTask(fitterTask);
 
   std::cout << "***** Starting Init ******" << std::endl;
   run->Init();

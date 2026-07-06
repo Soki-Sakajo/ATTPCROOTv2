@@ -10,7 +10,7 @@ bool reduceFunc(AtRawEvent *evt){
 void unpack_rcnp_129matm(int run_num = 116){
 
   // Load the library for unpacking and reconstruction
-  //  gSystem->Load("libAtRecoMediumnstruction.so");
+  gSystem->Load("libAtRecoMediumnstruction.so");
 
   TStopwatch timer;
   timer.Start();
