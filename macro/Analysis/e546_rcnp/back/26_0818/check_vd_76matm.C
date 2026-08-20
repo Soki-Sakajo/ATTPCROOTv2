@@ -4,7 +4,7 @@
 //#define c12_check
 #define states_vertex
 //#define vertex_index
-//#define check_verz0
+#define check_verz0
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -181,7 +181,7 @@ void check_vd_76matm(){
    TF1 *angle_gsgs_60_7    = new TF1("angle_gsgs_60_7", "-x + 90", 0, 90);
    TGraph *angle_gsex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_gsex_4.44_60.7.txt");
    TGraph *angle_exex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_exex_4.44_60.7.txt");
-   TF1 *sum_kine_beam = new TF1("sum_kine_beam", "x", 0, 70);
+   TF1 *sum_kine_beam = new TF1("sum_kine_beam", "x", 0, 80);
 
    /*
    TGraph *kine_dp_gs = ReadKinematics("./kineFiles/kine17C_dp_gs.txt");
@@ -290,8 +290,6 @@ void check_vd_76matm(){
    */
    TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 500, 0, 10);
    TH2F *h_kineE_thetalab_proton = new TH2F("h_kineE_thetalab_proton", "h_kineE_thetalab_proton;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 250, 0, 5);
-   TH2F *h_sumkine_kineE_gsgs = new TH2F("h_sumkine_kineE_gsgs", "h_sumkine_kineE_gsgs;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
-   TH2F *h_sumkine_kineE_gsgs_cm90 = new TH2F("h_sumkine_kineE_gsgs_cm90", "h_sumkine_kineE_gsgs_cm90;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
 
    // ... angle correlations
    TH2F *h_range_thetalab = new TH2F("h_range_thetalab", "h_range_thetalab", 180, 0, 180, 1030, 0, 1030);
@@ -323,7 +321,7 @@ void check_vd_76matm(){
 
    // ... vertex of tracks
    TH1D *h_verz = new TH1D("h_verz", "h_verz;Vertex Z [mm]", 1020, -10, 1010);
-   TH1D *h_verz01 = new TH1D("h_verz01", "h_verz;Vertex Z [mm]", 51, -0.1, 5);
+   TH1D *h_verz01 = new TH1D("h_verz01", "h_verz;Vertex Z [mm]", 11, -0.1, 1);
    TH1D *h_verz_cut12c_ela = new TH1D("h_verz_cut12c_ela", "h_verz_cut12c_ela;Vertex Z [mm]", 102, -10, 1010);
    TH1D *h_verz_gsgs = new TH1D("h_verz_gsgs", "h_verz_gsgs;Vertex Z [mm]", 102, -10, 1010);
    TH1D *h_verz_gsex = new TH1D("h_verz_gsex", "h_verz_gsex;Vertex Z [mm]", 102, -10, 1010);
@@ -356,8 +354,8 @@ void check_vd_76matm(){
    TH1D *h_Ebeam_gsgs_cm70 = new TH1D("h_Ebeam_gsgs_cm70", "h_Ebeam_gsgs_cm70;E_{beam} [MeV]", 70, 0, 70);
    TH1D *h_Ebeam_gsgs_cm80 = new TH1D("h_Ebeam_gsgs_cm80", "h_Ebeam_gsgs_cm80;E_{beam} [MeV]", 70, 0, 70);
    TH1D *h_Ebeam_gsgs_cm90 = new TH1D("h_Ebeam_gsgs_cm90", "h_Ebeam_gsgs_cm90;E_{beam} [MeV]", 70, 0, 70);
-   TH2D *h_sumkine_Ebeam_gsgs = new TH2F("h_sumkine_Ebeam_gsgs", "h_sumkine_Ebeam_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 90);
-   TH2D *h_sumkine_Ebeam_gsgs_cm90 = new TH2F("h_sumkine_Ebeam_gsgs_cm90", "h_sumkine_Ebeam_gsgs_cm90;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
+   TH2F *h_sumkine_Ebeam_gsgs = new TH2F("h_sumkine_Ebeam_gsgs", "h_sumkine_Ebeam_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 90);
+   TH2F *h_sumkine_Ebeam_gsgs_cm90 = new TH2F("h_sumkine_Ebeam_gsgs_cm90", "h_sumkine_Ebeam_gsgs_cm90;E_{beam} [MeV];sum_kineE [MeV]", 80, 0, 80, 80, 0, 80);
 
    TH1D *h_Ebcm = new TH1D("h_Ebcm", "h_Ebcm;E_{bc} [MeV]", 62, 0, 31);
    TH1D *h_Ebcm_gsgs = new TH1D("h_Ebcm_gsgs", "h_Ebcm_gsgs;E_{bc} [MeV]", 62, 0, 31);
@@ -876,8 +874,6 @@ void check_vd_76matm(){
                      h_range_thetalab_gsgs -> Fill(track_theta[1], track_range[1]);
                      h_kineE_thetalab_gsgs -> Fill(track_theta[0], track_KinE[0]);
                      h_kineE_thetalab_gsgs -> Fill(track_theta[1], track_KinE[1]);
-                     h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
-                     h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
                      h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
                      if(tracks_vertex){
                         h_Ebeam_gsgs->Fill(Ebeam);
@@ -911,8 +907,6 @@ void check_vd_76matm(){
                         }
                         if ((track_theta[0] > 43 && track_theta[0] < 47) || (track_theta[1] > 43 && track_theta[1] < 47)){
                            h_thetalab_thetalab_gsgs_cm90 -> Fill(track_theta[0], track_theta[1]);
-                           h_sumkine_kineE_gsgs_cm90->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
-                           h_sumkine_kineE_gsgs_cm90->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
                            h_verz_gsgs_cm90 -> Fill(vtz);
                            h_Ebeam_gsgs_cm90->Fill(Ebeam);
                            h_Ebcm_gsgs_cm90->Fill(Ebeam_cm);
@@ -1016,7 +1010,7 @@ void check_vd_76matm(){
    angle_gsgs_60_7 -> SetLineWidth(1);
    angle_exex_60_7 -> SetLineColor(kRed);
    sum_kine_beam->SetLineColor(kRed);
-   sum_kine_beam->SetLineWidth(2);
+   sum_kine_beam->SetLineWidth(1);
 
    // scale hist of cross section
 
@@ -1036,13 +1030,6 @@ void check_vd_76matm(){
    //   scale_gsgs_cm90 -> SetMinimum(gmin_ori);
    //   scale_gsgs_cm90 -> SetMaximum(gmax_ori);
 
-#ifdef nom_check
-   TCanvas *c0 = new TCanvas("c0", "c0");
-   c0->cd();
-   h_rmax->SetDirectory(0);
-   h_rmax->GetXaxis()->SetTitle("Rmax [mm]");
-   h_rmax->Draw();
-
    TCanvas *c1 = new TCanvas("c1", "c1");
    c1->Divide(2,1);
    c1->cd(1);
@@ -1053,6 +1040,14 @@ void check_vd_76matm(){
    h_rmax_12c->SetDirectory(0);
    h_rmax_12c->GetXaxis()->SetTitle("Rmax [mm]");
    h_rmax_12c->Draw();
+
+
+#ifdef nom_check
+   TCanvas *c0 = new TCanvas("c0", "c0");
+   c0->cd();
+   h_rmax->SetDirectory(0);
+   h_rmax->GetXaxis()->SetTitle("Rmax [mm]");
+   h_rmax->Draw();
 
    TCanvas *c2 = new TCanvas("c2", "c2");
    c2->cd();
@@ -1795,9 +1790,8 @@ void check_vd_76matm(){
    r_axis->Draw();
    c93->Update();
 
-   //   TCanvas *c94 = new TCanvas("c94", "c94", 600, 600);
-   TCanvas *c94 = new TCanvas("c94", "c94");
-   c94->Divide(3,1);
+   TCanvas *c94 = new TCanvas("c94", "c94", 600, 600);
+   c94->Divide(2,2);
    c94->cd(1);
    h_Ebeam_gsgs->SetDirectory(0);
    h_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
@@ -1805,6 +1799,12 @@ void check_vd_76matm(){
    gPad->SetLogy();
    h_Ebeam_gsgs->Draw();
    c94->cd(2);
+   h_Ebeam_gsgs_cm90->SetDirectory(0);
+   h_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs_cm90->Draw();
+   c94->cd(3);
    h_sumkine_Ebeam_gsgs->SetDirectory(0);
    h_sumkine_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_Ebeam_gsgs->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1814,27 +1814,7 @@ void check_vd_76matm(){
    h_sumkine_Ebeam_gsgs->SetMinimum(1);
    h_sumkine_Ebeam_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
-   c94->cd(3);
-   h_sumkine_kineE_gsgs->SetDirectory(0);
-   h_sumkine_kineE_gsgs->GetXaxis()->SetTitle("E_{kine} [MeV]");
-   h_sumkine_kineE_gsgs->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
-   h_sumkine_kineE_gsgs->SetTitle(Form("Sum E_{kine} vs E_{kine} , (12c12c, gsgs)"));
-   gPad->SetLogz();
-   //   h_sumkine_Ebeam_gsgs->SetMaximum(100);
-   h_sumkine_kineE_gsgs->SetMinimum(1);
-   h_sumkine_kineE_gsgs->Draw("colz");
-   sum_kine_beam->Draw("same");
-
-   //   TCanvas *c95 = new TCanvas("c95", "c95", 600, 600);
-   TCanvas *c95 = new TCanvas("c95", "c95");
-   c95->Divide(2,2);
-   c95->cd(1);
-   h_Ebeam_gsgs_cm90->SetDirectory(0);
-   h_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
-   h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
-   gPad->SetLogy();
-   h_Ebeam_gsgs_cm90->Draw();
-   c95->cd(2);
+   c94->cd(4);
    h_sumkine_Ebeam_gsgs_cm90->SetDirectory(0);
    h_sumkine_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_Ebeam_gsgs_cm90->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1843,16 +1823,6 @@ void check_vd_76matm(){
    //   h_sumkine_Ebeam_gsgs_cm90->SetMaximum(100);
    h_sumkine_Ebeam_gsgs_cm90->SetMinimum(1);
    h_sumkine_Ebeam_gsgs_cm90->Draw("colz");
-   sum_kine_beam->Draw("same");
-   c95->cd(3);
-   h_sumkine_kineE_gsgs_cm90->SetDirectory(0);
-   h_sumkine_kineE_gsgs_cm90->GetXaxis()->SetTitle("E_{kine} [MeV]");
-   h_sumkine_kineE_gsgs_cm90->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
-   h_sumkine_kineE_gsgs_cm90->SetTitle(Form("Sum E_{kine} vs E_{kine} , (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
-   gPad->SetLogz();
-   //   h_sumkine_Ebeam_gsgs_cm90->SetMaximum(100);
-   h_sumkine_kineE_gsgs_cm90->SetMinimum(1);
-   h_sumkine_kineE_gsgs_cm90->Draw("colz");
    sum_kine_beam->Draw("same");
 
 #endif
@@ -1972,8 +1942,6 @@ void check_vd_76matm(){
    kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
    kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
    */
-   h_sumkine_kineE_gsgs->Write();
-   h_sumkine_kineE_gsgs_cm90->Write();
 
    // angle correlations
    //  range vs theta

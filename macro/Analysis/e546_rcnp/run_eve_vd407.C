@@ -7,18 +7,19 @@
 #include "FairRunAna.h"
 */
 
-void run_eve(int runNum = 52){
-   TString InputDataFile = TString::Format("./decode_data/run_%04d.root", runNum);
-   TString OutputDataFile = TString::Format("./data/run_%04d_display.root", runNum);
-   //  TString OutputDataFile = "./run_0038_display.root";
+void run_eve_vd407(int runNum = 52){
+
+   TString InputDataFile = TString::Format("./vd_check_data/vd4.07_files/run_%04d.root", runNum);
+   //   TString InputDataFile = TString::Format("./vd_check_data/for_raw_eve_ana/run_%04d.root", runNum);
+   TString OutputDataFile = TString::Format("./vd_data/display/run_%04d_display.root", runNum);
    std::cout << "Opening: " << InputDataFile << std::endl;
 
    TString dir = getenv("VMCWORKDIR");
    //   TString geoFile = "ATTPC_C4H10_57_7torr_geomanager.root";
    TString geoFile = "rcnp_76matm_e546_geomanager.root";
    //   TString geoFile = "rcnp_129matm_e546_geomanager.root";
-   //   TString mapFile = "RCNP2025.xml";
-   TString mapFile = "rcnp_map.xml";   
+   //   TString mapFile = "rcnp_map.xml";
+   TString mapFile = "rcnp_map_size.xml";
 
    TString InputDataPath = InputDataFile;
    TString OutputDataPath = OutputDataFile;
