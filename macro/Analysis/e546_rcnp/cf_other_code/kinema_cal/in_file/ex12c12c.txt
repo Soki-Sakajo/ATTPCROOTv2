@@ -1,0 +1,17 @@
+#mass [MeV/c^2], ki[MeV], ex[Mev]
+#m1: (mass of beam)
+#m2: (mass of target)
+#m3: (mass of scatter particle)
+#m4: (mass of recoil particle)
+#Ex3: (exitation energy of m3)
+#Ex4: (exitation energy of m4)
+#Ebeam: (beam energy)
+#nstep: (number of point)
+m1:
+m2:
+m3:
+m4:
+Ex3:
+Ex4:
+Ebeam:
+#nstep: 1800

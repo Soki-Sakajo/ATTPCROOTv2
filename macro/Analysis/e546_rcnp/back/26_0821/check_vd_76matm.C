@@ -1,8 +1,10 @@
 //#define debug_mode
-#define nom_check
-#define peak_check
-#define c12_check
-#define check_verz0
+//#define nom_check
+//#define peak_check
+//#define c12_check
+#define states_vertex
+//#define vertex_index
+//#define check_verz0
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -13,24 +15,16 @@
 TGraph* ReadKinematics(TString kineFile);
 Double_t omega(Double_t x, Double_t y, Double_t z);
 std::tuple<double, double> kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Double_t thetalab, Double_t K_eject);
+void draw_ind(TString cname, TString states, Int_t n_group, Int_t n_h_z, TH1D* h_ver, TH2F* h_verxy, TH2F* h_E_theta, TH2F* h_theta_theta, 
+         std::vector<TH1D*> &h_verz_i, std::vector<TH2F*> &h_verxy_i, std::vector<TH2F*> &h_E_theta_i, std::vector<TH2F*> &h_theta_theta_i,
+         TGraph *kine_gsgs, TGraph *kine_gsex, TGraph *kine_exex, TF1 *ang_gsgs, TGraph *ang_gsex, TGraph *ang_exex);
+std::vector<Double_t> cal_Ebeam_para();
+Double_t est_Ebeam(std::vector<Double_t> &Ebeam_para, Double_t vertz);
+TGraph* read_crosssection(TString crossFile);
 
+//void check_vd_76matm(Double_t vd_val = 4.05){
 void check_vd_76matm(){
    //copy from kine.C 2026/05/06 12:20
-
-#if !defined(nom_check) && !defined (peak_check) && !defined (c12_check) && !defined (check_verz0)
-   std::cout << std::endl;
-   std::cout << "NO DRAW MODE!!!! NEED TO CHECK DEFINITIONS" << std::endl;
-   std::cout << std::endl;
-
-#endif
-
-#ifdef debug_mode
-   std::cout << std::endl;
-   std::cout << "DEBUG MODE!! If you want to turn it off, remove debug_mode from definitions" << std::endl;
-
-#endif
-
-   std::cout << std::endl;
 
    //set timer
    TStopwatch timer;
@@ -38,6 +32,18 @@ void check_vd_76matm(){
 
    // set parameters
    Double_t del_phi = 10; // cut value; phi1 - phi2 - 180 deg < del_phi
+
+   /*
+   // Masses.
+   double u_to_MeV = 931.49401;
+   double m_17C = 17.022578650 * u_to_MeV;
+   double m_18C = 18.026751930 * u_to_MeV;
+   double m_p = 1.007825031898 * u_to_MeV;
+   double m_d = 2.014101777844 * u_to_MeV;
+
+   // Beam energy.
+   double E_beam = 27.091 * 17.022578650;
+   */
 
    // directory
    //   Double_t vd_val = 3.06;
@@ -157,10 +163,20 @@ void check_vd_76matm(){
    TCutG *theta_exex = (TCutG*) gROOT->FindObject("theta_theta_ex-ex");
 
    // Kinematic lines.
-   // need to check: kine_--_60_7 -> kine_--_69
-   TGraph *kine_gsgs_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_60.7_verz_0.txt");
    TGraph *kine_gsex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsex_4.44_60.7.txt");
    TGraph *kine_exex_60_7 = ReadKinematics("./two-body_kine_files/kine_12c12c_exex_4.44_60.7.txt");
+
+   TGraph *kine_gsgs_0   = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_60.7_verz_0.txt");
+   TGraph *kine_gsgs_50  = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_57.9_verz_50.txt");
+   TGraph *kine_gsgs_100 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_55.0_verz_100.txt");
+   TGraph *kine_gsgs_150 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_51.8_verz_150.txt");
+   TGraph *kine_gsgs_200 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_48.5_verz_200.txt");
+
+   TGraph *kine_gsgs_300 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_41.5_verz_300.txt");
+   TGraph *kine_gsgs_350 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_37.8_verz_350.txt");
+   TGraph *kine_gsgs_400 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_33.8_verz_400.txt");
+   TGraph *kine_gsgs_450 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_29.5_verz_450.txt");
+   TGraph *kine_gsgs_500 = ReadKinematics("./two-body_kine_files/kine_12c12c_gsgs_24.6_verz_500.txt");
 
    TF1 *angle_gsgs_60_7    = new TF1("angle_gsgs_60_7", "-x + 90", 0, 90);
    TGraph *angle_gsex_60_7 = ReadKinematics("./two-body_kine_files/angle_12c12c_gsex_4.44_60.7.txt");
@@ -172,6 +188,12 @@ void check_vd_76matm(){
    TGraph *kine_dd_gs_25MeVu = ReadKinematics("./kineFiles/kine17C_dd_gs_25MeVu.txt");
    TGraph *kine_dp_gs_25MeVu = ReadKinematics("./kineFiles/kine17C_dp_gs_25MeVu.txt");
    */
+
+   TGraph *cross_gsgs_cm90 = read_crosssection("./sim_temp/c12c12_gsgs_theta_90_Ecm_mb_sr_10-38MeV.txt");
+
+//#ifdef states_vertex
+   Ebeam_para = cal_Ebeam_para();
+//#endif
 
    // Characteristic definitions
    bool tracks_vertex = false;
@@ -206,6 +228,8 @@ void check_vd_76matm(){
    Double_t vtx = 0;
    Double_t vty = 0;
    Double_t vtz = 0;
+   Double_t Ebeam = 0;
+   Double_t Ebeam_cm = 0;
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
@@ -266,6 +290,8 @@ void check_vd_76matm(){
    */
    TH2F *h_kineE_thetalab_alpha = new TH2F("h_kineE_thetalab_alpha", "h_kineE_thetalab_alpha;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 500, 0, 10);
    TH2F *h_kineE_thetalab_proton = new TH2F("h_kineE_thetalab_proton", "h_kineE_thetalab_proton;#theta_{LAB} [deg];roughKinE [MeV]", 180, 0, 180, 250, 0, 5);
+   TH2F *h_sumkine_kineE_gsgs = new TH2F("h_sumkine_kineE_gsgs", "h_sumkine_kineE_gsgs;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
+   TH2F *h_sumkine_kineE_gsgs_cm90 = new TH2F("h_sumkine_kineE_gsgs_cm90", "h_sumkine_kineE_gsgs_cm90;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
 
    // ... angle correlations
    TH2F *h_range_thetalab = new TH2F("h_range_thetalab", "h_range_thetalab", 180, 0, 180, 1030, 0, 1030);
@@ -282,6 +308,11 @@ void check_vd_76matm(){
    TH2F *h_thetalab_thetalab_cutphi_2tra = new TH2F("h_thetalab_thetalab_cutphi_2tra", "h_thetalab_thetalab_cutphi_2tra", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_cut12c_ela = new TH2F("h_thetalab_thetalab_cut12c_ela", "h_thetalab_thetalab_cut12c_ela", 200, 0, 100, 200, 0, 100);
    TH2F *h_thetalab_thetalab_gsgs = new TH2F("h_thetalab_thetalab_gsgs", "h_thetalab_thetalab_gsgs", 200, 0, 100, 200, 0, 100);
+   TH2F *h_thetalab_thetalab_gsgs_cm50 = new TH2F("h_thetalab_thetalab_gsgs_cm50", "h_thetalab_thetalab_gsgs_cm50", 200, 0, 100, 200, 0, 100);
+   TH2F *h_thetalab_thetalab_gsgs_cm60 = new TH2F("h_thetalab_thetalab_gsgs_cm60", "h_thetalab_thetalab_gsgs_cm60", 200, 0, 100, 200, 0, 100);
+   TH2F *h_thetalab_thetalab_gsgs_cm70 = new TH2F("h_thetalab_thetalab_gsgs_cm70", "h_thetalab_thetalab_gsgs_cm70", 200, 0, 100, 200, 0, 100);
+   TH2F *h_thetalab_thetalab_gsgs_cm80 = new TH2F("h_thetalab_thetalab_gsgs_cm80", "h_thetalab_thetalab_gsgs_cm80", 200, 0, 100, 200, 0, 100);
+   TH2F *h_thetalab_thetalab_gsgs_cm90 = new TH2F("h_thetalab_thetalab_gsgs_cm90", "h_thetalab_thetalab_gsgs_cm90", 200, 0, 100, 200, 0, 100);
 
    // ... .. phi vs phi
    TH2F *h_philab_philab = new TH2F("h_philab_philab", "h_philab_philab", 360, -180, 180, 360, -180, 180);
@@ -297,6 +328,11 @@ void check_vd_76matm(){
    TH1D *h_verz_gsgs = new TH1D("h_verz_gsgs", "h_verz_gsgs;Vertex Z [mm]", 102, -10, 1010);
    TH1D *h_verz_gsex = new TH1D("h_verz_gsex", "h_verz_gsex;Vertex Z [mm]", 102, -10, 1010);
    TH1D *h_verz_exex = new TH1D("h_verz_exex", "h_verz_exex;Vertex Z [mm]", 102, -10, 1010);
+   TH1D *h_verz_gsgs_cm50 = new TH1D("h_verz_gsgs_cm50", "h_verz_gsgs_cm50;Vertex Z [mm]", 102, -10, 1010);
+   TH1D *h_verz_gsgs_cm60 = new TH1D("h_verz_gsgs_cm60", "h_verz_gsgs_cm60;Vertex Z [mm]", 102, -10, 1010);
+   TH1D *h_verz_gsgs_cm70 = new TH1D("h_verz_gsgs_cm70", "h_verz_gsgs_cm70;Vertex Z [mm]", 102, -10, 1010);
+   TH1D *h_verz_gsgs_cm80 = new TH1D("h_verz_gsgs_cm80", "h_verz_gsgs_cm80;Vertex Z [mm]", 102, -10, 1010);
+   TH1D *h_verz_gsgs_cm90 = new TH1D("h_verz_gsgs_cm90", "h_verz_gsgs_cm90;Vertex Z [mm]", 102, -10, 1010);
 
    TH2F *h_ntraver_ntra = new TH2F("h_ntraver_ntra", "h_ntraver_ntra", 11, -0.5, 10.5, 11, -0.5, 10.5);
    TH2F *h_ntraver_ntra_cutphi = new TH2F("h_ntraver_ntra_cutphi", "h_ntraver_ntra_cutphi", 11, -0.5, 10.5, 11, -0.5, 10.5);
@@ -311,6 +347,25 @@ void check_vd_76matm(){
    TH2F *h_verxy_gsgs = new TH2F("h_verxy_gsgs", "h_verxy_gsgs", 50, -50, 50, 50, -50, 50);
    TH2F *h_verxy_gsex = new TH2F("h_verxy_gsex", "h_verxy_gsex", 50, -50, 50, 50, -50, 50);
    TH2F *h_verxy_exex = new TH2F("h_verxy_exex", "h_verxy_exex", 50, -50, 50, 50, -50, 50);
+
+   // ... Beam energy estimation
+   TH1D *h_Ebeam = new TH1D("h_Ebeam", "h_Ebeam;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs = new TH1D("h_Ebeam_gsgs", "h_Ebeam_gsgs;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm50 = new TH1D("h_Ebeam_gsgs_cm50", "h_Ebeam_gsgs_cm50;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm60 = new TH1D("h_Ebeam_gsgs_cm60", "h_Ebeam_gsgs_cm60;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm70 = new TH1D("h_Ebeam_gsgs_cm70", "h_Ebeam_gsgs_cm70;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm80 = new TH1D("h_Ebeam_gsgs_cm80", "h_Ebeam_gsgs_cm80;E_{beam} [MeV]", 70, 0, 70);
+   TH1D *h_Ebeam_gsgs_cm90 = new TH1D("h_Ebeam_gsgs_cm90", "h_Ebeam_gsgs_cm90;E_{beam} [MeV]", 70, 0, 70);
+   TH2D *h_sumkine_Ebeam_gsgs = new TH2F("h_sumkine_Ebeam_gsgs", "h_sumkine_Ebeam_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 90);
+   TH2D *h_sumkine_Ebeam_gsgs_cm90 = new TH2F("h_sumkine_Ebeam_gsgs_cm90", "h_sumkine_Ebeam_gsgs_cm90;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
+
+   TH1D *h_Ebcm = new TH1D("h_Ebcm", "h_Ebcm;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs = new TH1D("h_Ebcm_gsgs", "h_Ebcm_gsgs;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm50 = new TH1D("h_Ebcm_gsgs_cm50", "h_Ebcm_gsgs_cm50;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm60 = new TH1D("h_Ebcm_gsgs_cm60", "h_Ebcm_gsgs_cm60;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm70 = new TH1D("h_Ebcm_gsgs_cm70", "h_Ebcm_gsgs_cm70;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm80 = new TH1D("h_Ebcm_gsgs_cm80", "h_Ebcm_gsgs_cm80;E_{bc} [MeV]", 62, 0, 31);
+   TH1D *h_Ebcm_gsgs_cm90 = new TH1D("h_Ebcm_gsgs_cm90", "h_Ebcm_gsgs_cm90;E_{bc} [MeV]", 62, 0, 31);
 
    /*
    // ... Excitation energy 
@@ -333,7 +388,90 @@ void check_vd_76matm(){
    TH2F *h_kineE_thetalab_2H  = new TH2F("h_kineE_thetalab_2H", "h_kineE_thetalab_2H", 180, 0, 180, 250, 0, 20);
    TH2F *h_kineE_thetalab_1H  = new TH2F("h_kineE_thetalab_1H", "h_kineE_thetalab_1H", 180, 0, 180, 250, 0, 20);
 
-   // start to loop for read files
+   // ... index hist.
+#ifdef vertex_index
+   std::vector<TH1D*> h_verz_gsgs_index(n_group);
+   std::vector<TH1D*> h_verz_gsex_index(n_group);
+   std::vector<TH1D*> h_verz_exex_index(n_group);
+   std::vector<TH2F*> h_verxy_gsgs_index(n_group);
+   std::vector<TH2F*> h_verxy_gsex_index(n_group);
+   std::vector<TH2F*> h_verxy_exex_index(n_group);
+   std::vector<TH2F*> h_kineE_thetalab_gsgs_index(n_group);
+   std::vector<TH2F*> h_kineE_thetalab_gsex_index(n_group);
+   std::vector<TH2F*> h_kineE_thetalab_exex_index(n_group);
+   std::vector<TH2F*> h_thetalab_thetalab_gsgs_index(n_group);
+   std::vector<TH2F*> h_thetalab_thetalab_gsex_index(n_group);
+   std::vector<TH2F*> h_thetalab_thetalab_exex_index(n_group);
+
+   for (int i = 0; i < n_group; i++){
+      if (i == n_group - 1){
+         h_verz_gsgs_index[i] 
+            = new TH1D("h_verz_gsgs_index_other", "h_verz_gsgs_z_others;Vertex Z [mm]", 112, -10, 1010);
+         h_verz_gsex_index[i] 
+            = new TH1D("h_verz_gsex_index_other", "h_verz_gsex_z_others;Vertex Z [mm]", 112, -10, 1010);
+         h_verz_exex_index[i] 
+            = new TH1D("h_verz_exex_index_other", "h_verz_exex_z_others;Vertex Z [mm]", 112, -10, 1010);
+         h_verxy_gsgs_index[i] 
+            = new TH2F("h_verxy_gsgs_index_other", "h_verxy_gsgs_z_others;Vertex X [mm];Vertex Y [mm]", 50, -50, 50, 50, -50, 50);
+         h_verxy_gsex_index[i] 
+            = new TH2F("h_verxy_gsex_index_other", "h_verxy_gsex_z_others;Vertex X [mm];Vertex Y [mm]", 50, -50, 50, 50, -50, 50);
+         h_verxy_exex_index[i] 
+            = new TH2F("h_verxy_exex_index_other", "h_verxy_exex_z_others;Vertex X [mm];Vertex Y [mm]", 50, -50, 50, 50, -50, 50);
+         h_kineE_thetalab_gsgs_index[i] 
+            = new TH2F("h_kineE_thetalab_gsgs_index_other","h_kineE_gsgs_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 600, 0, 60);
+         h_kineE_thetalab_gsex_index[i] 
+            = new TH2F("h_kineE_thetalab_gsex_index_other","h_kineE_gsex_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 600, 0, 60);
+         h_kineE_thetalab_exex_index[i] 
+            = new TH2F("h_kineE_thetalab_exex_index_other","h_kineE_exex_thetalab_z_others;#theta_{LAB} [deg];roughKinE [MeV]", 100, 0, 100, 600, 0, 60);
+         h_thetalab_thetalab_gsgs_index[i]
+            = new TH2F("h_thetalab_thetalab_gsgs_index_other","h_thetalab_thetalab_gsgs_z_others;#theta_{LAB} [deg];#theta_{LAB} [deg]", 200, 0, 100, 200, 0, 100);
+         h_thetalab_thetalab_gsex_index[i]
+            = new TH2F("h_thetalab_thetalab_gsex_index_other","h_thetalab_thetalab_gsex_z_others;#theta_{LAB} [deg];#theta_{LAB} [deg]", 200, 0, 100, 200, 0, 100);
+         h_thetalab_thetalab_exex_index[i]
+            = new TH2F("h_thetalab_thetalab_exex_index_other","h_thetalab_thetalab_exex_z_others;#theta_{LAB} [deg];#theta_{LAB} [deg]", 200, 0, 100, 200, 0, 100);
+      }
+      else {
+         h_verz_gsgs_index[i] 
+            = new TH1D(Form("h_verz_gsgs_index_%d", i),
+               Form("h_verz_gsgs_z_%d--%d;Vertex Z [mm]", i*100, (i+1)*100), 112, -10, 1010);
+         h_verz_gsex_index[i] 
+            = new TH1D(Form("h_verz_gsex_index_%d", i),
+               Form("h_verz_gsex_z_%d--%d;Vertex Z [mm]", i*100, (i+1)*100), 112, -10, 1010);
+         h_verz_exex_index[i] 
+            = new TH1D(Form("h_verz_exex_index_%d", i), 
+               Form("h_verz_exex_z_%d--%d;Vertex Z [mm]", i*100, (i+1)*100), 112, -10, 1010);
+         h_verxy_gsgs_index[i] 
+            = new TH2F(Form("h_verxy_gsgs_index_%d", i),
+               Form("h_verxy_gsgs_z_%d--%d;Vertex X [mm];Vertex Y [mm]", i*100, (i+1)*100), 50, -50, 50, 50, -50, 50);
+         h_verxy_gsex_index[i] 
+            = new TH2F(Form("h_verxy_gsex_index_%d", i),
+               Form("h_verxy_gsex_z_%d--%d;Vertex X [mm];Vertex Y [mm]", i*100, (i+1)*100), 50, -50, 50, 50, -50, 50);
+         h_verxy_exex_index[i] 
+            = new TH2F(Form("h_verxy_exex_index_%d", i),
+               Form("h_verxy_exex_z_%d--%d;Vertex X [mm];Vertex Y [mm]", i*100, (i+1)*100), 50, -50, 50, 50, -50, 50);
+         h_kineE_thetalab_gsgs_index[i] 
+            = new TH2F(Form("h_kineE_thetalab_gsgs_index_%d", i),
+               Form("h_kineE_thetalab_gsgs_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 100, 0, 100, 600, 0, 60);
+         h_kineE_thetalab_gsex_index[i] 
+            = new TH2F(Form("h_kineE_thetalab_gsex_index_%d", i),
+               Form("h_kineE_thetalab_gsex_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 100, 0, 100, 600, 0, 60);
+         h_kineE_thetalab_exex_index[i] 
+            = new TH2F(Form("h_kineE_thetalab_exex_index_%d", i),
+               Form("h_kineE_thetalab_exex_z_%d--%d;#theta_{LAB} [deg];roughKinE [MeV]", i*100, (i+1)*100), 100, 0, 100, 600, 0, 60);
+         h_thetalab_thetalab_gsgs_index[i]
+            = new TH2F(Form("h_thetalab_thetalab_gsgs_index_%d", i),
+               Form("h_thetalab_thetalab_gsgs_z_%d--%d;#theta_{LAB} [deg];#theta_{LAB} [deg]", i*100, (i+1)*100), 200, 0, 100, 200, 0, 100);
+         h_thetalab_thetalab_gsex_index[i]
+            = new TH2F(Form("h_thetalab_thetalab_gsex_index_%d", i),
+               Form("h_thetalab_thetalab_gsex_z_%d--%d;#theta_{LAB} [deg];#theta_{LAB} [deg]", i*100, (i+1)*100), 200, 0, 100, 200, 0, 100);
+         h_thetalab_thetalab_exex_index[i]
+            = new TH2F(Form("h_thetalab_thetalab_exex_index_%d", i),
+               Form("h_thetalab_thetalab_exex_z_%d--%d;#theta_{LAB} [deg];#theta_{LAB} [deg]", i*100, (i+1)*100), 200, 0, 100, 200, 0, 100);
+      }
+   }
+
+#endif
+
    std::cout << std::endl;
    for (int runNum: runNums) {
       // Open the digitalization file and get the TTree.
@@ -703,6 +841,10 @@ void check_vd_76matm(){
                   if(tracks_vertex){
                      h_verxy_cut12c_ela -> Fill(vtx, vty);
                      h_verz_cut12c_ela -> Fill(vtz);
+                     Ebeam = est_Ebeam(Ebeam_para, vtz);
+                     Ebeam_cm = Ebeam/2.0;
+                     h_Ebeam->Fill(Ebeam);
+                     h_Ebcm->Fill(Ebeam_cm);
 #ifdef check_verz0
                      if(vtz > 0 && vtz <= 1){
                         std::cout << "  vertex z ~ 0 (12c12c) event: " << i << ", vertexz = " << vtz << std::endl;
@@ -714,11 +856,11 @@ void check_vd_76matm(){
 #endif
                   }
                   else {
-#if defined (check_verz0) || defined (c12_check)
-                     n_no_vertex ++;
-                     std::cout << "  No vertex (12c12c) event:" << i << ", count:" << n_no_vertex << std::endl;
+#ifdef states_vertex
+                     std::cout << "  No vertex event:" << i << " (12c12c elastic)" << std::endl;
                      track2_ver0[0].push_back(runNum);
                      track2_ver0[1].push_back(i);
+                     n_no_vertex ++;
 #endif
                   }
                   if (runNum == 52){
@@ -734,10 +876,55 @@ void check_vd_76matm(){
                      h_range_thetalab_gsgs -> Fill(track_theta[1], track_range[1]);
                      h_kineE_thetalab_gsgs -> Fill(track_theta[0], track_KinE[0]);
                      h_kineE_thetalab_gsgs -> Fill(track_theta[1], track_KinE[1]);
+                     h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
+                     h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
                      h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
                      if(tracks_vertex){
+                        h_Ebeam_gsgs->Fill(Ebeam);
+                        h_sumkine_Ebeam_gsgs->Fill(Ebeam, track_KinE[0] + track_KinE[1]);
+                        h_Ebcm_gsgs->Fill(Ebeam_cm);
                         h_verxy_gsgs -> Fill(vtx, vty);
                         h_verz_gsgs -> Fill(vtz);
+                        if ((track_theta[0] > 23 && track_theta[0] < 27) || (track_theta[1] > 23 && track_theta[1] < 27)){
+                           h_thetalab_thetalab_gsgs_cm50 -> Fill(track_theta[0], track_theta[1]);
+                           h_verz_gsgs_cm50 -> Fill(vtz);
+                           h_Ebeam_gsgs_cm50->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm50->Fill(Ebeam_cm);
+                        }
+                        if ((track_theta[0] > 28 && track_theta[0] < 32) || (track_theta[1] > 28 && track_theta[1] < 32)){
+                           h_thetalab_thetalab_gsgs_cm60 -> Fill(track_theta[0], track_theta[1]);
+                           h_verz_gsgs_cm60 -> Fill(vtz);
+                           h_Ebeam_gsgs_cm60->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm60->Fill(Ebeam_cm);
+                        }
+                        if ((track_theta[0] > 33 && track_theta[0] < 37) || (track_theta[1] > 33 && track_theta[1] < 37)){
+                           h_thetalab_thetalab_gsgs_cm70 -> Fill(track_theta[0], track_theta[1]);
+                           h_verz_gsgs_cm70 -> Fill(vtz);
+                           h_Ebeam_gsgs_cm70->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm70->Fill(Ebeam_cm);
+                        }
+                        if ((track_theta[0] > 38 && track_theta[0] < 42) || (track_theta[1] > 38 && track_theta[1] < 42)){
+                           h_thetalab_thetalab_gsgs_cm80 -> Fill(track_theta[0], track_theta[1]);
+                           h_verz_gsgs_cm80 -> Fill(vtz);
+                           h_Ebeam_gsgs_cm80->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm80->Fill(Ebeam_cm);
+                        }
+                        if ((track_theta[0] > 43 && track_theta[0] < 47) || (track_theta[1] > 43 && track_theta[1] < 47)){
+                           h_thetalab_thetalab_gsgs_cm90 -> Fill(track_theta[0], track_theta[1]);
+                           h_sumkine_kineE_gsgs_cm90->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
+                           h_sumkine_kineE_gsgs_cm90->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
+                           h_verz_gsgs_cm90 -> Fill(vtz);
+                           h_Ebeam_gsgs_cm90->Fill(Ebeam);
+                           h_Ebcm_gsgs_cm90->Fill(Ebeam_cm);
+                           h_sumkine_Ebeam_gsgs_cm90->Fill(Ebeam, track_KinE[0] + track_KinE[1]);
+                        }
+#ifdef vertex_index
+                        h_verz_gsgs_index[vindex] -> Fill(vtz);
+                        h_verxy_gsgs_index[vindex] -> Fill(vtx, vty);
+                        h_thetalab_thetalab_gsgs_index[vindex] -> Fill(track_theta[0], track_theta[1]);
+                        h_kineE_thetalab_gsgs_index[vindex] -> Fill(track_theta[0], track_KinE[0]);
+                        h_kineE_thetalab_gsgs_index[vindex] -> Fill(track_theta[1], track_KinE[1]);
+#endif
                      }
                   } 
                   //                  else if (sum_theta >= 84.0 && sum_theta < 88.0){
@@ -753,6 +940,13 @@ void check_vd_76matm(){
                      if(tracks_vertex){
                         h_verxy_gsex -> Fill(vtx, vty);
                         h_verz_gsex -> Fill(vtz);
+#ifdef vertex_index
+                        h_verz_gsex_index[vindex] -> Fill(vtz);
+                        h_verxy_gsex_index[vindex] -> Fill(vtx, vty);
+                        h_thetalab_thetalab_gsex_index[vindex] -> Fill(track_theta[0], track_theta[1]);
+                        h_kineE_thetalab_gsex_index[vindex] -> Fill(track_theta[0], track_KinE[0]);
+                        h_kineE_thetalab_gsex_index[vindex] -> Fill(track_theta[1], track_KinE[1]);
+#endif
                      }
                   }
                   //                  else if (sum_theta > 88.0 && sum_theta < 94.0){
@@ -768,6 +962,13 @@ void check_vd_76matm(){
                      if(tracks_vertex){
                         h_verxy_exex -> Fill(vtx, vty);
                         h_verz_exex -> Fill(vtz);
+#ifdef vertex_index
+                        h_verz_exex_index[vindex] -> Fill(vtz);
+                        h_verxy_exex_index[vindex] -> Fill(vtx, vty);
+                        h_thetalab_thetalab_exex_index[vindex] -> Fill(track_theta[0], track_theta[1]);
+                        h_kineE_thetalab_exex_index[vindex] -> Fill(track_theta[0], track_KinE[0]);
+                        h_kineE_thetalab_exex_index[vindex] -> Fill(track_theta[1], track_KinE[1]);
+#endif
                      }
                   }
                }
@@ -816,6 +1017,24 @@ void check_vd_76matm(){
    angle_exex_60_7 -> SetLineColor(kRed);
    sum_kine_beam->SetLineColor(kRed);
    sum_kine_beam->SetLineWidth(2);
+
+   // scale hist of cross section
+
+   //   Double_t scale = 1e-1; // scale factor for cross section
+   TGraph *scale_gsgs_cm90 = (TGraph*) cross_gsgs_cm90 -> Clone("scale_gsgs_cm90");
+   Double_t scale = h_Ebcm_gsgs_cm90 -> GetMinimum(0.0) / TMath::MinElement(scale_gsgs_cm90->GetN(), scale_gsgs_cm90->GetY());
+   Double_t gmin_ori = TMath::MinElement(scale_gsgs_cm90->GetN(), scale_gsgs_cm90->GetY()) * scale;
+   Double_t gmax_ori = TMath::MaxElement(scale_gsgs_cm90->GetN(), scale_gsgs_cm90->GetY()) * scale;
+   for (Int_t i = 0; i < scale_gsgs_cm90 -> GetN(); i++){
+      Double_t x, y;
+      scale_gsgs_cm90 -> GetPoint(i, x, y);
+      scale_gsgs_cm90 -> SetPoint(i, x, y * scale);
+   }
+   scale_gsgs_cm90 -> SetMarkerColor(kBlack);
+   scale_gsgs_cm90 -> SetMarkerStyle(20);
+   scale_gsgs_cm90 -> SetMarkerSize(0.8);
+   //   scale_gsgs_cm90 -> SetMinimum(gmin_ori);
+   //   scale_gsgs_cm90 -> SetMaximum(gmax_ori);
 
 #ifdef nom_check
    TCanvas *c0 = new TCanvas("c0", "c0");
@@ -872,7 +1091,7 @@ void check_vd_76matm(){
    h_kineE_thetalab->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab->GetYaxis()->SetTitle("roughKinE [MeV]");
    h_kineE_thetalab->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_gsgs_0->Draw("same");
 
    TCanvas *c7 = new TCanvas("c7", "c7");
    c7->cd();
@@ -980,7 +1199,7 @@ void check_vd_76matm(){
    h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
    h_kineE_thetalab_carbon->SetTitle(Form("KinE Theta_LAB (phi1-phi2-180 < %d, track ==2, 12c12c)", (int)del_phi));
    h_kineE_thetalab_carbon->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_gsgs_0->Draw("same");
 
    TCanvas *c19 = new TCanvas("c19", "c19");
    c19->cd();
@@ -1194,7 +1413,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_carbon->SetMinimum(1);
    h_kineE_thetalab_carbon->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_gsgs_0->Draw("same");
    kine_gsex_60_7->Draw("same");
    kine_exex_60_7->Draw("same");
    c81->cd(6);
@@ -1205,7 +1424,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_gsgs->SetMinimum(1);
    h_kineE_thetalab_gsgs->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_gsgs_0->Draw("same");
    kine_gsex_60_7->Draw("same");
    kine_exex_60_7->Draw("same");
    c81->cd(7);
@@ -1216,7 +1435,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_gsex->SetMinimum(1);
    h_kineE_thetalab_gsex->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_gsgs_0->Draw("same");
    kine_gsex_60_7->Draw("same");
    kine_exex_60_7->Draw("same");
    c81->cd(8);
@@ -1227,7 +1446,7 @@ void check_vd_76matm(){
    gPad->SetLogz();
    h_kineE_thetalab_exex->SetMinimum(1);
    h_kineE_thetalab_exex->Draw("colz");
-   kine_gsgs_60_7->Draw("same");
+   kine_gsgs_0->Draw("same");
    kine_gsex_60_7->Draw("same");
    kine_exex_60_7->Draw("same");
    c81->cd(9);
@@ -1278,12 +1497,436 @@ void check_vd_76matm(){
 
 #endif
 
+#ifdef states_vertex
+   TCanvas *c90 = new TCanvas("c90", "c90", 600, 600);
+   c90->Divide(2,2);
+   c90->cd(1);
+   h_ntraver_ntra->SetDirectory(0);
+   h_ntraver_ntra->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra->SetTitle(Form("tracks with vertex"));
+   gPad->SetLogz();
+   h_ntraver_ntra->Draw("colz");
+   c90->cd(2);
+   h_ntraver_ntra_cutphi->SetDirectory(0);
+   h_ntraver_ntra_cutphi->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra_cutphi->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra_cutphi->SetTitle(Form("tracks with vertex (phi1-phi2-180 < %d)", (int)del_phi));
+   gPad->SetLogz();
+   h_ntraver_ntra_cutphi->Draw("colz");
+   c90->cd(3);
+   h_ntraver_ntra_cutphi_2tra->SetDirectory(0);
+   h_ntraver_ntra_cutphi_2tra->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra_cutphi_2tra->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra_cutphi_2tra->SetTitle(Form("tracks with vertex (phi1-phi2-180 < %d, track == 2)", (int)del_phi));
+   gPad->SetLogz();
+   h_ntraver_ntra_cutphi_2tra->Draw("colz");
+   c90->cd(4);
+   h_ntraver_ntra_cut12c_ela->SetDirectory(0);
+   h_ntraver_ntra_cut12c_ela->GetXaxis()->SetTitle("number of tracks");
+   h_ntraver_ntra_cut12c_ela->GetYaxis()->SetTitle("number of tracks belong to vertex");
+   h_ntraver_ntra_cut12c_ela->SetTitle(Form("tracks with vertex (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
+   gPad->SetLogz();
+   h_ntraver_ntra_cut12c_ela->Draw("colz");
+   //   c90->SaveAs("can_output/check_vd_76matm_c90_vertex_tracks.pdf");
+
+   TCanvas *c91 = new TCanvas("c91", "c91", 1600, 1000);
+   c91->Divide(6, 3);
+   c91->cd(1);
+   h_thetalab_thetalab_gsgs->SetDirectory(0);
+   h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c, gsgs)", (int)del_phi));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs->SetMinimum(1);
+   h_thetalab_thetalab_gsgs->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c91->cd(2);
+   h_thetalab_thetalab_gsgs_cm50->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm50->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm50->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm50->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm50->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm50->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c91->cd(3);
+   h_thetalab_thetalab_gsgs_cm60->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm60->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm60->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm60->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm60->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm60->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c91->cd(4);
+   h_thetalab_thetalab_gsgs_cm70->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm70->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm70->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm70->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm70->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm70->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c91->cd(5);
+   h_thetalab_thetalab_gsgs_cm80->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm80->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm80->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm80->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm80->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm80->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c91->cd(6);
+   h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm90->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm90->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm90->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm90->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm90->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+
+   c91->cd(7);
+   h_verz_gsgs->SetDirectory(0);
+   h_verz_gsgs->GetXaxis()->SetTitle("vertex z [mm]");
+   h_verz_gsgs->SetTitle(Form("vertex z (12c12c, gsgs)"));
+   gPad->SetLogy();
+   h_verz_gsgs->Draw();
+   c91->cd(8);
+   h_verz_gsgs_cm50->SetDirectory(0);
+   h_verz_gsgs_cm50->GetXaxis()->SetTitle("vertex z [mm]");
+   h_verz_gsgs_cm50->SetTitle(Form("vertex z (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
+   gPad->SetLogy();
+   h_verz_gsgs_cm50->Draw();
+   c91->cd(9);
+   h_verz_gsgs_cm60->SetDirectory(0);
+   h_verz_gsgs_cm60->GetXaxis()->SetTitle("vertex z [mm]");
+   h_verz_gsgs_cm60->SetTitle(Form("vertex z (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
+   gPad->SetLogy();
+   h_verz_gsgs_cm60->Draw();
+   c91->cd(10);
+   h_verz_gsgs_cm70->SetDirectory(0);
+   h_verz_gsgs_cm70->GetXaxis()->SetTitle("vertex z [mm]");
+   h_verz_gsgs_cm70->SetTitle(Form("vertex z (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
+   gPad->SetLogy();
+   h_verz_gsgs_cm70->Draw();
+   c91->cd(11);
+   h_verz_gsgs_cm80->SetDirectory(0);
+   h_verz_gsgs_cm80->GetXaxis()->SetTitle("vertex z [mm]");
+   h_verz_gsgs_cm80->SetTitle(Form("vertex z (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
+   gPad->SetLogy();
+   h_verz_gsgs_cm80->Draw();
+   c91->cd(12);
+   h_verz_gsgs_cm90->SetDirectory(0);
+   h_verz_gsgs_cm90->GetXaxis()->SetTitle("vertex z [mm]");
+   h_verz_gsgs_cm90->SetTitle(Form("vertex z (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_verz_gsgs_cm90->Draw();
+
+   c91->cd(13);
+   h_Ebeam_gsgs->SetDirectory(0);
+   h_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs->Draw();
+   c91->cd(14);
+   h_Ebeam_gsgs_cm50->SetDirectory(0);
+   h_Ebeam_gsgs_cm50->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs_cm50->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs_cm50->Draw();
+   c91->cd(15);
+   h_Ebeam_gsgs_cm60->SetDirectory(0);
+   h_Ebeam_gsgs_cm60->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs_cm60->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs_cm60->Draw();
+   c91->cd(16);
+   h_Ebeam_gsgs_cm70->SetDirectory(0);
+   h_Ebeam_gsgs_cm70->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs_cm70->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs_cm70->Draw();
+   c91->cd(17);
+   h_Ebeam_gsgs_cm80->SetDirectory(0);
+   h_Ebeam_gsgs_cm80->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs_cm80->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs_cm80->Draw();
+   c91->cd(18);
+   h_Ebeam_gsgs_cm90->SetDirectory(0);
+   h_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs_cm90->Draw();
+
+   TCanvas *c92 = new TCanvas("c92", "c92", 1600, 600);
+   c92->Divide(6, 2);
+   c92->cd(1);
+   h_thetalab_thetalab_gsgs->SetDirectory(0);
+   h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->SetTitle(Form("Theta_LAB Theta_LAB (phi1-phi2-180 < %d, track == 2, 12c12c, gsgs)", (int)del_phi));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs->SetMinimum(1);
+   h_thetalab_thetalab_gsgs->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(2);
+   h_thetalab_thetalab_gsgs_cm50->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm50->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm50->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm50->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm50->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm50->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(3);
+   h_thetalab_thetalab_gsgs_cm60->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm60->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm60->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm60->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm60->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm60->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(4);
+   h_thetalab_thetalab_gsgs_cm70->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm70->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm70->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm70->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm70->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm70->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(5);
+   h_thetalab_thetalab_gsgs_cm80->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm80->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm80->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm80->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm80->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm80->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+   c92->cd(6);
+   h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
+   h_thetalab_thetalab_gsgs_cm90->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm90->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs_cm90->SetTitle(Form("Theta_LAB Theta_LAB (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs_cm90->SetMinimum(1);
+   h_thetalab_thetalab_gsgs_cm90->Draw("colz");
+   angle_gsgs_60_7->Draw("same");
+   theta_gsgs->Draw("same");
+
+   c92->cd(7);
+   h_Ebcm_gsgs->SetDirectory(0);
+   h_Ebcm_gsgs->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs->Draw();
+   c92->cd(8);
+   h_Ebcm_gsgs_cm50->SetDirectory(0);
+   h_Ebcm_gsgs_cm50->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm50->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm50->Draw();
+   c92->cd(9);
+   h_Ebcm_gsgs_cm60->SetDirectory(0);
+   h_Ebcm_gsgs_cm60->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm60->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm60->Draw();
+   c92->cd(10);
+   h_Ebcm_gsgs_cm70->SetDirectory(0);
+   h_Ebcm_gsgs_cm70->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm70->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm70->Draw();
+   c92->cd(11);
+   h_Ebcm_gsgs_cm80->SetDirectory(0);
+   h_Ebcm_gsgs_cm80->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm80->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm80->Draw();
+   c92->cd(12);
+   h_Ebcm_gsgs_cm90->SetDirectory(0);
+   h_Ebcm_gsgs_cm90->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm90->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm90->Draw();
+
+   TCanvas *c93 = new TCanvas("c93", "c93");
+   c93->cd();
+   h_Ebcm_gsgs_cm90->SetDirectory(0);
+   h_Ebcm_gsgs_cm90->SetLineColor(kBlue);
+   h_Ebcm_gsgs_cm90->SetLineWidth(2);
+   h_Ebcm_gsgs_cm90->SetMinimum(0.5);
+   h_Ebcm_gsgs_cm90->SetMaximum(50);
+   h_Ebcm_gsgs_cm90->GetXaxis()->SetRangeUser(0, 35);
+   h_Ebcm_gsgs_cm90->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm90->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm90->Draw("HIST");
+   scale_gsgs_cm90->SetMinimum(5);
+   scale_gsgs_cm90->SetMaximum(50);
+   scale_gsgs_cm90->Draw("PL same");
+   gPad->Update();
+   // set second y-axis for cross section
+   Double_t xr = gPad->GetUxmax();
+   Double_t ymin = h_Ebcm_gsgs_cm90->GetMinimum();
+   Double_t ymax = h_Ebcm_gsgs_cm90->GetMaximum();
+   TGaxis *r_axis = new TGaxis(xr, ymin, xr, ymax, 5, 500, 510, "+LG");
+   r_axis->SetTitle("cross section [mb/sr]");
+   r_axis->SetLineColor(kBlack);
+   r_axis->SetLabelColor(kBlack);
+   r_axis->SetTitleColor(kBlack);
+   r_axis->Draw();
+   c93->Update();
+
+   //   TCanvas *c94 = new TCanvas("c94", "c94", 600, 600);
+   TCanvas *c94 = new TCanvas("c94", "c94");
+   c94->Divide(3,1);
+   c94->cd(1);
+   h_Ebeam_gsgs->SetDirectory(0);
+   h_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs->Draw();
+   c94->cd(2);
+   h_sumkine_Ebeam_gsgs->SetDirectory(0);
+   h_sumkine_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_sumkine_Ebeam_gsgs->GetYaxis()->SetTitle("roughKineE [MeV]");
+   h_sumkine_Ebeam_gsgs->SetTitle(Form("Sum KineE vs Estimated E_{beam} , (12c12c, gsgs)"));
+   gPad->SetLogz();
+   //   h_sumkine_Ebeam_gsgs->SetMaximum(100);
+   h_sumkine_Ebeam_gsgs->SetMinimum(1);
+   h_sumkine_Ebeam_gsgs->Draw("colz");
+   sum_kine_beam->Draw("same");
+   c94->cd(3);
+   h_sumkine_kineE_gsgs->SetDirectory(0);
+   h_sumkine_kineE_gsgs->GetXaxis()->SetTitle("E_{kine} [MeV]");
+   h_sumkine_kineE_gsgs->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
+   h_sumkine_kineE_gsgs->SetTitle(Form("Sum E_{kine} vs E_{kine} , (12c12c, gsgs)"));
+   gPad->SetLogz();
+   //   h_sumkine_Ebeam_gsgs->SetMaximum(100);
+   h_sumkine_kineE_gsgs->SetMinimum(1);
+   h_sumkine_kineE_gsgs->Draw("colz");
+   sum_kine_beam->Draw("same");
+
+   //   TCanvas *c95 = new TCanvas("c95", "c95", 600, 600);
+   TCanvas *c95 = new TCanvas("c95", "c95");
+   c95->Divide(2,2);
+   c95->cd(1);
+   h_Ebeam_gsgs_cm90->SetDirectory(0);
+   h_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_Ebeam_gsgs_cm90->Draw();
+   c95->cd(2);
+   h_sumkine_Ebeam_gsgs_cm90->SetDirectory(0);
+   h_sumkine_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_sumkine_Ebeam_gsgs_cm90->GetYaxis()->SetTitle("roughKineE [MeV]");
+   h_sumkine_Ebeam_gsgs_cm90->SetTitle(Form("Sum KineE vs Estimated E_{beam} , (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogz();
+   //   h_sumkine_Ebeam_gsgs_cm90->SetMaximum(100);
+   h_sumkine_Ebeam_gsgs_cm90->SetMinimum(1);
+   h_sumkine_Ebeam_gsgs_cm90->Draw("colz");
+   sum_kine_beam->Draw("same");
+   c95->cd(3);
+   h_sumkine_kineE_gsgs_cm90->SetDirectory(0);
+   h_sumkine_kineE_gsgs_cm90->GetXaxis()->SetTitle("E_{kine} [MeV]");
+   h_sumkine_kineE_gsgs_cm90->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
+   h_sumkine_kineE_gsgs_cm90->SetTitle(Form("Sum E_{kine} vs E_{kine} , (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogz();
+   //   h_sumkine_Ebeam_gsgs_cm90->SetMaximum(100);
+   h_sumkine_kineE_gsgs_cm90->SetMinimum(1);
+   h_sumkine_kineE_gsgs_cm90->Draw("colz");
+   sum_kine_beam->Draw("same");
+
+#endif
+
+#ifdef vertex_index
+   draw_ind("c97", "gsgs", n_group, n_h_z, h_verz_gsgs, h_verxy_gsgs, h_kineE_thetalab_gsgs, h_thetalab_thetalab_cut12c_ela,
+      h_verz_gsgs_index, h_verxy_gsgs_index, h_kineE_thetalab_gsgs_index, h_thetalab_thetalab_gsgs_index,
+      kine_gsgs_0, kine_gsex_60_7, kine_exex_60_7, angle_gsgs_60_7, angle_gsex_60_7, angle_exex_60_7
+   );
+
+   draw_ind("c98", "gsex", n_group, n_h_z, h_verz_gsex, h_verxy_gsex, h_kineE_thetalab_gsex, h_thetalab_thetalab_cut12c_ela,
+      h_verz_gsex_index, h_verxy_gsex_index, h_kineE_thetalab_gsex_index, h_thetalab_thetalab_gsex_index,
+      kine_gsgs_0, kine_gsex_60_7, kine_exex_60_7, angle_gsgs_60_7, angle_gsex_60_7, angle_exex_60_7
+   );
+
+   draw_ind("c99", "exex", n_group, n_h_z, h_verz_exex, h_verxy_exex, h_kineE_thetalab_exex, h_thetalab_thetalab_cut12c_ela,
+      h_verz_exex_index, h_verxy_exex_index, h_kineE_thetalab_exex_index, h_thetalab_thetalab_exex_index,
+      kine_gsgs_0, kine_gsex_60_7, kine_exex_60_7, angle_gsgs_60_7, angle_gsex_60_7, angle_exex_60_7
+   );
+
+   TCanvas *c100 = new TCanvas("c100","c100");
+   c100->Divide(2,2);
+   c100->cd(1);
+   h_kineE_thetalab_gsgs_index[0]->SetStats(0);
+   gPad->SetLogz();
+   h_kineE_thetalab_gsgs_index[0]->Draw("colz");
+   kine_gsgs_0->Draw("PL same");
+   //  kine_gsgs_50->Draw("same");
+   kine_gsgs_100->Draw("PL same");
+
+   c100->cd(2);
+   h_kineE_thetalab_gsgs_index[1]->SetStats(0);
+   gPad->SetLogz();
+   h_kineE_thetalab_gsgs_index[1]->Draw("colz");
+   kine_gsgs_100->Draw("PL same");
+   //  kine_gsgs_150->Draw("same");
+   kine_gsgs_200->Draw("PL same");
+
+   c100->cd(3);
+   h_kineE_thetalab_gsgs_index[3]->SetStats(0);
+   gPad->SetLogz();
+   h_kineE_thetalab_gsgs_index[3]->Draw("colz");
+   kine_gsgs_300->Draw("PL same");
+   //  kine_gsgs_350->Draw("same");
+   kine_gsgs_400->Draw("PL same");
+
+   c100->cd(4);
+   h_kineE_thetalab_gsgs_index[4]->SetStats(0);
+   gPad->SetLogz();
+   h_kineE_thetalab_gsgs_index[4]->Draw("colz");
+   kine_gsgs_400->Draw("PL same");
+   //  kine_gsgs_450->Draw("same");
+   kine_gsgs_500->Draw("PL same");
+
+#endif
+
 #ifdef check_verz0
-   TCanvas *c90 = new TCanvas("c90", "c90");
+   TCanvas *c110 = new TCanvas("c110", "c110");
    h_verz01->SetDirectory(0);
    h_verz01->Draw();
    h_verz01->GetXaxis()->SetTitle("vertex z [mm]");
 #endif
+
+   /*
+   TCanvas *c8 = new TCanvas();
+   histExdp->SetDirectory(0);
+   histExdp->Draw();
+   histExdp->GetXaxis()->SetTitle("Ex [MeV]");
+
+   TCanvas *c9 = new TCanvas();
+   histExdd->SetDirectory(0);
+   histExdd->Draw();
+   histExdd->GetXaxis()->SetTitle("Ex [MeV]");
+   */
 
    // Saving histograms in a .root file ...
    Results->cd();
@@ -1329,6 +1972,8 @@ void check_vd_76matm(){
    kine_dd_gs_25MeVu->Write("kin_dd_gs_25MeVu");
    kine_dp_gs_25MeVu->Write("kin_dp_gs_25MeVu");
    */
+   h_sumkine_kineE_gsgs->Write();
+   h_sumkine_kineE_gsgs_cm90->Write();
 
    // angle correlations
    //  range vs theta
@@ -1346,6 +1991,12 @@ void check_vd_76matm(){
    h_thetalab_thetalab_cutphi_2tra->Write();
    h_thetalab_thetalab_cut12c_ela->Write();
    h_thetalab_thetalab_gsgs->Write();
+   h_thetalab_thetalab_gsgs_cm50->Write();
+   h_thetalab_thetalab_gsgs_cm60->Write();
+   h_thetalab_thetalab_gsgs_cm70->Write();
+   h_thetalab_thetalab_gsgs_cm80->Write();
+   h_thetalab_thetalab_gsgs_cm90->Write();
+
 
    //  phi vs phi
    h_philab_philab->Write();
@@ -1359,6 +2010,11 @@ void check_vd_76matm(){
    h_verz_cut12c_ela->Write();
    h_verz01->Write();
    h_verz_gsgs->Write();
+   h_verz_gsgs_cm50->Write();
+   h_verz_gsgs_cm60->Write();
+   h_verz_gsgs_cm70->Write();
+   h_verz_gsgs_cm80->Write();
+   h_verz_gsgs_cm90->Write();
 
    h_verz_gsex->Write();
    h_verz_exex->Write();
@@ -1375,6 +2031,24 @@ void check_vd_76matm(){
    h_ntraver_ntra_cutphi->Write();
    h_ntraver_ntra_cutphi_2tra->Write();
    h_ntraver_ntra_cut12c_ela->Write();
+
+   // Beam energy estimation
+   h_Ebeam->Write();
+   h_Ebeam_gsgs->Write();
+   h_Ebeam_gsgs_cm50->Write();
+   h_Ebeam_gsgs_cm60->Write();
+   h_Ebeam_gsgs_cm70->Write();
+   h_Ebeam_gsgs_cm80->Write();
+   h_Ebeam_gsgs_cm90->Write();
+   h_Ebcm->Write();
+   h_Ebcm_gsgs->Write();
+   h_Ebcm_gsgs_cm50->Write();
+   h_Ebcm_gsgs_cm60->Write();
+   h_Ebcm_gsgs_cm70->Write();
+   h_Ebcm_gsgs_cm80->Write();
+   h_Ebcm_gsgs_cm90->Write();
+   h_sumkine_Ebeam_gsgs->Write();
+   h_sumkine_Ebeam_gsgs_cm90->Write();
 
    /*
    // Excitation energy spectra
@@ -1398,6 +2072,24 @@ void check_vd_76matm(){
    histEstimatedKinEVThetaLAB1H->Write();
    */
 
+#ifdef vertex_index
+   for(Int_t i = 0; i < n_group; i++){
+      h_verz_gsgs_index[i]->Write();
+      h_verz_gsex_index[i]->Write();
+      h_verz_exex_index[i]->Write();
+      h_verxy_gsgs_index[i]->Write();
+      h_verxy_gsex_index[i]->Write();
+      h_verxy_exex_index[i]->Write();
+      h_kineE_thetalab_gsgs_index[i]->Write();
+      h_kineE_thetalab_gsex_index[i]->Write();
+      h_kineE_thetalab_exex_index[i]->Write();
+      h_thetalab_thetalab_gsgs_index[i]->Write();
+      h_thetalab_thetalab_gsex_index[i]->Write();
+      h_thetalab_thetalab_exex_index[i]->Write();
+   }
+
+#endif
+
    // save cuts
    cut12c->Write("charge_range_12c");
    cutalpha->Write("charge_range_alpha");
@@ -1407,12 +2099,24 @@ void check_vd_76matm(){
    theta_exex->Write("theta_theta_exex");
 
    // save lines
-   kine_gsgs_60_7->Write("kine_12c_gsgs");
+   kine_gsgs_0  ->Write("kine_12c_gsgs_E60_7_z0");
+   kine_gsgs_50 ->Write("kine_12c_gsgs_E57_9_z50");
+   kine_gsgs_100->Write("kine_12c_gsgs_E55_0_z100");
+   kine_gsgs_150->Write("kine_12c_gsgs_E51_8_z150");
+   kine_gsgs_200->Write("kine_12c_gsgs_E48_5_z200");
+
+   kine_gsgs_300->Write("kine_12c_gsgs_E41_5_z300");
+   kine_gsgs_350->Write("kine_12c_gsgs_E37_8_z350");
+   kine_gsgs_400->Write("kine_12c_gsgs_E33_8_z400");
+   kine_gsgs_450->Write("kine_12c_gsgs_E29_5_z450");
+   kine_gsgs_500->Write("kine_12c_gsgs_E24_6_z500");
+
    kine_gsex_60_7->Write("kine_12c_gsex");
    kine_exex_60_7->Write("kine_12c_exex");
    angle_gsgs_60_7->Write("angle_12c_gsgs");
    angle_gsex_60_7->Write("angle_12c_gsex");
    angle_exex_60_7->Write("angle_12c_exex");
+   sum_kine_beam->Write("sum_kine_beam");
    Results->Close();
 
    // cout of information
@@ -1444,7 +2148,7 @@ void check_vd_76matm(){
 
 #endif
 
-#if defined (check_verz0) || defined (c12_check)
+#ifdef states_vertex
    std::cout << " 12c12c elastic events: " << n_12c12c << std::flush;
    std::cout << " (no vertex: " << n_no_vertex << " events.)" << std::endl;
    if(n_no_vertex != track2_ver0.at(1).size()){
@@ -1604,4 +2308,229 @@ kine_2b(Double_t m1, Double_t m2, Double_t m3, Double_t m4, Double_t K_proj, Dou
 
    theta_cm = theta_cm * TMath::RadToDeg();
    return std::make_tuple(Ex, theta_cm);
+}
+void draw_ind(TString cname, TString states, Int_t n_group, Int_t n_h_z,
+   TH1D* h_verz, TH2F* h_verxy, TH2F* h_E_theta, TH2F* h_theta_theta,
+   std::vector<TH1D*> &h_verz_i, std::vector<TH2F*> &h_verxy_i, std::vector<TH2F*> &h_E_theta_i, std::vector<TH2F*> &h_theta_theta_i,
+   TGraph *kine_gsgs, TGraph *kine_gsex, TGraph *kine_exex, TF1 *ang_gsgs, TGraph *ang_gsex, TGraph *ang_exex)
+{
+   TCanvas *c = new TCanvas(cname, cname, 1600, 1000);
+   c->Divide(n_h_z,4);
+   c->cd(1);
+   h_verz->SetDirectory(0);
+   h_verz->GetXaxis()->SetTitle("vertex z [mm]");
+   h_verz->SetTitle(Form("vertex z (12c12c, %s)", states.Data()));
+   gPad->SetLogy();
+   h_verz->Draw();
+   c->cd(n_h_z + 1);
+   h_verxy->SetDirectory(0);
+   h_verxy->GetXaxis()->SetTitle("vertex x [mm]");
+   h_verxy->GetYaxis()->SetTitle("vertex y [mm]");
+   h_verxy->SetTitle(Form("vertex xy (12c12c, %s)", states.Data()));
+   gPad->SetLogz();
+   h_verxy->Draw("colz");
+   c->cd(n_h_z * 2 +1);
+   h_theta_theta->SetDirectory(0);
+   h_theta_theta->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_theta_theta->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_theta_theta->SetTitle(Form("Theta_LAB Theta_LAB (12c12c)"));
+   gPad->SetLogz();
+   h_theta_theta->SetMinimum(1);
+   h_theta_theta->Draw("colz");
+   ang_gsgs->Draw("same");
+   ang_gsex->Draw("same");
+   ang_exex->Draw("same");
+   c->cd(n_h_z * 3 +1);
+   h_E_theta->SetDirectory(0);
+   h_E_theta->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+   h_E_theta->GetYaxis()->SetTitle("roughKineE [MeV]");
+   h_E_theta->SetTitle(Form("KinE Theta_LAB (12c12c, %s)", states.Data()));
+   gPad->SetLogz();
+   h_E_theta->SetMinimum(1);
+   h_E_theta->Draw("colz");
+   kine_gsgs->Draw("same");
+   kine_gsex->Draw("same");
+   kine_exex->Draw("same");
+   for (Int_t i = 0; i < n_group; i++){
+      c->cd(i + 2);
+      h_verz_i[i]->SetDirectory(0);
+      h_verz_i[i]->GetXaxis()->SetTitle("vertex z [mm]");
+      //      h_verz_i[i]->SetTitle(Form("h_verz_%s_z_%d--%d;Vertex Z [mm]", states.Data(),i*100, (i+1)*100));
+      gPad->SetLogy();
+      h_verz_i[i]->Draw();
+      c->cd(n_h_z + i + 2);
+      h_verxy_i[i]->SetDirectory(0);
+      h_verxy_i[i]->GetXaxis()->SetTitle("vertex x [mm]");
+      h_verxy_i[i]->GetYaxis()->SetTitle("vertex y [mm]");
+      //      h_verxy_i[i]->SetTitle(Form("h_verxy_%s_z_%d--%d;Vertex X [mm];Vertex Y [mm]", states.Data(), i*100, (i+1)*100));
+      gPad->SetLogz();
+      h_verxy_i[i]->Draw("colz");
+      c->cd(2 * n_h_z + i + 2);
+      h_theta_theta_i[i]->SetDirectory(0);
+      h_theta_theta_i[i]->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+      h_theta_theta_i[i]->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+      //      h_theta_theta_i[i]->SetTitle(Form("h_theta_theta_%s_z_%d--%d;Theta_lab;Theta_lab", states.Data(), i*100, (i+1)*100));
+      gPad->SetLogz();
+      h_theta_theta_i[i]->SetMinimum(1);
+      h_theta_theta_i[i]->Draw("colz");
+      ang_gsgs->Draw("same");
+      ang_gsex->Draw("same");
+      ang_exex->Draw("same");
+      c->cd(3 * n_h_z + i + 2);
+      h_E_theta_i[i]->SetDirectory(0);
+      h_E_theta_i[i]->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
+      h_E_theta_i[i]->GetYaxis()->SetTitle("roughKineE [MeV]");
+      //      h_E_theta_i[i]->SetTitle(Form("h_KineE_theta_%s_z_%d--%d;KinE;Theta_lab", states.Data(), i*100, (i+1)*100));
+      gPad->SetLogz();
+      h_E_theta_i[i]->SetMinimum(1);
+      h_E_theta_i[i]->Draw("colz");
+      kine_gsgs->Draw("same");
+      kine_gsex->Draw("same");
+      kine_exex->Draw("same");
+
+   }
+   //   c->SaveAs(Form("can_output/check_vd_76matm_%s_vertex_%s.pdf", cname.Data(), states.Data()));
+
+}
+
+std::vector<Double_t> cal_Ebeam_para(){
+
+   // set data
+   /*
+   //  60.7 MeV injection energy to ATTPC
+   vector<pair<Double_t, Double_t>> lise_data={
+         {0, 60.724}, {50, 57.862}, {100, 54.873}, {150, 51.775}, {200, 48.529}, {250, 45.143}, {300, 41.562},
+         {350, 37.779},{400, 33.736},{450, 29.363}, {500, 24.589}, {550, 19.089},{600, 13.089}, {650, 5.513},
+         {680, 0.360}
+   };
+   */
+
+   //  69.0 MeV injection energy to ATTPC
+   vector<pair<Double_t, Double_t>> lise_data={
+         {0, 69.027}, {50, 66.411}, {100, 63.727}, {150, 60.949}, {200, 58.083}, {250, 55.105}, {300, 52.061},
+         {350, 48.784},{400, 45.411},{450, 41.844}, {500, 38.084}, {550, 34.062},{600, 29.719}, {650, 24.984},
+         {700, 19.708}, {750, 13.621}, {800, 6.194}, {830, 0.832}, {835, 0.271}
+   };
+
+   Int_t n_data = lise_data.size();
+   std::vector<std::vector<Double_t>> Ebeam(2, std::vector<Double_t>(n_data, 0));
+   for (Int_t i = 0; i < n_data; i++){
+      Ebeam.at(0).at(i) = lise_data[i].first;
+      Ebeam.at(1).at(i) = lise_data[i].second;
+   }
+   TGraph *h_Ebeam_est = new TGraph(n_data, Ebeam.at(0).data(), Ebeam.at(1).data());
+   TF1 *f1 = new TF1("f1", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4", 0, 1000);
+
+   h_Ebeam_est->Fit(f1, "QRN", "", 0, 700);
+
+   TCanvas *c0 = new TCanvas("c0", "c0");
+   h_Ebeam_est->SetMarkerStyle(20);
+   h_Ebeam_est->SetMarkerSize(1.2);
+   h_Ebeam_est->SetMarkerColor(kBlue);
+   h_Ebeam_est->SetLineColor(kRed);
+   h_Ebeam_est->GetXaxis()->SetTitle("Depth [mm]");
+   h_Ebeam_est->GetYaxis()->SetTitle("beam energy [MeV]");
+   h_Ebeam_est->SetTitle("Beam energy vs Depth");
+   h_Ebeam_est->GetXaxis()->SetLimits(0, 700);
+   h_Ebeam_est->Draw("AP");
+   f1->SetNpx(1000);
+   f1->SetLineColor(kBlack);
+   f1->Draw("P same");
+
+   Double_t a = f1->GetParameter(0);
+   Double_t b = f1->GetParameter(1);
+   Double_t c = f1->GetParameter(2);
+   Double_t d = f1->GetParameter(3);
+   Double_t e = f1->GetParameter(4);
+   std::vector<Double_t> Ebeam_para;
+   Ebeam_para.push_back(a);
+   Ebeam_para.push_back(b);
+   Ebeam_para.push_back(c);
+   Ebeam_para.push_back(d);
+   Ebeam_para.push_back(e);
+
+   std::cout << std::setprecision(4) << std::endl;
+   std::cout << "Set estimation of beam energy." << std::endl;
+   std::cout << "  function: a + b * x + c * x^2 + d * x^3 + e * x^4" << std::endl;
+   std::cout << "  a:" << a << ", b:" << b << ", c:" << c << ", d:" << d << ", e:" << e << std::endl;
+
+   return Ebeam_para;
+}
+
+Double_t est_Ebeam(std::vector<Double_t> &Ebeam_para, Double_t vertz){
+
+   Double_t Ebeam = -1;
+   if (Ebeam_para.size() != 5){
+      std::cout << "Error: Ebeam_para should have 5 parameters. Current size: " << Ebeam_para.size() << std::endl;
+      return -1;
+   }
+   else {
+      Double_t a = Ebeam_para[0];
+      Double_t b = Ebeam_para[1];
+      Double_t c = Ebeam_para[2];
+      Double_t d = Ebeam_para[3];
+      Double_t e = Ebeam_para[4];
+      Ebeam = a + b * vertz + c * pow(vertz, 2) + d * pow(vertz, 3) + e * pow(vertz, 4);
+   }
+
+   return Ebeam;
+}
+
+TGraph* read_crosssection(TString crossFile){
+
+   Int_t n_cs = 0;
+   Double_t E, cs;
+   std::vector<std::vector<Double_t>> plot(0, std::vector<Double_t>(0,0));
+   std::vector<std::pair<Double_t, Double_t>> data;
+
+   #ifdef debug_mode
+   // Debug: Check if file exists and current working directory
+   std::cout << "DEBUG ReadKinematics: pwd = " << gSystem->pwd() << std::endl;
+   std::cout << "DEBUG ReadKinematics: Attempting to read: " << crossFile << std::endl;
+   if (gSystem->AccessPathName(crossFile.Data(), kFileExists)) {
+      std::cout << "DEBUG ReadKinematics: FILE NOT FOUND!" << std::endl;
+   } else {
+      std::cout << "DEBUG ReadKinematics: File found" << std::endl;
+   }
+#endif
+   std::ifstream *crossStr = new std::ifstream(crossFile.Data());
+
+   if (!crossStr -> is_open() || !crossStr -> good()){
+      std::cout << "Warning : No kinematics file found or cannot read: " << crossFile << std::endl;
+      return new TGraph();
+   }
+   string line;
+   while (getline(*crossStr, line)){
+      if(line.empty() || line[0] == '#'){
+         continue;
+      }
+      istringstream iss(line);
+      if (iss >> E >> cs){
+         data.emplace_back(E, cs);
+      }
+      else{
+      std::cerr << "failed to parse line: " << line << std::endl;
+      }
+   }
+#ifdef debug_mode
+      std::cout << "DEBUG ReadKinematics: Successfully read " << data.size() << " points" << std::endl;
+#endif
+   if (data.size() == 0){
+      std::cout << " Warning : No data read from kinematics file: " << crossFile << std::endl;
+   }
+   n_cs = data.size();
+   sort(data.begin(), data.end(),[](const auto &a, auto &b){return a.first > b.first;});
+   std::cout << "check vector size of Ecm : " << n_cs << std::endl;
+
+   plot.resize(2, vector<Double_t> (0));
+   for (Int_t i = 0; i < n_cs; i++){
+      plot.at(0).push_back(data[i].first);
+      plot.at(1).push_back(data[i].second);
+   }
+   if(n_cs != plot.at(0).size()){
+      std::cout << "something wrong about filling data in making TGraph of cross section!!!"<<std::endl;
+      std::cout << "  skipping drawing of cross section!!!"<<std::endl;
+   }
+   TGraph *gcs = new TGraph(n_cs, plot.at(0).data(), plot.at(1).data());
+   return gcs;
 }

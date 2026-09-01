@@ -7,7 +7,7 @@
 void cal_Ebeam_para(){
 
    // set para
-   Double_t verz = 0;
+   Double_t verz = -50;
 
    // set data
    /*
@@ -79,7 +79,7 @@ void cal_Ebeam_para(){
    std::cout << "Set estimation of beam energy." << std::endl;
    std::cout << "  function: a + b * x + c * x^2 + d * x^3 + e * x^4" << std::endl;
    std::cout << "   a:" << a << ", b:" << b << ", c:" << c << ", d:" << d << ", e:" << e << std::endl;
-   std::cout << "   a_err:" << ae << ", b_err:" << be << ", c_err:" << ce << ", d_err:" << de << ", e_err:" << ee << std::endl;
+   std::cout << "   a_err:" << ae << ", b_err:" << be << ", c_err:" << ce << ", d_err:" << de << ", e_err:" << ee << std::endl 
    std::cout << std::endl;
 
 #ifdef cal_Ebeam
