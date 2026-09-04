@@ -9,7 +9,7 @@ static double sq(double x){ return x*x; }
 
 void kinema_12c12c(const char *states = "gsgs"){
 
-   TString outdi="./out_kinema_69/";
+   TString outdi="./out_kinema_69.5/";
    TString oufi="";
    Int_t n_data =0;
    Int_t n_file =0;
@@ -51,12 +51,22 @@ void kinema_12c12c(const char *states = "gsgs"){
    Double_t m3p = m3 + Ex3;
    Double_t m4p = m4 + Ex4;
 
+   /*
    //  69.0 MeV injection energy to ATTPC
    vector<pair<Double_t, Double_t>> lise_data={
          {0, 69.027}, {50, 66.411}, {100, 63.727}, {150, 60.949}, {200, 58.083}, {250, 55.105}, {300, 52.061},
          {350, 48.784},{400, 45.411},{450, 41.844}, {500, 38.084}, {550, 34.062},{600, 29.719}, {650, 24.984},
          {700, 19.708}, {750, 13.621}, {800, 6.194}, {830, 0.832}, {835, 0.271}
    };
+   */
+
+   //  69.5 MeV injection energy to ATTPC
+   vector<pair<Double_t, Double_t>> lise_data={
+         {0, 69.500}, {50, 66.899}, {100, 64.228}, {150, 61.468}, {200, 58.618}, {250, 55.662}, {300, 52.594},
+         {350, 49.391},{400, 46.046},{450, 42.514}, {500, 38.797}, {550, 34.822},{600, 30.545}, {650, 25.892},
+         {700, 20.728}, {750, 14.821}, {800, 7.705}, {840, 0.723}, {848, 0.028}
+   };
+
    Int_t l = lise_data.size();
    std::vector<std::vector<Double_t>> Ebeam(2, std::vector<Double_t>(l, 0));
    for (Int_t i = 0; i < l; i++){
