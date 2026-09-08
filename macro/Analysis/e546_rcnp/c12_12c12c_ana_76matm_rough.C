@@ -1,14 +1,14 @@
 //#define debug_mode
 //#define catima_check
-#define nom_check
-#define peak_check
-#define c12_check
-#define vertex_check
-#define vertex_index
-#define vertex_depth
-#define gsgs_check
+//#define nom_check
+//#define peak_check
+//#define c12_check
+//#define vertex_check
+//#define vertex_index
+//#define vertex_depth
+//#define gsgs_check
 //#define kine_comp
-#define check_verz0
+//#define check_verz0
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -31,7 +31,7 @@ std::vector<Double_t> cal_Ebeam_para();
 Double_t est_Ebeam(std::vector<Double_t> &Ebeam_para, Double_t vertz);
 TGraph* read_crosssection(TString crossFile);
 
-void c12_12c12c_ana_76matm(){
+void c12_12c12c_ana_76matm_rough(){
    //copy from kine.C 2026/05/06 12:20
 
    //set timer
@@ -58,6 +58,7 @@ void c12_12c12c_ana_76matm(){
    */
 
    const bool vertex_corr = true; // true: use the values calculated from vertex z; false: use rough values
+   const bool kine_comp_b = false;
    const Int_t n_group = 9; // group number of vertex z: 0-100, ... 700-800, 800-1000.
    //   const Int_t verz_h = 600;
    const Int_t verz_h = (n_group - 1) * 100;
@@ -69,11 +70,13 @@ void c12_12c12c_ana_76matm(){
    Double_t r = 0;
    std::vector<Double_t> Ebeam_para(0);
 #ifdef kine_comp
+   kine_comp_b = true;
    //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_kine_comp_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
    TString f_Re = TString::Format("data2/c12_12c12c/ana_results_kine_comp_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
 #else
-   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
-   //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
+   kine_comp_b = false;
+   //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
+   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
 #endif
 
    TFile * Results = new TFile(f_Re,"recreate");
@@ -89,6 +92,7 @@ void c12_12c12c_ana_76matm(){
    } else {
       std::cout << "OK: File found: " << testFile << std::endl;
    }
+   kine_comp_b = true;
 #endif
 
    // AtMap to check if a hit belong to a big pad or small pad.
@@ -379,6 +383,7 @@ void c12_12c12c_ana_76matm(){
    TH2F *h_sumkine_kineE_gsgs = new TH2F("h_sumkine_kineE_gsgs", "h_sumkine_kineE_gsgs;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
    TH2F *h_sumkine_kineE_ver_gsgs = new TH2F("h_sumkine_kineE_ver_gsgs", "h_sumkine_kineE_gsgs;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
    TH2F *h_sumkine_kineE_gsgs_cm90 = new TH2F("h_sumkine_kineE_gsgs_cm90", "h_sumkine_kineE_gsgs_cm90;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
+   TH2F *h_sumkine_verz_cut12c_ela = new TH2F("h_sumkine_verz_cut12c_ela", "h_sumkine_verz_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 121, -10, 1200, 160, 0, 80);
    TH2F *h_sumkine_verz_gsgs = new TH2F("h_sumkine_verz_gsgs", "h_sumkine_verz_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 121, -10, 1200, 160, 0, 80);
 
    // ... angle correlations
@@ -443,6 +448,7 @@ void c12_12c12c_ana_76matm(){
    TH1D *h_Ebeam_gsgs_cm70 = new TH1D("h_Ebeam_gsgs_cm70", "h_Ebeam_gsgs_cm70;E_{beam} [MeV]", 70, 0, 70);
    TH1D *h_Ebeam_gsgs_cm80 = new TH1D("h_Ebeam_gsgs_cm80", "h_Ebeam_gsgs_cm80;E_{beam} [MeV]", 70, 0, 70);
    TH1D *h_Ebeam_gsgs_cm90 = new TH1D("h_Ebeam_gsgs_cm90", "h_Ebeam_gsgs_cm90;E_{beam} [MeV]", 70, 0, 70);
+   TH2F *h_sumkine_ver_Ebeam_cut12c_ela = new TH2F("h_sumkine_ver_Ebeam_cut12c_ela", "h_sumkine_Ebeam_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 400, 0, 90, 400, 0, 90);
    TH2F *h_sumkine_Ebeam_gsgs = new TH2F("h_sumkine_Ebeam_gsgs", "h_sumkine_Ebeam_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
    TH2F *h_sumkine_Ebeam_gsgs_cm90 = new TH2F("h_sumkine_Ebeam_gsgs_cm90", "h_sumkine_Ebeam_gsgs_cm90;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
    TH2F *h_sumkine_ver_Ebeam_gsgs = new TH2F("h_sumkine_ver_Ebeam_gsgs", "h_sumkine_Ebeam_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
@@ -926,26 +932,25 @@ void c12_12c12c_ana_76matm(){
                vertex_range[itrack] = pattern->DistanceAlongPattern(lastPoint, vertexPoint);
                vertex_theta[itrack] = 180 - direvertra.Theta() * 180 / TMath::Pi();
                vertex_phi[itrack] = direvertra.Phi() * 180 / TMath::Pi();
-#if defined (debug_mode) || defined (kine_comp)
-               h_lastpoint_comp->Fill(v_lastPoint[itrack].R(), lastPoint.R());
-               h_distance_comp -> Fill((vertexPoint - v_lastPoint[itrack]).R(), (vertexPoint - lastPoint).R());
-               h_range_comp->Fill(track_range[itrack], vertex_range[itrack]);
-               h_thetalab_comp->Fill(track_theta[itrack], vertex_theta[itrack]);
-               h_philab_comp->Fill(track_phi[itrack], vertex_phi[itrack]);
-               auto braggCurve = track.GetBraggCurve();
-               if (braggCurve.RangeValues.size() > 0){
-                  vertexPoint2.SetXYZ(braggCurve.vertexX, braggCurve.vertexY, braggCurve.vertexZ);
-                  h_vertex_comp->Fill(vertexPoint.R(), vertexPoint2.R());
+               if (kine_comp_b){
+                  h_lastpoint_comp->Fill(v_lastPoint[itrack].R(), lastPoint.R());
+                  h_distance_comp -> Fill((vertexPoint - v_lastPoint[itrack]).R(), (vertexPoint - lastPoint).R());
+                  h_range_comp->Fill(track_range[itrack], vertex_range[itrack]);
+                  h_thetalab_comp->Fill(track_theta[itrack], vertex_theta[itrack]);
+                  h_philab_comp->Fill(track_phi[itrack], vertex_phi[itrack]);
+                  auto braggCurve = track.GetBraggCurve();
+                  if (braggCurve.RangeValues.size() > 0){
+                     vertexPoint2.SetXYZ(braggCurve.vertexX, braggCurve.vertexY, braggCurve.vertexZ);
+                     h_vertex_comp->Fill(vertexPoint.R(), vertexPoint2.R());
+                  }
+                  /*
+                  if (abs(vertexPoint2.R() - 1000.0) <= 1){
+                     std::cout << " vertexPoint2 check. run: " << runNum << ", event: " << i << ", itrack: " << itrack << std::endl;
+                     std::cout << "    vertexPoint  = (" << vertexPoint.X() << ", " << vertexPoint.Y() << ", " << vertexPoint.Z() << ")" << std::endl;
+                     std::cout << "    vertexPoint2 = (" << vertexPoint2.X() << ", " << vertexPoint2.Y() << ", " << vertexPoint2.Z() << ")" << std::endl;
+                  }
+                  */
                }
-               /*
-               if (abs(vertexPoint2.R() - 1000.0) <= 1){
-                  std::cout << " vertexPoint2 check. run: " << runNum << ", event: " << i << ", itrack: " << itrack << std::endl;
-                  std::cout << "    vertexPoint  = (" << vertexPoint.X() << ", " << vertexPoint.Y() << ", " << vertexPoint.Z() << ")" << std::endl;
-                  std::cout << "    vertexPoint2 = (" << vertexPoint2.X() << ", " << vertexPoint2.Y() << ", " << vertexPoint2.Z() << ")" << std::endl;
-               }
-               */
-
-#endif
                vertex_KinE[itrack] = 0.1;
                if (cut12c->IsInside(track_range[itrack], track_charge[itrack])){
                   const Double_t warmupRange12C_2 = eLossModelC4H10_12C->GetRange(0.1);
@@ -978,7 +983,6 @@ void c12_12c12c_ana_76matm(){
                   h_philab_philab_cutphi_12c -> Fill(track_phi[0], track_phi[1]);                  
                }
             }
-
             // fill to histograms
             h_charge_range_cutphi -> Fill(track_range[0], track_charge[0]);
             h_charge_range_cutphi -> Fill(track_range[1], track_charge[1]);
@@ -1014,7 +1018,6 @@ void c12_12c12c_ana_76matm(){
                   if(r_max > max_r_max_12c){
                      max_r_max_12c = r_max;
                   }
-
                   n_12c12c ++;
                   if(tracks_vertex){
                      h_verxy_cut12c_ela -> Fill(vtx, vty);
@@ -1023,6 +1026,8 @@ void c12_12c12c_ana_76matm(){
                      Ebeam_cm = Ebeam/2.0;
                      h_Ebeam->Fill(Ebeam);
                      h_Ebcm->Fill(Ebeam_cm);
+                     h_sumkine_verz_cut12c_ela->Fill(vtz, vertex_KinE[0] + vertex_KinE[1]);
+                     h_sumkine_ver_Ebeam_cut12c_ela->Fill(Ebeam, vertex_KinE[0] + vertex_KinE[1]);
 #ifdef check_verz0
                      if(vtz > 0 && vtz <= 1){
                         std::cout << "  Vertex z ~ 0 (12c12c); run: " << runNum << ", event: " << i << ", vertexz = " << vtz << std::string(10, ' ') << std::endl;
@@ -1064,57 +1069,56 @@ void c12_12c12c_ana_76matm(){
                         h_kineE_thetalab_gsgs -> Fill(track_theta[0], track_KinE[0]);
                         h_kineE_thetalab_gsgs -> Fill(track_theta[1], track_KinE[1]);
                      }
-#ifndef kine_comp
-                     if (vertex_corr){
-                        h_sumkine_kineE_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[0]);
-                        h_sumkine_kineE_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[1]);
-                        h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
-                        h_philab_philab_gsgs -> Fill(track_phi[0], track_phi[1]);
+                     if (!kine_comp_b){
+                        if (vertex_corr){
+                           h_sumkine_kineE_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[0]);
+                           h_sumkine_kineE_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[1]);
+                           h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
+                           h_philab_philab_gsgs -> Fill(track_phi[0], track_phi[1]);
+                        }
+                        else if (!vertex_corr){
+                           h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
+                           h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
+                           h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
+                           h_philab_philab_gsgs -> Fill(track_phi[0], track_phi[1]);
+                        }
                      }
-                     else if (!vertex_corr){
-                        h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
-                        h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
-                        h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
-                        h_philab_philab_gsgs -> Fill(track_phi[0], track_phi[1]);
-                     }
-#endif
                      if(tracks_vertex){
                         h_verz_gsgs->Fill(vtz);
                         h_verxy_gsgs->Fill(vtx, vty);
                         h_Ebeam_gsgs->Fill(Ebeam);
                         h_Ebcm_gsgs->Fill(Ebeam_cm);
-#ifndef kine_comp
-                        if (vertex_corr){
+                        if(!kine_comp_b){
+                           if (vertex_corr){
+                              h_sumkine_verz_gsgs->Fill(vtz, vertex_KinE[0] + vertex_KinE[1]);
+                              h_sumkine_Ebeam_gsgs->Fill(Ebeam, vertex_KinE[0] + vertex_KinE[1]);
+                           }
+                           else if (!vertex_corr){
+                              h_sumkine_verz_gsgs->Fill(vtz, track_KinE[0] + track_KinE[1]);
+                              h_sumkine_Ebeam_gsgs->Fill(Ebeam, track_KinE[0] + track_KinE[1]);
+                           }
+                        }
+                        else if (kine_comp_b){
+                           h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
+                           h_philab_philab_gsgs -> Fill(track_phi[0], track_phi[1]);
+                           h_thetalab_thetalab_ver_gsgs -> Fill(vertex_theta[0], vertex_theta[1]);
+                           h_philab_philab_ver_gsgs -> Fill(vertex_phi[0], vertex_phi[1]);
+                           h_range_comp_gsgs->Fill(track_range[0], vertex_range[0]);
+                           h_range_comp_gsgs->Fill(track_range[1], vertex_range[1]);
+                           h_kineE_comp_gsgs->Fill(track_KinE[0], vertex_KinE[0]);
+                           h_kineE_comp_gsgs->Fill(track_KinE[1], vertex_KinE[1]);
+                           h_thetalab_comp_gsgs->Fill(track_theta[0], vertex_theta[0]);
+                           h_thetalab_comp_gsgs->Fill(track_theta[1], vertex_theta[1]);
+                           h_philab_comp_gsgs->Fill(track_phi[0], vertex_phi[0]);
+                           h_philab_comp_gsgs->Fill(track_phi[1], vertex_phi[1]);
                            h_sumkine_verz_gsgs->Fill(vtz, vertex_KinE[0] + vertex_KinE[1]);
-                           h_sumkine_Ebeam_gsgs->Fill(Ebeam, vertex_KinE[0] + vertex_KinE[1]);
-                        }
-                        else if (!vertex_corr){
-                           h_sumkine_verz_gsgs->Fill(vtz, track_KinE[0] + track_KinE[1]);
                            h_sumkine_Ebeam_gsgs->Fill(Ebeam, track_KinE[0] + track_KinE[1]);
+                           h_sumkine_ver_Ebeam_gsgs->Fill(Ebeam, vertex_KinE[0] + vertex_KinE[1]);
+                           h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
+                           h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
+                           h_sumkine_kineE_ver_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[0]);
+                           h_sumkine_kineE_ver_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[1]);
                         }
-#endif
-#ifdef kine_comp
-                        h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
-                        h_philab_philab_gsgs -> Fill(track_phi[0], track_phi[1]);
-                        h_thetalab_thetalab_ver_gsgs -> Fill(vertex_theta[0], vertex_theta[1]);
-                        h_philab_philab_ver_gsgs -> Fill(vertex_phi[0], vertex_phi[1]);
-                        h_range_comp_gsgs->Fill(track_range[0], vertex_range[0]);
-                        h_range_comp_gsgs->Fill(track_range[1], vertex_range[1]);
-                        h_kineE_comp_gsgs->Fill(track_KinE[0], vertex_KinE[0]);
-                        h_kineE_comp_gsgs->Fill(track_KinE[1], vertex_KinE[1]);
-                        h_thetalab_comp_gsgs->Fill(track_theta[0], vertex_theta[0]);
-                        h_thetalab_comp_gsgs->Fill(track_theta[1], vertex_theta[1]);
-                        h_philab_comp_gsgs->Fill(track_phi[0], vertex_phi[0]);
-                        h_philab_comp_gsgs->Fill(track_phi[1], vertex_phi[1]);
-                        h_sumkine_verz_gsgs->Fill(vtz, vertex_KinE[0] + vertex_KinE[1]);
-                        h_sumkine_Ebeam_gsgs->Fill(Ebeam, track_KinE[0] + track_KinE[1]);
-                        h_sumkine_ver_Ebeam_gsgs->Fill(Ebeam, vertex_KinE[0] + vertex_KinE[1]);
-                        h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[0]);
-                        h_sumkine_kineE_gsgs->Fill(track_KinE[0] + track_KinE[1], track_KinE[1]);
-                        h_sumkine_kineE_ver_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[0]);
-                        h_sumkine_kineE_ver_gsgs->Fill(vertex_KinE[0] + vertex_KinE[1], vertex_KinE[1]);
-#endif
-
                         if ((track_theta[0] > 23 && track_theta[0] < 27) || (track_theta[1] > 23 && track_theta[1] < 27)){
                            h_thetalab_thetalab_gsgs_cm50 -> Fill(track_theta[0], track_theta[1]);
                            h_verz_gsgs_cm50 -> Fill(vtz);
@@ -1169,7 +1173,6 @@ void c12_12c12c_ana_76matm(){
                            h_kineE_thetalab_gsgs_index[vindex] -> Fill(track_theta[0], track_KinE[0]);
                            h_kineE_thetalab_gsgs_index[vindex] -> Fill(track_theta[1], track_KinE[1]);
                         }
-
 #endif
                      }
                   } 
@@ -2249,9 +2252,29 @@ void c12_12c12c_ana_76matm(){
    h_sumkine_kineE_ver_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
 
-   TCanvas *c64 = new TCanvas("c64", "c64", 1200, 600);
-   c64->Divide(2,1);
+   TCanvas *c64 = new TCanvas("c64", "c64", 1200, 1200);
+   c64->Divide(2,2);
    c64->cd(1);
+   h_sumkine_verz_cut12c_ela->SetDirectory(0);
+   h_sumkine_verz_cut12c_ela->GetXaxis()->SetTitle("vertex z [mm]");
+   h_sumkine_verz_cut12c_ela->GetYaxis()->SetTitle("vertexKineE [MeV]");
+   h_sumkine_verz_cut12c_ela->SetTitle(Form("Sum KineE vs vertex z, (12c12c)"));
+   gPad->SetLogz();
+   //   h_sumkine_ver_Ebeam_gsgs->SetMaximum(100);
+   h_sumkine_verz_cut12c_ela->SetMinimum(1);
+   h_sumkine_verz_cut12c_ela->Draw("colz");
+   f_Ebeam->Draw("same");
+   c64->cd(2);
+   h_sumkine_ver_Ebeam_cut12c_ela->SetDirectory(0);
+   h_sumkine_ver_Ebeam_cut12c_ela->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_sumkine_ver_Ebeam_cut12c_ela->GetYaxis()->SetTitle("vertexKineE [MeV]");
+   h_sumkine_ver_Ebeam_cut12c_ela->SetTitle(Form("Sum KineE vs Estimated E_{beam} , (12c12c)"));
+   gPad->SetLogz();
+   //   h_sumkine_ver_Ebeam_gsgs->SetMaximum(100);
+   h_sumkine_ver_Ebeam_cut12c_ela->SetMinimum(1);
+   h_sumkine_ver_Ebeam_cut12c_ela->Draw("colz");
+   sum_kine_beam->Draw("same");
+   c64->cd(3);
    h_sumkine_verz_gsgs->SetDirectory(0);
    h_sumkine_verz_gsgs->GetXaxis()->SetTitle("vertex z [mm]");
    h_sumkine_verz_gsgs->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -2261,7 +2284,7 @@ void c12_12c12c_ana_76matm(){
    h_sumkine_verz_gsgs->SetMinimum(1);
    h_sumkine_verz_gsgs->Draw("colz");
    f_Ebeam->Draw("same");
-   c64->cd(2);
+   c64->cd(4);
    h_sumkine_ver_Ebeam_gsgs->SetDirectory(0);
    h_sumkine_ver_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_ver_Ebeam_gsgs->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -2273,6 +2296,18 @@ void c12_12c12c_ana_76matm(){
    sum_kine_beam->Draw("same");
 
 #endif
+
+   TCanvas *c65 = new TCanvas("c65", "c65", 1000, 1000);
+   c65->cd();
+   h_sumkine_ver_Ebeam_cut12c_ela->SetDirectory(0);
+   h_sumkine_ver_Ebeam_cut12c_ela->GetXaxis()->SetTitle("E_{beam} [MeV]");
+   h_sumkine_ver_Ebeam_cut12c_ela->GetYaxis()->SetTitle("vertexKineE [MeV]");
+   h_sumkine_ver_Ebeam_cut12c_ela->SetTitle(Form("Sum KineE vs Estimated E_{beam} , (12c12c)"));
+   gPad->SetLogz();
+   //   h_sumkine_ver_Ebeam_gsgs->SetMaximum(100);
+   h_sumkine_ver_Ebeam_cut12c_ela->SetMinimum(1);
+   h_sumkine_ver_Ebeam_cut12c_ela->Draw("colz");
+   sum_kine_beam->Draw("same");
 
 #ifdef vertex_index
    draw_ind("c70", "gsgs", n_group, n_h_z, h_verz_gsgs, h_verxy_gsgs, h_kineE_thetalab_gsgs, h_thetalab_thetalab_cut12c_ela,
