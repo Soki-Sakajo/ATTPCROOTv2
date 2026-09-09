@@ -2833,10 +2833,10 @@ void draw_dep(TString cname, TString states, TString LineType, Int_t n_group, In
 
       if (LineType == "full"){
          if (n_kine > 2 * i + 1){
-         kine_i[2 * i]->Draw("PL same");
+            kine_i[2 * i]->Draw("PL same");
          }
          if (n_kine > 2 * i + 2){
-            kine_i[2 * i + 1]->Draw("same");
+            kine_i[2 * i + 1]->Draw("PL same");
          }
          if (n_kine > 2 * i + 3){
             kine_i[2 * i + 2]->Draw("PL same");
@@ -2844,7 +2844,7 @@ void draw_dep(TString cname, TString states, TString LineType, Int_t n_group, In
       }
       else if (LineType == "center"){
          if (n_kine > 2 * i + 2){
-            kine_i[2 * i + 1]->Draw("same");
+            kine_i[2 * i + 1]->Draw("PL same");
          }
       }
       n_l ++;

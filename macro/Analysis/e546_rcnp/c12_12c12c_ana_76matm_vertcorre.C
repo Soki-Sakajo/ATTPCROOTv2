@@ -2,8 +2,8 @@
 //#define catima_check
 //#define nom_check
 //#define kine_comp
-#define states_check
-//#define gsgs_check
+//#define states_check
+#define gsgs_check
 //#define vertex_depth
 #include <string>
 #include <sstream>
@@ -167,14 +167,14 @@ void c12_12c12c_ana_76matm_vertcorre(){
    gROOT->ProcessLine(".x ./cut_files/theta_theta_12c_ex-ex.C");
    TCutG *theta_exex = (TCutG*) gROOT->FindObject("theta_theta_ex-ex");
 
+   /*
    gROOT->ProcessLine(".x ./cut_files/sumkineE_Ebeam_12c_gsgs.C");
    TCutG *kine_gsgs_cut = (TCutG*) gROOT->FindObject("gsgs");
-
    gROOT->ProcessLine(".x ./cut_files/sumkineE_Ebeam_12c_gsex.C");
    TCutG *kine_gsex_cut = (TCutG*) gROOT->FindObject("gsex");
-
    gROOT->ProcessLine(".x ./cut_files/sumkineE_Ebeam_12c_exex.C");
    TCutG *kine_exex_cut = (TCutG*) gROOT->FindObject("exex");
+   */
 
    // Kinematic lines.
    TGraph *kine_gsgs_0   = ReadKinematics("gsgs_69.5_verz_0",   "kine");
@@ -294,6 +294,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    Double_t Ebeam = 0;
    Double_t Ebeam_cm = 0;
    Double_t SumkineE = 0;
+   Double_t DeltaE = 0;
    Double_t track_theta[narray];
    Double_t track_phi[narray];
    Double_t track_range[narray];
@@ -395,9 +396,8 @@ void c12_12c12c_ana_76matm_vertcorre(){
    TH1D *h_Ebcm_gsgs_cm80 = new TH1D("h_Ebcm_gsgs_cm80", "h_Ebcm_gsgs_cm80;E_{bc} [MeV]", 80, 0, 40);
    TH1D *h_Ebcm_gsgs_cm90 = new TH1D("h_Ebcm_gsgs_cm90", "h_Ebcm_gsgs_cm90;E_{bc} [MeV]", 80, 0, 40);
 
-
    // ... Excitation energy 
-   TH1F *h_dE_12c = new TH1F("h_dE_12c", "h_dE_12c;Ex [MeV]", 60, -5, 15);
+   TH1F *h_dE_12c = new TH1F("h_dE_12c", "h_dE_12c;Ex [MeV]", 200, -5, 15);
    TH1F *h_dE_gsgs = new TH1F("h_dE_gsgs", "h_dE_gsgs;Ex [MeV]", 60, -5, 15);
    TH1F *h_dE_gsex = new TH1F("h_dE_gsex", "h_dE_gsex;Ex [MeV]", 60, -5, 15);
    TH1F *h_dE_exex = new TH1F("h_dE_exex", "h_dE_exex;Ex [MeV]", 60, -5, 15);
@@ -565,6 +565,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
          vty = 0;
          vtz = 0;
          SumkineE = 0;
+         DeltaE = 0;
          for (Int_t i = 0; i < narray; i ++){
             vertex_theta[i] = 0;
             vertex_phi[i] = 0;
@@ -904,13 +905,15 @@ void c12_12c12c_ana_76matm_vertcorre(){
                      Ebeam = est_Ebeam(Ebeam_para, vtz);
                      Ebeam_cm = Ebeam/2.0;
                      SumkineE = vertex_KinE[0] + vertex_KinE[1];
+                     DeltaE = Ebeam - SumkineE;
                      h_sumkine_verz_cut12c_ela->Fill(vtz, SumkineE);
                      h_sumkine_ver_Ebeam_cut12c_ela->Fill(Ebeam, SumkineE);
-                     h_dE_12c->Fill(Ebeam - SumkineE);
+                     h_dE_12c->Fill(DeltaE);
                   }
                   //                  if (theta_gsgs->IsInside(track_theta[0], track_theta[1])){
                   //                  if (theta_gsgs->IsInside(track_theta[0], track_theta[1]) && kine_gsgs_cut->IsInside(Ebeam, vertex_KinE[0] + vertex_KinE[1])){
-                  if (kine_gsgs_cut->IsInside(Ebeam, SumkineE)){
+                  //                  if (kine_gsgs_cut->IsInside(Ebeam, SumkineE)){
+                  if (DeltaE > -4.0 && DeltaE <= 2.25){
                      h_sum_theta_gsgs -> Fill(sum_theta);
                      // Using new kinematics energy by calculation of new range from vertex to last point of track
                      h_kineE_thetalab_gsgs -> Fill(track_theta[0], vertex_KinE[0]);
@@ -926,7 +929,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
                         h_Ebeam_gsgs->Fill(Ebeam);
                         h_Ebcm_gsgs->Fill(Ebeam_cm);
                         h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
-                        h_dE_gsgs->Fill(Ebeam - SumkineE);
+                        h_dE_gsgs->Fill(DeltaE);
                         if(!kine_comp_b){
                            h_sumkine_verz_gsgs->Fill(vtz, SumkineE);
                            h_sumkine_Ebeam_gsgs->Fill(Ebeam, SumkineE);
@@ -985,7 +988,8 @@ void c12_12c12c_ana_76matm_vertcorre(){
                   } 
                   //                  else if (theta_gsex->IsInside(track_theta[0],track_theta[1])){
                   //                  else if (theta_gsex->IsInside(track_theta[0],track_theta[1]) && kine_gsex_cut->IsInside(Ebeam, vertex_KinE[0] + vertex_KinE[1])){
-                  else if (kine_gsex_cut->IsInside(Ebeam, SumkineE)){
+                  //                  else if (kine_gsex_cut->IsInside(Ebeam, SumkineE)){
+                  else if (DeltaE > 2.25 && DeltaE <= 7.00){
                      h_sum_theta_gsex -> Fill(sum_theta);
                      h_kineE_thetalab_gsex -> Fill(track_theta[0], vertex_KinE[0]);
                      h_kineE_thetalab_gsex -> Fill(track_theta[1], vertex_KinE[1]);
@@ -994,7 +998,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
                         h_verxy_gsex -> Fill(vtx, vty);
                         h_verz_gsex -> Fill(vtz);
                         h_thetalab_thetalab_gsex -> Fill(track_theta[0], track_theta[1]);
-                        h_dE_gsex->Fill(Ebeam - SumkineE);
+                        h_dE_gsex->Fill(DeltaE);
 #ifdef vertex_depth
                         h_verz_gsex_index[vindex] -> Fill(vtz);
                         h_verxy_gsex_index[vindex] -> Fill(vtx, vty);
@@ -1007,7 +1011,8 @@ void c12_12c12c_ana_76matm_vertcorre(){
                   }
                   //                  else if (theta_exex->IsInside(track_theta[0], track_theta[1])){
                   //                  else if (theta_exex->IsInside(track_theta[0], track_theta[1]) && kine_exex_cut->IsInside(Ebeam, vertex_KinE[0] + vertex_KinE[1])){
-                  else if (kine_exex_cut->IsInside(Ebeam, SumkineE)){
+                  //                  else if (kine_exex_cut->IsInside(Ebeam, SumkineE)){
+                  else if (DeltaE > 7.00 && DeltaE < 13.00){
                      h_sum_theta_exex -> Fill(sum_theta);
                      h_kineE_thetalab_exex -> Fill(track_theta[0], vertex_KinE[0]);
                      h_kineE_thetalab_exex -> Fill(track_theta[1], vertex_KinE[1]);            
@@ -1016,7 +1021,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
                         h_verxy_exex -> Fill(vtx, vty);
                         h_verz_exex -> Fill(vtz);
                         h_thetalab_thetalab_exex -> Fill(track_theta[0], track_theta[1]);
-                        h_dE_exex->Fill(Ebeam - SumkineE);
+                        h_dE_exex->Fill(DeltaE);
 #ifdef vertex_depth
                         h_verz_exex_index[vindex] -> Fill(vtz);
                         h_verxy_exex_index[vindex] -> Fill(vtx, vty);
@@ -1352,9 +1357,11 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_ver_Ebeam_cut12c_ela->SetMinimum(1);
    h_sumkine_ver_Ebeam_cut12c_ela->Draw("colz");
    sum_kine_beam->Draw("same");
+   /*
    kine_gsgs_cut->Draw("same");
    kine_gsex_cut->Draw("same");
    kine_exex_cut->Draw("same");
+   */
 
    TCanvas *c8 = new TCanvas("c8", "c8", 1000, 1000);
    c8->Divide(2,2);
@@ -1807,6 +1814,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_kineE_gsgs->Write();
    h_sumkine_kineE_ver_gsgs->Write();
    h_sumkine_kineE_gsgs_cm90->Write();
+   h_sumkine_verz_cut12c_ela->Write();
    h_sumkine_verz_gsgs->Write();
 
    // angle correlations
@@ -1848,15 +1856,18 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_Ebeam_gsgs_cm70->Write();
    h_Ebeam_gsgs_cm80->Write();
    h_Ebeam_gsgs_cm90->Write();
+
+   h_sumkine_Ebeam_gsgs->Write();
+   h_sumkine_Ebeam_gsgs_cm90->Write();
+   h_sumkine_ver_Ebeam_cut12c_ela->Write();
+   h_sumkine_ver_Ebeam_gsgs->Write();
+
    h_Ebcm_gsgs->Write();
    h_Ebcm_gsgs_cm50->Write();
    h_Ebcm_gsgs_cm60->Write();
    h_Ebcm_gsgs_cm70->Write();
    h_Ebcm_gsgs_cm80->Write();
    h_Ebcm_gsgs_cm90->Write();
-   h_sumkine_Ebeam_gsgs->Write();
-   h_sumkine_ver_Ebeam_gsgs->Write();
-   h_sumkine_Ebeam_gsgs_cm90->Write();
 
    // Excitation energy
    h_dE_12c->Write();
@@ -1889,9 +1900,6 @@ void c12_12c12c_ana_76matm_vertcorre(){
    theta_gsgs->Write("theta_cut_gsgs");
    theta_gsex->Write("theta_cut_gsex");
    theta_exex->Write("theta_cut_exex");
-   kine_gsgs_cut->Write("sumkine_cut_gsgs");
-   kine_gsex_cut->Write("sumkine_cut_gsex");
-   kine_exex_cut->Write("sumkine_cut_exex");
 
    // save lines
    kine_gsgs_0  ->Write("kine_12c_gsgs_E69_0_z0"  );
@@ -2083,10 +2091,10 @@ void draw_dep(TString cname, TString states, TString LineType, Int_t n_group, In
 
       if (LineType == "full"){
          if (n_kine > 2 * i + 1){
-         kine_i[2 * i]->Draw("PL same");
+            kine_i[2 * i]->Draw("PL same");
          }
          if (n_kine > 2 * i + 2){
-            kine_i[2 * i + 1]->Draw("same");
+            kine_i[2 * i + 1]->Draw("PL same");
          }
          if (n_kine > 2 * i + 3){
             kine_i[2 * i + 2]->Draw("PL same");
@@ -2094,13 +2102,13 @@ void draw_dep(TString cname, TString states, TString LineType, Int_t n_group, In
       }
       else if (LineType == "center"){
          if (n_kine > 2 * i + 2){
-            kine_i[2 * i + 1]->Draw("same");
+            kine_i[2 * i + 1]->Draw("PL same");
          }
       }
       n_l ++;
    }
    c->Update();
-   //   c->SaveAs(Form("can_output/c12_" + states + "_kine_" + LineType + "_E69.5_z0-%d.pdf", (n_kine - 1) * 50));
+   //   c->SaveAs(Form("can_output/c12_" + states + "_kine_vectcorre_" + LineType + "_E69.5_z0-%d.pdf", (n_kine - 1) * 50));
 
 }
 
