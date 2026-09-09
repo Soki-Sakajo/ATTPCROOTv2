@@ -14,8 +14,8 @@ void kinema_12c12c(const char *states = "gsgs"){
    Int_t n_data =0;
    Int_t n_file =0;
    Int_t verz =0;
-   Double_t n=1800;
-   Double_t m = 11174.863254; // MeV/c^2; 12C mass
+   const Double_t n=1800;
+   const Double_t m = 11174.863254; // MeV/c^2; 12C mass
    Double_t Ex3 = 0.0;
    Double_t Ex4 = 0.0;
    Double_t K1_lab = 0.0;
@@ -92,9 +92,8 @@ void kinema_12c12c(const char *states = "gsgs"){
       Double_t sqrt_s = sqrt(s);
 
       if(s < sq(m3p+m4p)){
-         std::cout << std::endl;
+         std::cout << std::string(30, ' ') << std::endl;
          std::cout << "Depth:" << verz << " mm, reaction forbidden: sqrt(s) < m3'+m4'" << std::endl;
-         //         return;
          break;
       }
       oufi = outdi + Form("kine_12c12c_%.4s_%.1f_verz_%d.txt", states, K1_lab, verz);
@@ -124,9 +123,9 @@ void kinema_12c12c(const char *states = "gsgs"){
       fout << "#kinematics calculation of " << states << "\n";
       fout << "#vertex z = " << verz << " mm, E_reaction = " << K1_lab << " MeV" << "\n";
       fout << "#theta_cm, theta3_lab, Ek3_lab, theta4_lab, Ek4_lab" << "\n";
-      for(int k = 0; k < n+1;k++){
+      for(int k = 0; k < n; k++){
          if(k%100 == 0){
-            std::cout << "Finish " << verz << "mm: " << 100*k/n << " % !      \r" << std::flush;
+            std::cout << "Finish " << verz << " mm: " << 100*k/n << " % !      \r" << std::flush;
          }
 
          Double_t theta_cm_rad = k * dtheta;
@@ -153,10 +152,8 @@ void kinema_12c12c(const char *states = "gsgs"){
          Double_t E4_lab = gamma*(E4_cm + beta*p_cm*ct4);
          Double_t p4_para = gamma*(p_cm*ct4 + beta*E4_cm);
          Double_t p4_perp = p_cm*st4;
-         //    Double_t theta4_lab = atan2(p4_perp,p4_para);
          Double_t theta4_lab = atan2(p4_perp, p4_para);
          Double_t theta4_deg = theta4_lab * 180.0 / TMath::Pi();
-         //    if(theta4_deg < 0) theta4_deg += 180.0;
 
          Double_t Ek4_lab = E4_lab - m4p;
          if(Ek4_lab < 0) Ek4_lab = 0;
@@ -165,6 +162,7 @@ void kinema_12c12c(const char *states = "gsgs"){
          fout << theta_cm_deg << " " << theta3_deg << " " << Ek3_lab << " " << theta4_deg << " " << Ek4_lab << "\n";
       }
       fout.close();
+      std::cout << "Finish " << verz << " mm: 100 % !      \r" << std::flush;
    }
    if (n_data != n_file){
       std::cout << std::endl;
@@ -172,9 +170,9 @@ void kinema_12c12c(const char *states = "gsgs"){
       std::cout << "  n_data: " << n_data << ", n_file: " << n_file << std::endl;
    }
 
-   std::cout << std::setprecision(3) << std::endl;
-   std::cout << "Finish calculation, E: " << Ebeam.at(1).at(0) << " MeV, Depth: " << Ebeam.at(0).at(n_file - 1) << "mm " << std::endl;
-   std::cout << "Output saved. n_file: " << n_file << std::endl;
+   std::cout << std::string(30, ' ') << std::setprecision(3) << std::endl;
+   std::cout << "Finish calculation, E: " << Ebeam.at(1).at(0) << " MeV, Depth: " << Ebeam.at(0).at(n_file - 1) << " mm " << std::endl;
+   std::cout << "Output saved. n_file: " << n_file << std::endl << std::endl;
    gSystem->Exit(0);
 
 }

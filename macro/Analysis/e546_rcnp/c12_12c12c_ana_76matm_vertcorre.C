@@ -1902,31 +1902,31 @@ void c12_12c12c_ana_76matm_vertcorre(){
    theta_exex->Write("theta_cut_exex");
 
    // save lines
-   kine_gsgs_0  ->Write("kine_12c_gsgs_E69_0_z0"  );
-   kine_gsgs_50 ->Write("kine_12c_gsgs_E66_4_z50" );
-   kine_gsgs_100->Write("kine_12c_gsgs_E63_7_z100");
-   kine_gsgs_150->Write("kine_12c_gsgs_E60_9_z150");
-   kine_gsgs_200->Write("kine_12c_gsgs_E58_1_z200");
-   kine_gsgs_250->Write("kine_12c_gsgs_E55_1_z250");
-   kine_gsgs_300->Write("kine_12c_gsgs_E52_1_z300");
-   kine_gsgs_350->Write("kine_12c_gsgs_E48_8_z350");
-   kine_gsgs_400->Write("kine_12c_gsgs_E45_4_z400");
-   kine_gsgs_450->Write("kine_12c_gsgs_E41_8_z450");
-   kine_gsgs_500->Write("kine_12c_gsgs_E38_1_z500");
-   kine_gsgs_550->Write("kine_12c_gsgs_E34_1_z550");
-   kine_gsgs_600->Write("kine_12c_gsgs_E29_7_z600");
-   kine_gsgs_650->Write("kine_12c_gsgs_E25_0_z650");
-   kine_gsgs_700->Write("kine_12c_gsgs_E19_7_z700");
-   kine_gsgs_750->Write("kine_12c_gsgs_E13_6_z750");
-   kine_gsgs_800->Write("kine_12c_gsgs_E06_2_z800");
+   kine_gsgs_0  ->Write("kine_12c_gsgs_z0"  );
+   kine_gsgs_50 ->Write("kine_12c_gsgs_z50" );
+   kine_gsgs_100->Write("kine_12c_gsgs_z100");
+   kine_gsgs_150->Write("kine_12c_gsgs_z150");
+   kine_gsgs_200->Write("kine_12c_gsgs_z200");
+   kine_gsgs_250->Write("kine_12c_gsgs_z250");
+   kine_gsgs_300->Write("kine_12c_gsgs_z300");
+   kine_gsgs_350->Write("kine_12c_gsgs_z350");
+   kine_gsgs_400->Write("kine_12c_gsgs_z400");
+   kine_gsgs_450->Write("kine_12c_gsgs_z450");
+   kine_gsgs_500->Write("kine_12c_gsgs_z500");
+   kine_gsgs_550->Write("kine_12c_gsgs_z550");
+   kine_gsgs_600->Write("kine_12c_gsgs_z600");
+   kine_gsgs_650->Write("kine_12c_gsgs_z650");
+   kine_gsgs_700->Write("kine_12c_gsgs_z700");
+   kine_gsgs_750->Write("kine_12c_gsgs_z750");
+   kine_gsgs_800->Write("kine_12c_gsgs_z800");
 
-   kine_gsex_0->Write( "kine_12c_gsex_E69_0_z0" );
+   kine_gsex_0->Write( "kine_12c_gsex_z0" );
 
-   kine_exex_0->Write( "kine_12c_exex_E69_0_z0" );
+   kine_exex_0->Write( "kine_12c_exex_z0" );
 
-   angle_gsgs_0->Write("angle_12c_gsgs_E69_0_z0");
-   angle_gsex_0->Write("angle_12c_gsex_E69_0_z0");
-   angle_exex_0->Write("angle_12c_exex_E69_0_z0");
+   angle_gsgs_0->Write("angle_12c_gsgs_z0");
+   angle_gsex_0->Write("angle_12c_gsex_z0");
+   angle_exex_0->Write("angle_12c_exex_z0");
 
    sum_kine_beam->Write("sum_kine_beam");
    Results->Close();
