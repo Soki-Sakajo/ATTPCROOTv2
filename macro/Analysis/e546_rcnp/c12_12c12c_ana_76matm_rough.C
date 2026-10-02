@@ -1307,11 +1307,13 @@ void c12_12c12c_ana_76matm_rough(){
    //   scale_gsgs_cm90 -> SetMaximum(gmax_ori);
 
 #ifdef nom_check
+   /*
    TCanvas *c0 = new TCanvas("c0", "c0");
    c0->cd();
    h_rmax->SetDirectory(0);
    h_rmax->GetXaxis()->SetTitle("Rmax [mm]");
    h_rmax->Draw();
+   */
 
    TCanvas *c1 = new TCanvas("c1", "c1");
    c1->Divide(2,1);
@@ -2514,6 +2516,7 @@ void c12_12c12c_ana_76matm_rough(){
    angle_exex_0->Write("angle_12c_exex_z0");
 
    sum_kine_beam->Write("sum_kine_beam");
+   f_Ebeam->Wrrite("f_Ebeam_verz");
    Results->Close();
 
    // cout of information

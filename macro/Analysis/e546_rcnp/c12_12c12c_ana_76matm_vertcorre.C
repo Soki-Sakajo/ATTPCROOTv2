@@ -3,11 +3,14 @@
 //#define nom_check
 //#define kine_comp
 //#define states_check
-#define gsgs_check
+//#define gsgs_check
 //#define vertex_depth
+#define rough_cross
+//#include <cmath>
 #include <string>
 #include <sstream>
 #include <fstream>
+#include "TMath.h"
 #include "TFile.h"
 #include "TString.h"
 #include "TObject.h"
@@ -23,8 +26,11 @@ void draw_ind(TString cname, TString states, Int_t n_group, Int_t n_h_z, TH1D* h
 void draw_dep(TString cname, TString states, TString LineType, Int_t n_group, Int_t n_div,
          std::vector<TH2F*> &h_E_theta_i, std::vector<TGraph*> &kine_i);
 
-std::vector<Double_t> cal_Ebeam_para();
+std::vector<Double_t> cal_Ebeam_para(vector<pair<Double_t, Double_t>> lise_data);
 Double_t est_Ebeam(std::vector<Double_t> &Ebeam_para, Double_t vertz);
+std::vector<Double_t> cal_vertz_para(vector<pair<Double_t, Double_t>> lise_data);
+Double_t est_vertz(std::vector<Double_t> &vertz_para, Double_t Ebeam);
+Double_t cal_rho(Double_t Pmatm); //particle number density; Y = sigm * Ib * rho * dz
 TGraph* read_crosssection(TString crossFile);
 
 void c12_12c12c_ana_76matm_vertcorre(){
@@ -44,13 +50,24 @@ void c12_12c12c_ana_76matm_vertcorre(){
    //   std::vector runNums = {52};
    //   std::vector runNums = {50,51,52,53,54,55,56,57,58};
 
+   // evt file run
+   std::vector runNums = {
+      28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47,50,
+      51,52,53,54,55,56,57,58,62,63,64,66,67,68,69,70,71,75,76,77,
+      78,79,80,81,82,83,84,85,86,87,88,90,91,92,95,107,108,109,110,
+      111,112
+   };
+   /*
+   */
+
+   /*
+   // all run
    std::vector runNums = {
       28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,47,50,
       51,52,53,54,55,56,57,58,62,63,64,66,67,68,69,70,71,75,76,77,
       78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,95,96,97,98,99,
       100,101,102,103,104,105,106,107,108,109,110,111,112
    };
-   /*
    */
 
    const Int_t n_group = 9; // group number of vertex z: 0-100, ... 700-800, 800-1000.
@@ -58,12 +75,27 @@ void c12_12c12c_ana_76matm_vertcorre(){
    const Int_t verz_h = (n_group - 1) * 100;
    const Int_t n_div = 3; // number of divided canvas for each line
    const Int_t n_dep = 17; // number of hists by vertex z
+   const Int_t Pmatm = 76; // gas pressure, matm
+
+   //For calculating cross-section
+   const Double_t rho = cal_rho(Pmatm);
+   //  From evt file 
+   const Double_t req = 1.9988e9; //clock 
+   const Double_t acc = 1.8545e9; //clock live time
+   const Double_t icc = 1.2869e9; //IC req
+   const Double_t n_b = icc * acc / req;
+   //  Set histogram
+   const Int_t Emax = 40; // CAUTION! This is C.M.!! 
+   const Int_t Ebin = 40;
+   const Int_t hEbin = Ebin * 10;
+   std::vector<std::vector<Double_t>> sig_E(2, std::vector<Double_t>(0));
 
    bool kine_comp_b = false;
    Int_t run_start = runNums.front();
    Int_t run_end = runNums.back();
    Double_t r = 0;
    std::vector<Double_t> Ebeam_para(0);
+   std::vector<Double_t> vertz_para(0);
 #ifdef kine_comp
    kine_comp_b = true;
    //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_kine_comp_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
@@ -253,9 +285,47 @@ void c12_12c12c_ana_76matm_vertcorre(){
       kine_exex_600, kine_exex_650, kine_exex_700
    };
 
-   Ebeam_para = cal_Ebeam_para();
+
+   // set data for Ebeam and vertex z function
+   /*
+   //  60.7 MeV injection energy to ATTPC
+   vector<pair<Double_t, Double_t>> lise_data={
+         {0, 60.724}, {50, 57.862}, {100, 54.873}, {150, 51.775}, {200, 48.529}, {250, 45.143}, {300, 41.562},
+         {350, 37.779},{400, 33.736},{450, 29.363}, {500, 24.589}, {550, 19.089},{600, 13.089}, {650, 5.513},
+         {680, 0.360}
+   };
+
+   //  69.0 MeV injection energy to ATTPC
+   vector<pair<Double_t, Double_t>> lise_data={
+         {0, 69.027}, {50, 66.411}, {100, 63.727}, {150, 60.949}, {200, 58.083}, {250, 55.105}, {300, 52.061},
+         {350, 48.784},{400, 45.411},{450, 41.844}, {500, 38.084}, {550, 34.062},{600, 29.719}, {650, 24.984},
+         {700, 19.708}, {750, 13.621}, {800, 6.194}, {830, 0.832}, {835, 0.271}
+   };
+   */
+
+   //  69.5 MeV injection energy to ATTPC
+   vector<pair<Double_t, Double_t>> lise_data={
+         {0, 69.500}, {50, 66.899}, {100, 64.228}, {150, 61.468}, {200, 58.618}, {250, 55.662}, {300, 52.594},
+         {350, 49.391},{400, 46.046},{450, 42.514}, {500, 38.797}, {550, 34.822},{600, 30.545}, {650, 25.892},
+         {700, 20.728}, {750, 14.821}, {800, 7.705}, {840, 0.723}, {848, 0.028}
+   };
+
+   /*
+   //  70.0 MeV injection energy to ATTPC
+   vector<pair<Double_t, Double_t>> lise_data={
+         {0, 70.000}, {50, 67.414}, {100, 64.757}, {150, 62.016}, {200, 59.183}, {250, 56.251}, {300, 53.203},
+         {350, 50.031},{400, 46.713},{450, 43.222}, {500, 39.545}, {550, 35.617},{600, 31.411}, {650, 26.837},
+         {700, 21.788}, {750, 16.056}, {800, 9.230}, {850, 0.695}, {858, 0.019}
+   };
+   */
+
+   Ebeam_para = cal_Ebeam_para(lise_data);
    TF1 *f_Ebeam = new TF1("f_Ebeam", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4+[5]*x^5", 0, 1000);
    f_Ebeam->SetParameters(Ebeam_para[0], Ebeam_para[1], Ebeam_para[2], Ebeam_para[3], Ebeam_para[4], Ebeam_para[5]);
+
+   vertz_para = cal_vertz_para(lise_data);
+   TF1 *f_vertz = new TF1("f_vertz", "[1]+[2]*([0]-x)+[3]*([0]-x)^2+[4]*([0]-x)^3+[5]*([0]-x)^4+[6]*([0]-x)^5", 0, 1000);
+   f_vertz->SetParameters(vertz_para[0], vertz_para[1], vertz_para[2], vertz_para[3], vertz_para[4], vertz_para[5], vertz_para[6]);
 
    // Characteristic definitions
    bool tracks_vertex = false;
@@ -342,8 +412,8 @@ void c12_12c12c_ana_76matm_vertcorre(){
    TH2F *h_sumkine_kineE_gsgs = new TH2F("h_sumkine_kineE_gsgs", "h_sumkine_kineE_gsgs;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
    TH2F *h_sumkine_kineE_ver_gsgs = new TH2F("h_sumkine_kineE_ver_gsgs", "h_sumkine_kineE_gsgs;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
    TH2F *h_sumkine_kineE_gsgs_cm90 = new TH2F("h_sumkine_kineE_gsgs_cm90", "h_sumkine_kineE_gsgs_cm90;E_{kine} [MeV];sum_kineE [MeV]", 160, 0, 80, 160, 0, 80);
-   TH2F *h_sumkine_verz_cut12c_ela = new TH2F("h_sumkine_verz_cut12c_ela", "h_sumkine_verz_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 121, -10, 1200, 160, 0, 80);
-   TH2F *h_sumkine_verz_gsgs = new TH2F("h_sumkine_verz_gsgs", "h_sumkine_verz_gsgs;E_{beam} [MeV];sum_kineE [MeV]", 121, -10, 1200, 160, 0, 80);
+   TH2F *h_sumkine_verz_cut12c_ela = new TH2F("h_sumkine_verz_cut12c_ela", "h_sumkine_verz_gsgs;vertex_z [mm];sum_kineE [MeV]", 121, -10, 1200, 160, 0, 80);
+   TH2F *h_sumkine_verz_gsgs = new TH2F("h_sumkine_verz_gsgs", "h_sumkine_verz_gsgs;vertex_z [mm];sum_kineE [MeV]", 121, -10, 1200, 160, 0, 80);
 
    // ... angle correlations
 
@@ -359,6 +429,10 @@ void c12_12c12c_ana_76matm_vertcorre(){
    TH2F *h_thetalab_thetalab_exex = new TH2F("h_thetalab_thetalab_exex", "h_thetalab_thetalab_exex", 200, 0, 100, 200, 0, 100);
 
    // ... .. phi vs phi
+   TH2F *h_philab_philab_cutphi = new TH2F("h_philab_philab_cutphi", "h_philab_philab_cutphi", 360, -180, 180, 360, -180, 180);
+   TH2F *h_philab_philab_12c12c = new TH2F("h_philab_philab_cutphi_12c", "h_philab_philab_cutphi_12c", 360, -180, 180, 360, -180, 180);
+   TH2F *h_philab_philab_gsgs = new TH2F("h_philab_philab_gsgs", "h_philab_philab_gsgs", 360, -180, 180, 360, -180, 180);
+   TH2F *h_philab_philab_gsgs_cm90 = new TH2F("h_philab_philab_gsgs_cm90", "h_philab_philab_gsgs_cm90", 360, -180, 180, 360, -180, 180);
 
    // ... vertex of tracks
    TH1D *h_verz_cut12c_ela = new TH1D("h_verz_cut12c_ela", "h_verz_cut12c_ela;Vertex Z [mm]", 102, -10, 1010);
@@ -395,6 +469,9 @@ void c12_12c12c_ana_76matm_vertcorre(){
    TH1D *h_Ebcm_gsgs_cm70 = new TH1D("h_Ebcm_gsgs_cm70", "h_Ebcm_gsgs_cm70;E_{bc} [MeV]", 80, 0, 40);
    TH1D *h_Ebcm_gsgs_cm80 = new TH1D("h_Ebcm_gsgs_cm80", "h_Ebcm_gsgs_cm80;E_{bc} [MeV]", 80, 0, 40);
    TH1D *h_Ebcm_gsgs_cm90 = new TH1D("h_Ebcm_gsgs_cm90", "h_Ebcm_gsgs_cm90;E_{bc} [MeV]", 80, 0, 40);
+
+   TH1D *h_Ebcm_gsgs_cm90_cs = new TH1D("h_Ebcm_gsgs_cm90_cs", "h_Ebcm_gsgs_cm90;E_{bc} [MeV]", hEbin * 10, 0, Emax);
+   TH2F *h_Ebcm_DeltaE_gsgs_cm90 = new TH2F("h_Ebcm_DeltaE_gsgs_cm90", "h_Ebcm_DeltaE_gsgs_cm90;E_{beam.cm} [MeV];#DeltaE [MeV]", 80, 0, 40, 200, -5, 15);
 
    // ... Excitation energy 
    TH1F *h_dE_12c = new TH1F("h_dE_12c", "h_dE_12c;Ex [MeV]", 200, -5, 15);
@@ -884,12 +961,14 @@ void c12_12c12c_ana_76matm_vertcorre(){
                }
             }
             // fill to histograms
+            h_philab_philab_cutphi -> Fill(track_phi[0], track_phi[1]);
             if (ntrack == 2){
                if (track_12c[0] && track_12c[1]){
                   Double_t sum_theta = track_theta[0] + track_theta[1];
                   h_kineE_thetalab_carbon -> Fill(track_theta[0], vertex_KinE[0]);
                   h_kineE_thetalab_carbon -> Fill(track_theta[1], vertex_KinE[1]);
                   h_thetalab_thetalab_cut12c_ela -> Fill(track_theta[0], track_theta[1]);
+                  h_philab_philab_12c12c -> Fill(track_phi[0], track_phi[1]);
                   h_sum_theta_cut12c_ela -> Fill(sum_theta);
                   h_rmax_12c->Fill(r_max);
                   if(r_tri_12c > r_max && r_max > 0){
@@ -929,6 +1008,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
                         h_Ebeam_gsgs->Fill(Ebeam);
                         h_Ebcm_gsgs->Fill(Ebeam_cm);
                         h_thetalab_thetalab_gsgs -> Fill(track_theta[0], track_theta[1]);
+                        h_philab_philab_gsgs -> Fill(track_phi[0], track_phi[1]);
                         h_dE_gsgs->Fill(DeltaE);
                         if(!kine_comp_b){
                            h_sumkine_verz_gsgs->Fill(vtz, SumkineE);
@@ -972,9 +1052,13 @@ void c12_12c12c_ana_76matm_vertcorre(){
                            h_Ebeam_gsgs_cm90->Fill(Ebeam);
                            h_Ebcm_gsgs_cm90->Fill(Ebeam_cm);
                            h_thetalab_thetalab_gsgs_cm90 -> Fill(track_theta[0], track_theta[1]);
-                              h_sumkine_kineE_gsgs_cm90->Fill(SumkineE, vertex_KinE[0]);
-                              h_sumkine_kineE_gsgs_cm90->Fill(SumkineE, vertex_KinE[1]);
-                              h_sumkine_Ebeam_gsgs_cm90->Fill(Ebeam, SumkineE);
+                           h_sumkine_kineE_gsgs_cm90->Fill(SumkineE, vertex_KinE[0]);
+                           h_sumkine_kineE_gsgs_cm90->Fill(SumkineE, vertex_KinE[1]);
+                           h_sumkine_Ebeam_gsgs_cm90->Fill(Ebeam, SumkineE);
+
+                           h_philab_philab_gsgs_cm90 -> Fill(track_phi[0], track_phi[1]);
+                           h_Ebcm_DeltaE_gsgs_cm90->Fill(Ebeam_cm, DeltaE);
+                           h_Ebcm_gsgs_cm90_cs->Fill(Ebeam_cm);
                         }
 #ifdef vertex_depth
                         h_verz_gsgs_index[vindex] -> Fill(vtz);
@@ -1092,20 +1176,76 @@ void c12_12c12c_ana_76matm_vertcorre(){
    //   scale_gsgs_cm90 -> SetMinimum(gmin_ori);
    //   scale_gsgs_cm90 -> SetMaximum(gmax_ori);
 
+#ifdef rough_cross
+   std::cout << "Starting cross-section calculation." << std::endl;
+   const Double_t theta_min = 43.0 * 2 * TMath::DegToRad();
+   const Double_t theta_max = 47.0 * 2 * TMath::DegToRad();
+   const Double_t domega = 2 * TMath::Pi() * (std::cos(theta_min) - std::cos(theta_max));
+   Double_t dE = (double)(Emax) / Ebin;
+   std::cout << std::setprecision(4) << "debug: for cross rho = " << rho << " /(mb*mm), dE = " << dE << " MeV" << std::endl;
+   for (Int_t i = 0; i < Ebin; i++){
+      //      Int_t nbin = Ebin - i +1;
+      Double_t Y = 0;
+      Double_t dz = -1;
+      Double_t Etem = -1;
+      Double_t sigm = -1;
+      Etem = Emax - dE * i;
+      if (est_vertz(vertz_para, 2 * Etem) < 0 && est_vertz(vertz_para, 2 * (Etem - dE)) < 0){
+         continue;
+      }
+      else if (est_vertz(vertz_para, 2 * Etem) < 0){
+         dz = est_vertz(vertz_para, 2 * (Etem - dE));
+      }
+      else {
+         dz = est_vertz(vertz_para, 2 * (Etem - dE)) - est_vertz(vertz_para, 2 * Etem);
+      }
+      //      std::cout << "debug: for cross i = " << i << ", Etem = " << Etem << ", Elab = " << Etem * 2 << ", z = " << est_vertz(vertz_para, 2 * Etem) << std::endl;
+      /*
+      if (nbin != h_Ebcm_gsgs_cm90_cs -> FindBin(Etem)){
+         std::cout << "Somthing worng with nbin in cross-section calculation!! i: " << i << ", Etem: " << Etem << ", dz: " << dz
+                     << ", nbin: " << nbin << ", findbin: " << h_Ebcm_gsgs_cm90_cs -> FindBin(Etem) << std::endl;
+      }
+      */
+      Y = h_Ebcm_gsgs_cm90_cs -> Integral(h_Ebcm_gsgs_cm90_cs -> FindBin(Etem - dE), h_Ebcm_gsgs_cm90_cs -> FindBin(Etem));
+      /*
+      std::cout << "debug: cross-section calculation!! i: " << i << ", Etem: " << Etem << ", z = " << est_vertz(vertz_para, 2 * Etem)
+                  << ", z' = " << est_vertz(vertz_para, 2 * (Etem - dE)) << ", dz: " << dz << "Y = " << Y << std::endl;
+      std::cout << "debug: for cross i = " << i << ", Etem = " << Etem << ", Elab = " << Etem * 2 
+                  << ", z = " << est_vertz(vertz_para, 2 * Etem) << ", start bin = " << h_Ebcm_gsgs_cm90_cs -> FindBin(Etem) 
+                  << ", endbin = " << h_Ebcm_gsgs_cm90_cs -> FindBin(Etem -dE) << ", Y = " << Y << std::endl;
+      */
+      sigm = Y / n_b / rho / dz / domega;
+      /*
+      std::cout << "debug: cross-section calculation!! i: " << i << ", Y: " << Y << ", n_b: " << n_b << ", rho: " << rho
+                  << ", dz: " << dz << ", domega: " << domega << ", Y: " << Y << ", sigm: " << sigm << std::endl;
+      */
+      sig_E[0].push_back(Etem - dE /2);
+      sig_E[1].push_back(sigm);
+   }
+   /*
+   if (Ebin != sig_E.at(0).size()){
+      std::cout << "Somthing worng with n_data in cross-section calculation!! Ebin: " << Ebin << ", sig_E: " << sig_E.at(0).size() << std::endl;
+   }
+   */
+
+#endif
+
+   TGraph *sigma_Ebcm_gsgs_cm90 = new TGraph(sig_E.at(0).size(), sig_E.at(0).data(), sig_E.at(1).data());
+
 #ifdef nom_check
-   TCanvas *c0 = new TCanvas("c0", "c0");
-   c0->Divide(2,1);
-   c0->cd(1);
+   TCanvas *c1 = new TCanvas("c1", "c1");
+   c1->Divide(2,1);
+   c1->cd(1);
    h_rmax->SetDirectory(0);
    h_rmax->GetXaxis()->SetTitle("Rmax [mm]");
    h_rmax->Draw();
-   c0->cd(2);
+   c1->cd(2);
    h_rmax_12c->SetDirectory(0);
    h_rmax_12c->GetXaxis()->SetTitle("Rmax [mm]");
    h_rmax_12c->Draw();
 
-   TCanvas *c1 = new TCanvas("c1", "c1");
-   c1->cd();
+   TCanvas *c2 = new TCanvas("c2", "c2");
+   c2->cd();
    h_thetalab_thetalab_cut12c_ela->SetDirectory(0);
    h_thetalab_thetalab_cut12c_ela->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1120,51 +1260,51 @@ void c12_12c12c_ana_76matm_vertcorre(){
    theta_gsex->Draw("same");
    theta_exex->Draw("same");
 
-   TCanvas *c2 = new TCanvas("c2", "c2", 1600,600);
-   c2->Divide(4,1);
-   c2->cd(1);
+   TCanvas *c3 = new TCanvas("c3", "c3", 1600,600);
+   c3->Divide(4,1);
+   c3->cd(1);
    h_sum_theta_cut12c_ela->SetDirectory(0);
    h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
    h_sum_theta_cut12c_ela->Draw();
-   c2->cd(2);
+   c3->cd(2);
    h_sum_theta_gsgs->SetDirectory(0);
    h_sum_theta_gsgs->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c gsgs");
    h_sum_theta_gsgs->Draw();
-   c2->cd(3);
+   c3->cd(3);
    h_sum_theta_gsex->SetDirectory(0);
    h_sum_theta_gsex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (gsex)");
    h_sum_theta_gsex->Draw();
-   c2->cd(4);
+   c3->cd(4);
    h_sum_theta_exex->SetDirectory(0);
    h_sum_theta_exex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (exex)");
    h_sum_theta_exex->Draw();
 
-   TCanvas *c3 = new TCanvas("c3", "c3");
-   c3->cd();
+   TCanvas *c4 = new TCanvas("c4", "c4");
+   c4->cd();
    h_sum_theta_gsgs->SetDirectory(0);
    h_sum_theta_gsgs->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c gsgs");
    h_sum_theta_gsgs->GetXaxis()->SetRangeUser(85, 100);
    h_sum_theta_gsgs->Draw();
 
-   TCanvas *c4 = new TCanvas("c4", "c4", 1200, 1000);
-   c4->Divide(4,4);
-   c4->cd(1);
+   TCanvas *c5 = new TCanvas("c5", "c5", 1200, 1000);
+   c5->Divide(4,4);
+   c5->cd(1);
    h_sum_theta_cut12c_ela->SetDirectory(0);
    h_sum_theta_cut12c_ela->GetXaxis()->SetTitle("Sum of tracks [deg]");
    h_sum_theta_cut12c_ela->Draw();
-   c4->cd(2);
+   c5->cd(2);
    h_sum_theta_gsgs->SetDirectory(0);
    h_sum_theta_gsgs->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c gsgs");
    h_sum_theta_gsgs->Draw();
-   c4->cd(3);
+   c5->cd(3);
    h_sum_theta_gsex->SetDirectory(0);
    h_sum_theta_gsex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (gsex)");
    h_sum_theta_gsex->Draw();
-   c4->cd(4);
+   c5->cd(4);
    h_sum_theta_exex->SetDirectory(0);
    h_sum_theta_exex->GetXaxis()->SetTitle("Sum of tracks [deg] cut 12c (exex)");
    h_sum_theta_exex->Draw();
-   c4->cd(5);
+   c5->cd(5);
    h_kineE_thetalab_carbon->SetDirectory(0);
    h_kineE_thetalab_carbon->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_carbon->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1175,7 +1315,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    kine_gsgs_0->Draw("same");
    kine_gsex_0->Draw("same");
    kine_exex_0->Draw("same");
-   c4->cd(6);
+   c5->cd(6);
    h_kineE_thetalab_gsgs->SetDirectory(0);
    h_kineE_thetalab_gsgs->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_gsgs->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1186,7 +1326,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    kine_gsgs_0->Draw("same");
    kine_gsex_0->Draw("same");
    kine_exex_0->Draw("same");
-   c4->cd(7);
+   c5->cd(7);
    h_kineE_thetalab_gsex->SetDirectory(0);
    h_kineE_thetalab_gsex->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_gsex->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1197,7 +1337,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    kine_gsgs_0->Draw("same");
    kine_gsex_0->Draw("same");
    kine_exex_0->Draw("same");
-   c4->cd(8);
+   c5->cd(8);
    h_kineE_thetalab_exex->SetDirectory(0);
    h_kineE_thetalab_exex->GetXaxis()->SetTitle("#theta_{LAB} [deg]");
    h_kineE_thetalab_exex->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1208,58 +1348,58 @@ void c12_12c12c_ana_76matm_vertcorre(){
    kine_gsgs_0->Draw("same");
    kine_gsex_0->Draw("same");
    kine_exex_0->Draw("same");
-   c4->cd(9);
+   c5->cd(9);
    h_verxy_cut12c_ela->SetDirectory(0);
    h_verxy_cut12c_ela->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_cut12c_ela->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_cut12c_ela->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
    h_verxy_cut12c_ela->Draw("colz");
-   c4->cd(10);
+   c5->cd(10);
    h_verxy_gsgs->SetDirectory(0);
    h_verxy_gsgs->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_gsgs->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_gsgs->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c, gsgs)", (int)del_phi));
    h_verxy_gsgs->Draw("colz");
-   c4->cd(11);
+   c5->cd(11);
    h_verxy_gsex->SetDirectory(0);
    h_verxy_gsex->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_gsex->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_gsex->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c, gsex)", (int)del_phi));
    h_verxy_gsex->Draw("colz");
-   c4->cd(12);
+   c5->cd(12);
    h_verxy_exex->SetDirectory(0);
    h_verxy_exex->GetXaxis()->SetTitle("vertex x [mm]");
    h_verxy_exex->GetYaxis()->SetTitle("vertex y [mm]");
    h_verxy_exex->SetTitle(Form("vertex xy (phi1-phi2-180 < %d, track == 2, 12c12c, exex)", (int)del_phi));
    h_verxy_exex->Draw("colz");
-   c4->cd(13);
+   c5->cd(13);
    h_verz_cut12c_ela->SetDirectory(0);
    h_verz_cut12c_ela->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_cut12c_ela->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c)", (int)del_phi));
    h_verz_cut12c_ela->Draw();
-   c4->cd(14);
+   c5->cd(14);
    h_verz_gsgs->SetDirectory(0);
    h_verz_gsgs->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c, gsgs)", (int)del_phi));
    h_verz_gsgs->Draw();
-   c4->cd(15);
+   c5->cd(15);
    h_verz_gsex->SetDirectory(0);
    h_verz_gsex->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsex->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c, gsex)", (int)del_phi));
    h_verz_gsex->Draw();
-   c4->cd(16);
+   c5->cd(16);
    h_verz_exex->SetDirectory(0);
    h_verz_exex->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_exex->SetTitle(Form("vertex z (phi1-phi2-180 < %d, track == 2, 12c12c, exex)", (int)del_phi));
    h_verz_exex->Draw();
-   //   c41->SaveAs("can_output/check_vd_76matm_c41_vertex_states.pdf");
+   //   c5->SaveAs("can_output/check_vd_76matm_c5_vertex_states.pdf");
 
 #endif
 
 #ifdef kine_comp
-   TCanvas *c5 = new TCanvas("c5", "c5", 1000, 1000);
-   c5->Divide(2,2);
-   c5->cd(1);
+   TCanvas *c10 = new TCanvas("c10", "c10", 1000, 1000);
+   c10->Divide(2,2);
+   c10->cd(1);
    h_sumkine_Ebeam_gsgs->SetDirectory(0);
    h_sumkine_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_Ebeam_gsgs->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1269,7 +1409,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_Ebeam_gsgs->SetMinimum(1);
    h_sumkine_Ebeam_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
-   c5->cd(2);
+   c10->cd(2);
    h_sumkine_ver_Ebeam_gsgs->SetDirectory(0);
    h_sumkine_ver_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_ver_Ebeam_gsgs->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -1279,7 +1419,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_ver_Ebeam_gsgs->SetMinimum(1);
    h_sumkine_ver_Ebeam_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
-   c5->cd(3);
+   c10->cd(3);
    h_sumkine_kineE_gsgs->SetDirectory(0);
    h_sumkine_kineE_gsgs->GetXaxis()->SetTitle("E_{kine} [MeV]");
    h_sumkine_kineE_gsgs->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
@@ -1289,7 +1429,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_kineE_gsgs->SetMinimum(1);
    h_sumkine_kineE_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
-   c5->cd(4);
+   c10->cd(4);
    h_sumkine_kineE_ver_gsgs->SetDirectory(0);
    h_sumkine_kineE_ver_gsgs->GetXaxis()->SetTitle("E_{kine} [MeV]");
    h_sumkine_kineE_ver_gsgs->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
@@ -1300,9 +1440,9 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_kineE_ver_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
 
-   TCanvas *c6 = new TCanvas("c6", "c6", 1200, 1200);
-   c6->Divide(2,2);
-   c6->cd(1);
+   TCanvas *c11 = new TCanvas("c11", "c11", 1200, 1200);
+   c11->Divide(2,2);
+   c11->cd(1);
    h_sumkine_verz_cut12c_ela->SetDirectory(0);
    h_sumkine_verz_cut12c_ela->GetXaxis()->SetTitle("vertex z [mm]");
    h_sumkine_verz_cut12c_ela->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -1312,7 +1452,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_verz_cut12c_ela->SetMinimum(1);
    h_sumkine_verz_cut12c_ela->Draw("colz");
    f_Ebeam->Draw("same");
-   c6->cd(2);
+   c11->cd(2);
    h_sumkine_ver_Ebeam_cut12c_ela->SetDirectory(0);
    h_sumkine_ver_Ebeam_cut12c_ela->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_ver_Ebeam_cut12c_ela->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -1322,7 +1462,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_ver_Ebeam_cut12c_ela->SetMinimum(1);
    h_sumkine_ver_Ebeam_cut12c_ela->Draw("colz");
    sum_kine_beam->Draw("same");
-   c6->cd(3);
+   c11->cd(3);
    h_sumkine_verz_gsgs->SetDirectory(0);
    h_sumkine_verz_gsgs->GetXaxis()->SetTitle("vertex z [mm]");
    h_sumkine_verz_gsgs->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -1332,7 +1472,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_verz_gsgs->SetMinimum(1);
    h_sumkine_verz_gsgs->Draw("colz");
    f_Ebeam->Draw("same");
-   c6->cd(4);
+   c11->cd(4);
    h_sumkine_ver_Ebeam_gsgs->SetDirectory(0);
    h_sumkine_ver_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_ver_Ebeam_gsgs->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -1346,8 +1486,8 @@ void c12_12c12c_ana_76matm_vertcorre(){
 #endif
 
 #ifdef states_check
-   TCanvas *c7 = new TCanvas("c7", "c7", 1000, 1000);
-   c7->cd();
+   TCanvas *c20 = new TCanvas("c20", "c20", 1000, 1000);
+   c20->cd();
    h_sumkine_ver_Ebeam_cut12c_ela->SetDirectory(0);
    h_sumkine_ver_Ebeam_cut12c_ela->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_ver_Ebeam_cut12c_ela->GetYaxis()->SetTitle("vertexKineE [MeV]");
@@ -1363,9 +1503,9 @@ void c12_12c12c_ana_76matm_vertcorre(){
    kine_exex_cut->Draw("same");
    */
 
-   TCanvas *c8 = new TCanvas("c8", "c8", 1000, 1000);
-   c8->Divide(2,2);
-   c8->cd(1);
+   TCanvas *c21 = new TCanvas("c21", "c21", 1000, 1000);
+   c21->Divide(2,2);
+   c21->cd(1);
    h_thetalab_thetalab_cut12c_ela->SetDirectory(0);
    h_thetalab_thetalab_cut12c_ela->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_cut12c_ela->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1379,7 +1519,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    theta_gsgs->Draw("same");
    theta_gsex->Draw("same");
    theta_exex->Draw("same");
-   c8->cd(2);
+   c21->cd(2);
    h_thetalab_thetalab_gsgs->SetDirectory(0);
    h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1393,7 +1533,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    theta_gsgs->Draw("same");
    theta_gsex->Draw("same");
    theta_exex->Draw("same");
-   c8->cd(3);
+   c21->cd(3);
    h_thetalab_thetalab_gsex->SetDirectory(0);
    h_thetalab_thetalab_gsex->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsex->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1407,7 +1547,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    theta_gsgs->Draw("same");
    theta_gsex->Draw("same");
    theta_exex->Draw("same");
-   c8->cd(4);
+   c21->cd(4);
    h_thetalab_thetalab_exex->SetDirectory(0);
    h_thetalab_thetalab_exex->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_exex->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1422,9 +1562,9 @@ void c12_12c12c_ana_76matm_vertcorre(){
    theta_gsex->Draw("same");
    theta_exex->Draw("same");
 
-   TCanvas *c9 = new TCanvas("c9", "c9", 1000, 1000);
-   c9->Divide(2,2);
-   c9->cd(1);
+   TCanvas *c22 = new TCanvas("c22", "c22", 1000, 1000);
+   c22->Divide(2,2);
+   c22->cd(1);
    h_dE_12c->SetDirectory(0);
    h_dE_12c->GetXaxis()->SetTitle("#DeltaE [MeV]");
    h_dE_12c->GetYaxis()->SetTitle("count");
@@ -1432,7 +1572,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    //   gPad->SetLogz();
    //   h_dE_12c->SetMinimum(1);
    h_dE_12c->Draw();
-   c9->cd(2);
+   c22->cd(2);
    h_dE_gsgs->SetDirectory(0);
    h_dE_gsgs->GetXaxis()->SetTitle("#DeltaE [MeV]");
    h_dE_gsgs->GetYaxis()->SetTitle("count");
@@ -1440,7 +1580,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    //   gPad->SetLogz();
    //   h_dE_gsgs->SetMinimum(1);
    h_dE_gsgs->Draw();
-   c9->cd(3);
+   c22->cd(3);
    h_dE_gsex->SetDirectory(0);
    h_dE_gsex->GetXaxis()->SetTitle("#DeltaE [MeV]");
    h_dE_gsex->GetYaxis()->SetTitle("count");
@@ -1448,7 +1588,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    //   gPad->SetLogz();
    //   h_dE_gsex->SetMinimum(1);
    h_dE_gsex->Draw();
-   c9->cd(4);
+   c22->cd(4);
    h_dE_exex->SetDirectory(0);
    h_dE_exex->GetXaxis()->SetTitle("#DeltaE [MeV]");
    h_dE_exex->GetYaxis()->SetTitle("count");
@@ -1460,9 +1600,9 @@ void c12_12c12c_ana_76matm_vertcorre(){
 #endif
 
 #ifdef gsgs_check
-   TCanvas *c10 = new TCanvas("c10", "c10", 1600, 1000);
-   c10->Divide(6, 3);
-   c10->cd(1);
+   TCanvas *c30 = new TCanvas("c30", "c30", 1600, 1000);
+   c30->Divide(6, 3);
+   c30->cd(1);
    h_thetalab_thetalab_gsgs->SetDirectory(0);
    h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1472,7 +1612,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c10->cd(2);
+   c30->cd(2);
    h_thetalab_thetalab_gsgs_cm50->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm50->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm50->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1482,7 +1622,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm50->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c10->cd(3);
+   c30->cd(3);
    h_thetalab_thetalab_gsgs_cm60->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm60->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm60->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1492,7 +1632,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm60->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c10->cd(4);
+   c30->cd(4);
    h_thetalab_thetalab_gsgs_cm70->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm70->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm70->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1502,7 +1642,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm70->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c10->cd(5);
+   c30->cd(5);
    h_thetalab_thetalab_gsgs_cm80->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm80->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm80->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1512,7 +1652,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm80->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c10->cd(6);
+   c30->cd(6);
    h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm90->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm90->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1523,83 +1663,83 @@ void c12_12c12c_ana_76matm_vertcorre(){
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
 
-   c10->cd(7);
+   c30->cd(7);
    h_verz_gsgs->SetDirectory(0);
    h_verz_gsgs->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs->SetTitle(Form("vertex z (12c12c, gsgs)"));
    gPad->SetLogy();
    h_verz_gsgs->Draw();
-   c10->cd(8);
+   c30->cd(8);
    h_verz_gsgs_cm50->SetDirectory(0);
    h_verz_gsgs_cm50->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs_cm50->SetTitle(Form("vertex z (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
    gPad->SetLogy();
    h_verz_gsgs_cm50->Draw();
-   c10->cd(9);
+   c30->cd(9);
    h_verz_gsgs_cm60->SetDirectory(0);
    h_verz_gsgs_cm60->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs_cm60->SetTitle(Form("vertex z (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
    gPad->SetLogy();
    h_verz_gsgs_cm60->Draw();
-   c10->cd(10);
+   c30->cd(10);
    h_verz_gsgs_cm70->SetDirectory(0);
    h_verz_gsgs_cm70->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs_cm70->SetTitle(Form("vertex z (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
    gPad->SetLogy();
    h_verz_gsgs_cm70->Draw();
-   c10->cd(11);
+   c30->cd(11);
    h_verz_gsgs_cm80->SetDirectory(0);
    h_verz_gsgs_cm80->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs_cm80->SetTitle(Form("vertex z (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
    gPad->SetLogy();
    h_verz_gsgs_cm80->Draw();
-   c10->cd(12);
+   c30->cd(12);
    h_verz_gsgs_cm90->SetDirectory(0);
    h_verz_gsgs_cm90->GetXaxis()->SetTitle("vertex z [mm]");
    h_verz_gsgs_cm90->SetTitle(Form("vertex z (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
    gPad->SetLogy();
    h_verz_gsgs_cm90->Draw();
 
-   c10->cd(13);
+   c30->cd(13);
    h_Ebeam_gsgs->SetDirectory(0);
    h_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs)"));
    gPad->SetLogy();
    h_Ebeam_gsgs->Draw();
-   c10->cd(14);
+   c30->cd(14);
    h_Ebeam_gsgs_cm50->SetDirectory(0);
    h_Ebeam_gsgs_cm50->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs_cm50->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
    gPad->SetLogy();
    h_Ebeam_gsgs_cm50->Draw();
-   c10->cd(15);
+   c30->cd(15);
    h_Ebeam_gsgs_cm60->SetDirectory(0);
    h_Ebeam_gsgs_cm60->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs_cm60->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
    gPad->SetLogy();
    h_Ebeam_gsgs_cm60->Draw();
-   c10->cd(16);
+   c30->cd(16);
    h_Ebeam_gsgs_cm70->SetDirectory(0);
    h_Ebeam_gsgs_cm70->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs_cm70->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
    gPad->SetLogy();
    h_Ebeam_gsgs_cm70->Draw();
-   c10->cd(17);
+   c30->cd(17);
    h_Ebeam_gsgs_cm80->SetDirectory(0);
    h_Ebeam_gsgs_cm80->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs_cm80->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
    gPad->SetLogy();
    h_Ebeam_gsgs_cm80->Draw();
-   c10->cd(18);
+   c30->cd(18);
    h_Ebeam_gsgs_cm90->SetDirectory(0);
    h_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
    gPad->SetLogy();
    h_Ebeam_gsgs_cm90->Draw();
 
-   TCanvas *c11 = new TCanvas("c11", "c11", 1600, 600);
-   c11->Divide(6, 2);
-   c11->cd(1);
+   TCanvas *c31 = new TCanvas("c31", "c31", 1600, 600);
+   c31->Divide(6, 2);
+   c31->cd(1);
    h_thetalab_thetalab_gsgs->SetDirectory(0);
    h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1609,7 +1749,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c11->cd(2);
+   c31->cd(2);
    h_thetalab_thetalab_gsgs_cm50->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm50->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm50->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1619,7 +1759,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm50->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c11->cd(3);
+   c31->cd(3);
    h_thetalab_thetalab_gsgs_cm60->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm60->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm60->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1629,7 +1769,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm60->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c11->cd(4);
+   c31->cd(4);
    h_thetalab_thetalab_gsgs_cm70->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm70->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm70->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1639,7 +1779,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm70->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c11->cd(5);
+   c31->cd(5);
    h_thetalab_thetalab_gsgs_cm80->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm80->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm80->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1649,7 +1789,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_thetalab_thetalab_gsgs_cm80->Draw("colz");
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
-   c11->cd(6);
+   c31->cd(6);
    h_thetalab_thetalab_gsgs_cm90->SetDirectory(0);
    h_thetalab_thetalab_gsgs_cm90->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs_cm90->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -1660,45 +1800,45 @@ void c12_12c12c_ana_76matm_vertcorre(){
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
 
-   c11->cd(7);
+   c31->cd(7);
    h_Ebcm_gsgs->SetDirectory(0);
    h_Ebcm_gsgs->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
    h_Ebcm_gsgs->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs)"));
    gPad->SetLogy();
    h_Ebcm_gsgs->Draw();
-   c11->cd(8);
+   c31->cd(8);
    h_Ebcm_gsgs_cm50->SetDirectory(0);
    h_Ebcm_gsgs_cm50->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
    h_Ebcm_gsgs_cm50->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 23<#theta_1<27 or 23<#theta_2<27)"));
    gPad->SetLogy();
    h_Ebcm_gsgs_cm50->Draw();
-   c11->cd(9);
+   c31->cd(9);
    h_Ebcm_gsgs_cm60->SetDirectory(0);
    h_Ebcm_gsgs_cm60->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
    h_Ebcm_gsgs_cm60->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 28<#theta_1<32 or 28<#theta_2<32)"));
    gPad->SetLogy();
    h_Ebcm_gsgs_cm60->Draw();
-   c11->cd(10);
+   c31->cd(10);
    h_Ebcm_gsgs_cm70->SetDirectory(0);
    h_Ebcm_gsgs_cm70->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
    h_Ebcm_gsgs_cm70->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 33<#theta_1<37 or 33<#theta_2<37)"));
    gPad->SetLogy();
    h_Ebcm_gsgs_cm70->Draw();
-   c11->cd(11);
+   c31->cd(11);
    h_Ebcm_gsgs_cm80->SetDirectory(0);
    h_Ebcm_gsgs_cm80->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
    h_Ebcm_gsgs_cm80->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 38<#theta_1<42 or 38<#theta_2<42)"));
    gPad->SetLogy();
    h_Ebcm_gsgs_cm80->Draw();
-   c11->cd(12);
+   c31->cd(12);
    h_Ebcm_gsgs_cm90->SetDirectory(0);
    h_Ebcm_gsgs_cm90->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
-   h_Ebcm_gsgs_cm90->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   h_Ebcm_gsgs_cm90->SetTitle(Form("Estimated E_{beam.cm} (12c32c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
    gPad->SetLogy();
    h_Ebcm_gsgs_cm90->Draw();
 
-   TCanvas *c12 = new TCanvas("c12", "c12");
-   c12->cd();
+   TCanvas *c32 = new TCanvas("c32", "c32");
+   c32->cd();
    h_Ebcm_gsgs_cm90->SetDirectory(0);
    h_Ebcm_gsgs_cm90->SetLineColor(kBlue);
    h_Ebcm_gsgs_cm90->SetLineWidth(2);
@@ -1723,17 +1863,17 @@ void c12_12c12c_ana_76matm_vertcorre(){
    r_axis->SetLabelColor(kBlack);
    r_axis->SetTitleColor(kBlack);
    r_axis->Draw();
-   c12->Update();
+   c32->Update();
 
-   TCanvas *c13 = new TCanvas("c13", "c13", 1600, 1000);
-   c13->Divide(3,2);
-   c13->cd(1);
+   TCanvas *c33 = new TCanvas("c33", "c33", 1600, 1000);
+   c33->Divide(3,2);
+   c33->cd(1);
    h_Ebeam_gsgs->SetDirectory(0);
    h_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs)"));
    gPad->SetLogy();
    h_Ebeam_gsgs->Draw();
-   c13->cd(2);
+   c33->cd(2);
    h_sumkine_Ebeam_gsgs->SetDirectory(0);
    h_sumkine_Ebeam_gsgs->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_Ebeam_gsgs->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1743,7 +1883,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_Ebeam_gsgs->SetMinimum(1);
    h_sumkine_Ebeam_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
-   c13->cd(3);
+   c33->cd(3);
    h_sumkine_kineE_gsgs->SetDirectory(0);
    h_sumkine_kineE_gsgs->GetXaxis()->SetTitle("E_{kine} [MeV]");
    h_sumkine_kineE_gsgs->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
@@ -1754,13 +1894,13 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_kineE_gsgs->Draw("colz");
    sum_kine_beam->Draw("same");
 
-   c13->cd(4);
+   c33->cd(4);
    h_Ebeam_gsgs_cm90->SetDirectory(0);
    h_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_Ebeam_gsgs_cm90->SetTitle(Form("Estimated E_{beam} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
    gPad->SetLogy();
    h_Ebeam_gsgs_cm90->Draw();
-   c13->cd(5);
+   c33->cd(5);
    h_sumkine_Ebeam_gsgs_cm90->SetDirectory(0);
    h_sumkine_Ebeam_gsgs_cm90->GetXaxis()->SetTitle("E_{beam} [MeV]");
    h_sumkine_Ebeam_gsgs_cm90->GetYaxis()->SetTitle("roughKineE [MeV]");
@@ -1770,7 +1910,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_sumkine_Ebeam_gsgs_cm90->SetMinimum(1);
    h_sumkine_Ebeam_gsgs_cm90->Draw("colz");
    sum_kine_beam->Draw("same");
-   c13->cd(6);
+   c33->cd(6);
    h_sumkine_kineE_gsgs_cm90->SetDirectory(0);
    h_sumkine_kineE_gsgs_cm90->GetXaxis()->SetTitle("E_{kine} [MeV]");
    h_sumkine_kineE_gsgs_cm90->GetYaxis()->SetTitle("sum E_{kine} [MeV]");
@@ -1784,12 +1924,113 @@ void c12_12c12c_ana_76matm_vertcorre(){
 #endif
 
 #ifdef vertex_depth
-   draw_dep("c20", "gsgs", "full", n_group, n_div, h_kineE_thetalab_gsgs_index, kine_gsgs_i);
-   //   draw_dep("c21", "gsgs", "center", n_group, n_div, h_kineE_thetalab_gsgs_index, kine_gsgs_i);
-   draw_dep("c22", "gsex", "full", n_group, n_div, h_kineE_thetalab_gsex_index, kine_gsex_i);
-   //   draw_dep("c23", "gsex", "center", n_group, n_div, h_kineE_thetalab_gsex_index, kine_gsex_i);
-   draw_dep("c24", "exex", "full", n_group, n_div, h_kineE_thetalab_exex_index, kine_exex_i);
-   //   draw_dep("c25", "exex", "center", n_group, n_div, h_kineE_thetalab_exex_index, kine_exex_i);
+   draw_dep("c40", "gsgs", "full", n_group, n_div, h_kineE_thetalab_gsgs_index, kine_gsgs_i);
+   //   draw_dep("c41", "gsgs", "center", n_group, n_div, h_kineE_thetalab_gsgs_index, kine_gsgs_i);
+   draw_dep("c42", "gsex", "full", n_group, n_div, h_kineE_thetalab_gsex_index, kine_gsex_i);
+   //   draw_dep("c43", "gsex", "center", n_group, n_div, h_kineE_thetalab_gsex_index, kine_gsex_i);
+   draw_dep("c44", "exex", "full", n_group, n_div, h_kineE_thetalab_exex_index, kine_exex_i);
+   //   draw_dep("c45", "exex", "center", n_group, n_div, h_kineE_thetalab_exex_index, kine_exex_i);
+
+#endif
+
+#ifdef rough_cross
+   TCanvas *c50 = new TCanvas("c50", "c50");
+   c50->cd();
+   h_Ebcm_gsgs_cm90->SetDirectory(0);
+   h_Ebcm_gsgs_cm90->SetLineColor(kBlue);
+   h_Ebcm_gsgs_cm90->SetLineWidth(2);
+   h_Ebcm_gsgs_cm90->SetMinimum(0.5);
+   h_Ebcm_gsgs_cm90->SetMaximum(50);
+   h_Ebcm_gsgs_cm90->GetXaxis()->SetRangeUser(0, 35);
+   h_Ebcm_gsgs_cm90->GetXaxis()->SetTitle("E_{beam.cm} [MeV]");
+   h_Ebcm_gsgs_cm90->SetTitle(Form("Estimated E_{beam.cm} (12c12c, gsgs, 43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogy();
+   h_Ebcm_gsgs_cm90->Draw("HIST");
+   scale_gsgs_cm90->SetMinimum(5);
+   scale_gsgs_cm90->SetMaximum(50);
+   scale_gsgs_cm90->Draw("PL same");
+   gPad->Update();
+   // set second y-axis for cross section
+   Double_t xr = gPad->GetUxmax();
+   Double_t ymin = h_Ebcm_gsgs_cm90->GetMinimum();
+   Double_t ymax = h_Ebcm_gsgs_cm90->GetMaximum();
+   TGaxis *r_axis = new TGaxis(xr, ymin, xr, ymax, 5, 500, 510, "+LG");
+   r_axis->SetTitle("cross section [mb/sr]");
+   r_axis->SetLineColor(kBlack);
+   r_axis->SetLabelColor(kBlack);
+   r_axis->SetTitleColor(kBlack);
+   r_axis->Draw();
+   c50->Update();
+
+   TCanvas *c51 = new TCanvas("c51", "c51");
+   c51->cd();
+   sigma_Ebcm_gsgs_cm90->SetMarkerStyle(20);
+   sigma_Ebcm_gsgs_cm90->SetMarkerSize(1.2);
+   sigma_Ebcm_gsgs_cm90->SetMarkerColor(kBlue);
+   sigma_Ebcm_gsgs_cm90->SetLineColor(kBlue);
+   sigma_Ebcm_gsgs_cm90->GetXaxis()->SetTitle("beam energy [MeV]");
+   sigma_Ebcm_gsgs_cm90->GetYaxis()->SetTitle("rough cross section [mb/sr]");
+   sigma_Ebcm_gsgs_cm90->SetTitle("Beam energy vs Depth");
+   sigma_Ebcm_gsgs_cm90->GetXaxis()->SetLimits(0, 35);
+   sigma_Ebcm_gsgs_cm90->Draw("APL");
+   cross_gsgs_cm90->SetMarkerColor(kBlack);
+   cross_gsgs_cm90->SetLineColor(kBlack);
+   cross_gsgs_cm90->SetMarkerStyle(20);
+   cross_gsgs_cm90->SetMarkerSize(0.8);
+   cross_gsgs_cm90->Draw("PL same");
+
+   TCanvas *c52 = new TCanvas("c52", "c52");
+   c52->cd();
+   h_Ebcm_DeltaE_gsgs_cm90->SetDirectory(0);
+   h_Ebcm_DeltaE_gsgs_cm90->Draw("colz");
+
+
+   TCanvas *c53 = new TCanvas("c53", "c53");
+   c53->cd();
+   h_thetalab_thetalab_gsgs->SetDirectory(0);
+   h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
+   h_thetalab_thetalab_gsgs->SetTitle(Form("Theta_LAB Theta_LAB (gsgs)"));
+   gPad->SetLogz();
+   h_thetalab_thetalab_gsgs->SetMinimum(1);
+   h_thetalab_thetalab_gsgs->Draw("colz");
+   angle_gsgs_0->Draw("same");
+   theta_gsgs->Draw("same");
+
+   TCanvas *c54 = new TCanvas("c54", "c54", 1000, 1000);
+   c54->Divide(2, 2);
+   c54->cd(1);
+   h_philab_philab_cutphi->SetDirectory(0);
+   h_philab_philab_cutphi->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_cutphi->SetTitle(Form("Phi_LAB Phi_LAB (phi1-phi2-180 < %d )", (int)del_phi));
+   gPad->SetLogz();
+   h_philab_philab_cutphi->SetMinimum(1);
+   h_philab_philab_cutphi->Draw("colz");
+   c54->cd(2);
+   h_philab_philab_12c12c->SetDirectory(0);
+   h_philab_philab_12c12c->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_12c12c->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_12c12c->SetTitle(Form("Phi_LAB Phi_LAB (gsgs)"));
+   gPad->SetLogz();
+   h_philab_philab_12c12c->SetMinimum(1);
+   h_philab_philab_12c12c->Draw("colz");
+   c54->cd(3);
+   h_philab_philab_gsgs->SetDirectory(0);
+   h_philab_philab_gsgs->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_gsgs->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_gsgs->SetTitle(Form("Phi_LAB Phi_LAB (gsgs,  43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogz();
+   h_philab_philab_gsgs->SetMinimum(1);
+   h_philab_philab_gsgs->Draw("colz");
+   c54->cd(4);
+   h_philab_philab_gsgs_cm90->SetDirectory(0);
+   h_philab_philab_gsgs_cm90->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
+   h_philab_philab_gsgs_cm90->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
+   h_philab_philab_gsgs_cm90->SetTitle(Form("Phi_LAB Phi_LAB (gsgs,  43<#theta_1<47 or 43<#theta_2<47)"));
+   gPad->SetLogz();
+   h_philab_philab_gsgs_cm90->SetMinimum(1);
+   h_philab_philab_gsgs_cm90->Draw("colz");
 
 #endif
 
@@ -1868,6 +2109,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    h_Ebcm_gsgs_cm70->Write();
    h_Ebcm_gsgs_cm80->Write();
    h_Ebcm_gsgs_cm90->Write();
+   h_Ebcm_DeltaE_gsgs_cm90->Write();
 
    // Excitation energy
    h_dE_12c->Write();
@@ -1929,6 +2171,8 @@ void c12_12c12c_ana_76matm_vertcorre(){
    angle_exex_0->Write("angle_12c_exex_z0");
 
    sum_kine_beam->Write("sum_kine_beam");
+   f_Ebeam->Write("f_Ebeam_vertz");
+   f_vertz->Write("f_vertz_Ebeam");
    Results->Close();
 
    // cout of information
@@ -2112,40 +2356,7 @@ void draw_dep(TString cname, TString states, TString LineType, Int_t n_group, In
 
 }
 
-std::vector<Double_t> cal_Ebeam_para(){
-
-   // set data
-   /*
-   //  60.7 MeV injection energy to ATTPC
-   vector<pair<Double_t, Double_t>> lise_data={
-         {0, 60.724}, {50, 57.862}, {100, 54.873}, {150, 51.775}, {200, 48.529}, {250, 45.143}, {300, 41.562},
-         {350, 37.779},{400, 33.736},{450, 29.363}, {500, 24.589}, {550, 19.089},{600, 13.089}, {650, 5.513},
-         {680, 0.360}
-   };
-
-   //  69.0 MeV injection energy to ATTPC
-   vector<pair<Double_t, Double_t>> lise_data={
-         {0, 69.027}, {50, 66.411}, {100, 63.727}, {150, 60.949}, {200, 58.083}, {250, 55.105}, {300, 52.061},
-         {350, 48.784},{400, 45.411},{450, 41.844}, {500, 38.084}, {550, 34.062},{600, 29.719}, {650, 24.984},
-         {700, 19.708}, {750, 13.621}, {800, 6.194}, {830, 0.832}, {835, 0.271}
-   };
-   */
-
-   //  69.5 MeV injection energy to ATTPC
-   vector<pair<Double_t, Double_t>> lise_data={
-         {0, 69.500}, {50, 66.899}, {100, 64.228}, {150, 61.468}, {200, 58.618}, {250, 55.662}, {300, 52.594},
-         {350, 49.391},{400, 46.046},{450, 42.514}, {500, 38.797}, {550, 34.822},{600, 30.545}, {650, 25.892},
-         {700, 20.728}, {750, 14.821}, {800, 7.705}, {840, 0.723}, {848, 0.028}
-   };
-
-   /*
-   //  70.0 MeV injection energy to ATTPC
-   vector<pair<Double_t, Double_t>> lise_data={
-         {0, 70.000}, {50, 67.414}, {100, 64.757}, {150, 62.016}, {200, 59.183}, {250, 56.251}, {300, 53.203},
-         {350, 50.031},{400, 46.713},{450, 43.222}, {500, 39.545}, {550, 35.617},{600, 31.411}, {650, 26.837},
-         {700, 21.788}, {750, 16.056}, {800, 9.230}, {850, 0.695}, {858, 0.019}
-   };
-   */
+std::vector<Double_t> cal_Ebeam_para(vector<pair<Double_t, Double_t>> lise_data){
 
    Int_t n_data = lise_data.size();
    std::vector<std::vector<Double_t>> Ebeam(2, std::vector<Double_t>(n_data, 0));
@@ -2154,13 +2365,12 @@ std::vector<Double_t> cal_Ebeam_para(){
       Ebeam.at(1).at(i) = lise_data[i].second;
    }
    TGraph *h_Ebeam_est = new TGraph(n_data, Ebeam.at(0).data(), Ebeam.at(1).data());
-   //   TF1 *f1 = new TF1("f1", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4", 0, 1000);
    TF1 *f1 = new TF1("f1", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4+[5]*x^5", 0, 1000);
 
    f1->FixParameter(0, Ebeam.at(1).at(0));
    h_Ebeam_est->Fit(f1, "QRN", "", 0, Ebeam.at(0).at(n_data - 1));
 
-   TCanvas *c0 = new TCanvas("c0", "c0");
+   TCanvas *c_Ebeam = new TCanvas("c_Ebeam", "c_Ebeam");
    h_Ebeam_est->SetMarkerStyle(20);
    h_Ebeam_est->SetMarkerSize(1.2);
    h_Ebeam_est->SetMarkerColor(kBlue);
@@ -2214,6 +2424,92 @@ Double_t est_Ebeam(std::vector<Double_t> &Ebeam_para, Double_t vertz){
    }
 
    return Ebeam;
+}
+
+std::vector<Double_t> cal_vertz_para(vector<pair<Double_t, Double_t>> lise_data){
+
+   Int_t n_data = lise_data.size();
+   std::vector<std::vector<Double_t>> vertz(2, std::vector<Double_t>(n_data, 0));
+   for (Int_t i = 0; i < n_data; i++){
+      vertz.at(0).at(i) = lise_data[i].second;
+      vertz.at(1).at(i) = lise_data[i].first;
+   }
+   TGraph *h_vertz_est = new TGraph(n_data, vertz.at(0).data(), vertz.at(1).data());
+   TF1 *f1 = new TF1("f1", "([0]-x)*([1]+[2]*x+[3]*x^2+[4]*x^3+[5]*x^4)", 0, 80);
+
+   f1->FixParameter(0, vertz.at(0).at(0));
+   h_vertz_est->Fit(f1, "QRN", "", 0, vertz.at(0).at(0));
+
+   TCanvas *c_vertz = new TCanvas("c_vertz", "c_vertz");
+   h_vertz_est->SetMarkerStyle(20);
+   h_vertz_est->SetMarkerSize(1.2);
+   h_vertz_est->SetMarkerColor(kBlue);
+   h_vertz_est->SetLineColor(kRed);
+   h_vertz_est->GetXaxis()->SetTitle("beam energy [MeV]");
+   h_vertz_est->GetYaxis()->SetTitle("Depth [mm]");
+   h_vertz_est->SetTitle("Beam energy vs Depth");
+   h_vertz_est->GetXaxis()->SetLimits(0, 80);
+   h_vertz_est->Draw("AP");
+   f1->SetNpx(1000);
+   f1->SetLineColor(kBlack);
+   f1->Draw("P same");
+
+   Double_t q = f1->GetParameter(0);
+   Double_t a = f1->GetParameter(1);
+   Double_t b = f1->GetParameter(2);
+   Double_t c = f1->GetParameter(3);
+   Double_t d = f1->GetParameter(4);
+   Double_t e = f1->GetParameter(5);
+   //   Double_t f = f1->GetParameter(6);
+   std::vector<Double_t> vertz_para;
+   vertz_para.push_back(q);
+   vertz_para.push_back(a);
+   vertz_para.push_back(b);
+   vertz_para.push_back(c);
+   vertz_para.push_back(d);
+   vertz_para.push_back(e);
+   //   vertz_para.push_back(f);
+
+   std::cout << std::setprecision(4) << std::endl;
+   std::cout << "Set estimation of vertex z." << std::endl;
+   std::cout << "  function: (q-x) * (a + b * x + c * x^2 + d * x^3 + e * x^4)" << std::endl;
+   std::cout << "  q:" << q << ", a:" << a << ", b:" << b << ", c:" << c << ", d:" << d << ", e:" << e << std::endl;
+
+   return vertz_para;
+}
+
+Double_t est_vertz(std::vector<Double_t> &vertz_para, Double_t Ebeam){
+
+   Double_t vertz = -1;
+   if (vertz_para.size() != 6){
+   //   if (vertz_para.size() != 7){
+      std::cout << "Error: vertz_para should have 7 parameters. Current size: " << vertz_para.size() << std::endl;
+      return -1;
+   }
+   else {
+      Double_t q = vertz_para[0];
+      Double_t a = vertz_para[1];
+      Double_t b = vertz_para[2];
+      Double_t c = vertz_para[3];
+      Double_t d = vertz_para[4];
+      Double_t e = vertz_para[5];
+      //      Double_t f = vertz_para[6];
+      vertz = (q - Ebeam) * (a + b * Ebeam + c * pow(Ebeam, 2) + d * pow(Ebeam, 3) + e * pow(Ebeam, 4));
+   }
+
+   return vertz;
+}
+
+Double_t cal_rho(Double_t Pmatm){
+
+   const Int_t N_rate1 = 4;         // (number of scatterd particle)/molecular
+   const Double_t T = 300;          // K; thermodynamic temparature
+   const Double_t P = Pmatm * 1e-3; // atm; gas pressure
+   const Double_t k_b = 1.38065e-23;// J/K ; Bolzman constant
+   const Double_t atmtoPa = 101325; // Pa
+   Double_t rho = P * atmtoPa * N_rate1 * 1e-34 / (k_b * T);
+
+   return rho;
 }
 
 TGraph* read_crosssection(TString crossFile){

@@ -7,7 +7,7 @@
 void cal_Ebeam_para(){
 
    // set para
-   Double_t verz = 450;
+   Double_t verz = 740.8;
 
    // set data
    /*
@@ -103,8 +103,9 @@ void cal_Ebeam_para(){
    std::cout << std::endl;
 
 #ifdef cal_Ebeam
-   std::cout << "E_beam estimation at z = " << verz << " mm; E_beam = " 
-   << a + b * verz + c * pow(verz, 2) + d * pow(verz, 3) + e * pow(verz, 4) + f * pow(verz, 5) << " MeV" << std::endl << std::endl;
+   Double_t E_beam = a + b * verz + c * pow(verz, 2) + d * pow(verz, 3) + e * pow(verz, 4) + f * pow(verz, 5);
+   Double_t E_bcm = E_beam / 2.0;
+   std::cout << "E_beam estimation at z = " << verz << " mm; E_beam = "  << E_beam << " MeV, E_bcm = " << E_bcm << " MeV" << std::endl << std::endl;
 
 #endif
 
