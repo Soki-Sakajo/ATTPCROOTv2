@@ -70,8 +70,8 @@ void check_vd_76matm(){
    Int_t run_start = runNums.front();
    Int_t run_end = runNums.back();
    std::vector<Double_t> Ebeam_para(0);
-   //   TFile * Results = new TFile(Form("vd_data/vd_results_all_hists_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
-   TFile * Results = new TFile(Form("vd_data/vd_results_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
+   //   TFile * Results = new TFile(Form("vd_data/vd_results_all_hists_76matm_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
+   TFile * Results = new TFile(Form("vd_data/vd_results_76matm_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val),"recreate");
 
    FairRunAna *run = new FairRunAna(); // Forcing a dummy run
 #ifdef debug_mode

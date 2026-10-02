@@ -71,12 +71,12 @@ void c12_12c12c_ana_76matm_rough(){
    std::vector<Double_t> Ebeam_para(0);
 #ifdef kine_comp
    kine_comp_b = true;
-   //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_kine_comp_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
-   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_kine_comp_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
+   //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_kine_comp_76matm_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
+   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_kine_comp_76matm_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
 #else
    kine_comp_b = false;
-   //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
-   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
+   //   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_all_hists_76matm_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
+   TString f_Re = TString::Format("data2/c12_12c12c/ana_results_76matm_run%d-run%d_vd%.2f.root", run_start, run_end, vd_val);
 #endif
 
    TFile * Results = new TFile(f_Re,"recreate");
