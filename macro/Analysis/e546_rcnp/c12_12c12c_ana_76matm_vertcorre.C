@@ -1993,15 +1993,48 @@ void c12_12c12c_ana_76matm_vertcorre(){
    reill->SetMarkerSize(0.8);
    reill->SetMarkerStyle(20);
    reill->Draw("PL same");
-   c51->SaveAs(Form("can_output_sigma_Ebcm_gsgs_cm90.pdf"));
+   c51->SaveAs(Form("./can_output/sigma_Ebcm_gsgs_cm90_nom.pdf"));
 
    TCanvas *c52 = new TCanvas("c52", "c52");
    c52->cd();
-   h_Ebcm_DeltaE_gsgs_cm90->SetDirectory(0);
-   h_Ebcm_DeltaE_gsgs_cm90->Draw("colz");
+   sigma_Ebcm_gsgs_cm90->SetMarkerStyle(20);
+   sigma_Ebcm_gsgs_cm90->SetMarkerSize(1.2);
+   sigma_Ebcm_gsgs_cm90->SetMarkerColor(kBlue);
+   sigma_Ebcm_gsgs_cm90->SetLineColor(kBlue);
+   sigma_Ebcm_gsgs_cm90->GetXaxis()->SetTitle("beam energy [MeV]");
+   sigma_Ebcm_gsgs_cm90->GetYaxis()->SetTitle("rough cross section [mb/sr]");
+   sigma_Ebcm_gsgs_cm90->SetTitle("Beam energy vs Depth");
+   sigma_Ebcm_gsgs_cm90->GetXaxis()->SetLimits(0, 35);
+   sigma_Ebcm_gsgs_cm90->GetYaxis()->SetRangeUser(5e-3, 3e+3);
+   sigma_Ebcm_gsgs_cm90->Draw("APL");
+   emlin->SetMarkerColor(kBlack);
+   emlin->SetLineColor(kBlack);
+   emlin->SetMarkerSize(0.8);
+   emlin->SetMarkerStyle(20);
+   emlin->Draw("PL same");
+
+   wiela->SetMarkerColor(kViolet);
+   wiela->SetLineColor(kViolet);
+   wiela->SetMarkerSize(0.8);
+   wiela->SetMarkerStyle(20);
+   wiela->Draw("PL same");
+
+   reill->SetMarkerColor(kRed);
+   reill->SetLineColor(kRed);
+   reill->SetMarkerSize(0.8);
+   reill->SetMarkerStyle(20);
+   reill->Draw("PL same");
+   gPad->SetLogy();
+   c52->Update();
+   c52->SaveAs(Form("./can_output/sigma_Ebcm_gsgs_cm90_logy.pdf"));
 
    TCanvas *c53 = new TCanvas("c53", "c53");
    c53->cd();
+   h_Ebcm_DeltaE_gsgs_cm90->SetDirectory(0);
+   h_Ebcm_DeltaE_gsgs_cm90->Draw("colz");
+
+   TCanvas *c54 = new TCanvas("c54", "c54");
+   c54->cd();
    h_thetalab_thetalab_gsgs->SetDirectory(0);
    h_thetalab_thetalab_gsgs->GetXaxis()->SetTitle("track1_#theta_{LAB} [deg]");
    h_thetalab_thetalab_gsgs->GetYaxis()->SetTitle("track2_#theta_{LAB} [deg]");
@@ -2012,9 +2045,9 @@ void c12_12c12c_ana_76matm_vertcorre(){
    angle_gsgs_0->Draw("same");
    theta_gsgs->Draw("same");
 
-   TCanvas *c54 = new TCanvas("c54", "c54", 1000, 1000);
-   c54->Divide(2, 2);
-   c54->cd(1);
+   TCanvas *c55 = new TCanvas("c55", "c55", 1000, 1000);
+   c55->Divide(2, 2);
+   c55->cd(1);
    h_philab_philab_cutphi->SetDirectory(0);
    h_philab_philab_cutphi->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_cutphi->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
@@ -2022,7 +2055,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    gPad->SetLogz();
    h_philab_philab_cutphi->SetMinimum(1);
    h_philab_philab_cutphi->Draw("colz");
-   c54->cd(2);
+   c55->cd(2);
    h_philab_philab_12c12c->SetDirectory(0);
    h_philab_philab_12c12c->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_12c12c->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
@@ -2030,7 +2063,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    gPad->SetLogz();
    h_philab_philab_12c12c->SetMinimum(1);
    h_philab_philab_12c12c->Draw("colz");
-   c54->cd(3);
+   c55->cd(3);
    h_philab_philab_gsgs->SetDirectory(0);
    h_philab_philab_gsgs->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_gsgs->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
@@ -2038,7 +2071,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    gPad->SetLogz();
    h_philab_philab_gsgs->SetMinimum(1);
    h_philab_philab_gsgs->Draw("colz");
-   c54->cd(4);
+   c55->cd(4);
    h_philab_philab_gsgs_cm90->SetDirectory(0);
    h_philab_philab_gsgs_cm90->GetXaxis()->SetTitle("track1_#phi_{LAB} [deg]");
    h_philab_philab_gsgs_cm90->GetYaxis()->SetTitle("track2_#phi_{LAB} [deg]");
