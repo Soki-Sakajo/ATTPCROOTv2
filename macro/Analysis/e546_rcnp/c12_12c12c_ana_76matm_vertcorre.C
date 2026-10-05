@@ -267,7 +267,10 @@ void c12_12c12c_ana_76matm_vertcorre(){
    TF1 *sum_kine_beam = new TF1("sum_kine_beam", "x", 0, 70);
    TF1 *angle_xy = new TF1("angle_xy", "x", -200, 200);
 
-   TGraph *cross_gsgs_cm90 = read_crosssection("./sim_temp/c12c12_gsgs_theta_90_Ecm_mb_sr_10-38MeV.txt");
+   //   TGraph *cross_gsgs_cm90 = read_crosssection("./sim_temp/c12c12_gsgs_theta_90_Ecm_mb_sr_10-38MeV.txt");
+   TGraph *emlin = read_crosssection("./sim_temp/c12c12_gsgs_theta_90_Ecm_mb_sr_10-38MeV.txt"); //H.Emling et.al NPA 211 (1973) 600-616 fig.3
+   TGraph *wiela = read_crosssection("./sim_temp/c12c12_gsgs_theta_90_Ecm_mb_sr_20-30MeV.txt"); //R.Wieland et.al PRC vol.8 num.1 (1973) 37-45 fig.8
+   TGraph *reill = read_crosssection("./sim_temp/c12c12_gsgs_theta_90_Ecm_mb_sr_13-38MeV.txt"); //W.Reilly et.al Nuovo Cimento A 13 (1973) 913-922 fig.2
 
    std::vector<TGraph*> kine_gsgs_i = {
       kine_gsgs_0, kine_gsgs_50, kine_gsgs_100, kine_gsgs_150, kine_gsgs_200, kine_gsgs_250,
@@ -1161,7 +1164,7 @@ void c12_12c12c_ana_76matm_vertcorre(){
    // scale hist of cross section
 
    //   Double_t scale = 1e-1; // scale factor for cross section
-   TGraph *scale_gsgs_cm90 = (TGraph*) cross_gsgs_cm90 -> Clone("scale_gsgs_cm90");
+   TGraph *scale_gsgs_cm90 = (TGraph*) emlin -> Clone("scale_gsgs_cm90");
    Double_t scale = h_Ebcm_gsgs_cm90 -> GetMinimum(0.0) / TMath::MinElement(scale_gsgs_cm90->GetN(), scale_gsgs_cm90->GetY());
    Double_t gmin_ori = TMath::MinElement(scale_gsgs_cm90->GetN(), scale_gsgs_cm90->GetY()) * scale;
    Double_t gmax_ori = TMath::MaxElement(scale_gsgs_cm90->GetN(), scale_gsgs_cm90->GetY()) * scale;
@@ -1973,17 +1976,29 @@ void c12_12c12c_ana_76matm_vertcorre(){
    sigma_Ebcm_gsgs_cm90->SetTitle("Beam energy vs Depth");
    sigma_Ebcm_gsgs_cm90->GetXaxis()->SetLimits(0, 35);
    sigma_Ebcm_gsgs_cm90->Draw("APL");
-   cross_gsgs_cm90->SetMarkerColor(kBlack);
-   cross_gsgs_cm90->SetLineColor(kBlack);
-   cross_gsgs_cm90->SetMarkerStyle(20);
-   cross_gsgs_cm90->SetMarkerSize(0.8);
-   cross_gsgs_cm90->Draw("PL same");
+   emlin->SetMarkerColor(kBlack);
+   emlin->SetLineColor(kBlack);
+   emlin->SetMarkerSize(0.8);
+   emlin->SetMarkerStyle(20);
+   emlin->Draw("PL same");
+
+   wiela->SetMarkerColor(kViolet);
+   wiela->SetLineColor(kViolet);
+   wiela->SetMarkerSize(0.8);
+   wiela->SetMarkerStyle(20);
+   wiela->Draw("PL same");
+
+   reill->SetMarkerColor(kRed);
+   reill->SetLineColor(kRed);
+   reill->SetMarkerSize(0.8);
+   reill->SetMarkerStyle(20);
+   reill->Draw("PL same");
+   c51->SaveAs(Form("can_output_sigma_Ebcm_gsgs_cm90.pdf"));
 
    TCanvas *c52 = new TCanvas("c52", "c52");
    c52->cd();
    h_Ebcm_DeltaE_gsgs_cm90->SetDirectory(0);
    h_Ebcm_DeltaE_gsgs_cm90->Draw("colz");
-
 
    TCanvas *c53 = new TCanvas("c53", "c53");
    c53->cd();
@@ -2173,6 +2188,10 @@ void c12_12c12c_ana_76matm_vertcorre(){
    sum_kine_beam->Write("sum_kine_beam");
    f_Ebeam->Write("f_Ebeam_vertz");
    f_vertz->Write("f_vertz_Ebeam");
+
+   emlin->Write("cs_emlin_gsgs_theta_90_Ecm_10-38MeV");
+   wiela->Write("cs_wiela_gsgs_theta_90_Ecm_20-30MeV");
+   reill->Write("cs_reill_gsgs_theta_90_Ecm_13-38MeV");
    Results->Close();
 
    // cout of information
