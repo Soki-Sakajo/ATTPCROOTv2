@@ -1975,7 +1975,6 @@ void c12_12c12c_ana_76matm_vertcorre(){
    sigma_Ebcm_gsgs_cm90->GetYaxis()->SetTitle("rough cross section [mb/sr]");
    sigma_Ebcm_gsgs_cm90->SetTitle("Beam energy vs Depth");
    sigma_Ebcm_gsgs_cm90->GetXaxis()->SetLimits(0, 35);
-   sigma_Ebcm_gsgs_cm90->GetYaxis()->SetRangeUser(5e-3, 3e+3);
    sigma_Ebcm_gsgs_cm90->Draw("APL");
    emlin->SetMarkerColor(kBlack);
    emlin->SetLineColor(kBlack);
